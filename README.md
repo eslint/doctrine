@@ -13,7 +13,7 @@ simple example:
     doctrine.parse(
         [
             "/**",
-            " * This function commet is parsed by doctrine",
+            " * This function comment is parsed by doctrine",
             " * @param {{ok:String}} userName",
             "*/"
         ].join('\n'), { unwrap: true });
@@ -21,7 +21,7 @@ simple example:
 and gets following information
 
     {
-        "description": "This function commet is parsed by doctrine",
+        "description": "This function comment is parsed by doctrine",
         "tags": [
             {
                 "title": "param",
