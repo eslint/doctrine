@@ -27,6 +27,8 @@ and gets following information
         }
     }]
 
+see [demo page](http://constellation.github.com/doctrine/demo/index.html) more detail.
+
 ### License
 
 #### doctrine
