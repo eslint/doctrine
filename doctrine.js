@@ -1316,6 +1316,12 @@
             return name;
         }
 
+        function isTypeParameterRequired(title) {
+            return title === 'define' || title === 'enum' || title === 'extends' ||
+                title === 'implements' || title === 'param' || title === 'return' ||
+                title === 'this' || title === 'type' || title === 'typedef' || title === 'throws';
+        }
+
         function next() {
             var tag, title, type, last, description;
 
@@ -1349,9 +1355,7 @@
             };
 
             // type required titles
-            if (title === 'define' || title === 'enum' || title === 'extends' ||
-                    title === 'implements' || title === 'param' || title === 'return' ||
-                    title === 'this' || title === 'type' || title === 'typedef') {
+            if (isTypeParameterRequired(title)) {
                 tag.type = parseType(title, last);
                 if (!tag.type) {
                     return;
