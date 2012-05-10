@@ -7,7 +7,7 @@ simple example:
             "/**",
             " * @param {{ok:String}} userName",
             "*/"
-        ].join('\n'));
+        ].join('\n'), { unwrap: true });
 
 and gets following information
 
