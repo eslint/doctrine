@@ -31,22 +31,22 @@ require('should');
 describe('parse', function () {
     it('const', function () {
         var res = doctrine.parse('/** @const */');
-        res.should.have.length(1);
-        res[0].should.have.property('title', 'const');
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'const');
     });
 
     it('const multiple', function () {
         var res = doctrine.parse("/**@const\n @const*/");
-        res.should.have.length(2);
-        res[0].should.have.property('title', 'const');
-        res[1].should.have.property('title', 'const');
+        res.tags.should.have.length(2);
+        res.tags[0].should.have.property('title', 'const');
+        res.tags[1].should.have.property('title', 'const');
     });
 
     it('const double', function () {
         var res = doctrine.parse("/**@const\n @const*/");
-        res.should.have.length(2);
-        res[0].should.have.property('title', 'const');
-        res[1].should.have.property('title', 'const');
+        res.tags.should.have.length(2);
+        res.tags[0].should.have.property('title', 'const');
+        res.tags[1].should.have.property('title', 'const');
     });
 
     it('const triple', function () {
@@ -60,10 +60,10 @@ describe('parse', function () {
             ].join('\n'), {
             unwrap: true
         });
-        res.should.have.length(3);
-        res[0].should.have.property('title', 'const');
-        res[1].should.have.property('title', 'const');
-        res[2].should.have.property('title', 'const');
+        res.tags.should.have.length(3);
+        res.tags[0].should.have.property('title', 'const');
+        res.tags[1].should.have.property('title', 'const');
+        res.tags[2].should.have.property('title', 'const');
     });
 
     it('param', function () {
@@ -73,11 +73,11 @@ describe('parse', function () {
                 " * @param {String} userName",
                 "*/",
             ].join('\n'));
-        res.should.have.length(1);
-        res[0].should.have.property('title', 'param');
-        res[0].should.have.property('name', 'userName');
-        res[0].should.have.property('type');
-        res[0].type.should.eql({
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'param');
+        res.tags[0].should.have.property('name', 'userName');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
             type: 'NameExpression',
             name: 'String'
         });
@@ -91,11 +91,11 @@ describe('parse', function () {
                 " * @param {String userName",
                 "*/",
             ].join('\n'));
-        res.should.have.length(1);
-        res[0].should.have.property('title', 'param');
-        res[0].should.have.property('name', 'userName');
-        res[0].should.have.property('type');
-        res[0].type.should.eql({
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'param');
+        res.tags[0].should.have.property('name', 'userName');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
             type: 'NameExpression',
             name: 'String'
         });
@@ -108,11 +108,11 @@ describe('parse', function () {
                 " * @param {{ok:String}} userName",
                 "*/"
             ].join('\n'));
-        res.should.have.length(1);
-        res[0].should.have.property('title', 'param');
-        res[0].should.have.property('name', 'userName');
-        res[0].should.have.property('type');
-        res[0].type.should.eql({
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'param');
+        res.tags[0].should.have.property('name', 'userName');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
             type: 'RecordType',
             fields: [{
                 type: 'FieldType',
@@ -132,7 +132,7 @@ describe('parse', function () {
                 " * @param {{ok:String} userName",
                 "*/"
             ].join('\n'));
-        res.should.be.empty;
+        res.tags.should.be.empty;
     });
 });
 

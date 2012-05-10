@@ -119,6 +119,10 @@
         };
     }
 
+    function trim(str) {
+        return str.replace(/^\s+/, '').replace(/\s+$/, '');
+    }
+
     function unwrapComment(doc) {
         // JSDoc comment is following form
         //   /**
@@ -134,7 +138,7 @@
             result,
             ch;
 
-        doc = doc.replace(/^\/\*\*([\s\S]+)\*\/$/, '$1');
+        doc = doc.replace(/^\/\*\*/, '').replace(/\*\/$/, '');
         index = 0;
         len = doc.length;
         mode = BEFORE_STAR;
@@ -781,7 +785,8 @@
         //     NameExpression
         //   | NameExpression TypeApplication
         //
-        // TypeApplication := '.<' TypeExpressionList '>'
+        // TypeApplication :=
+        //     '.<' TypeExpressionList '>'
         function parseTypeName() {
             var expr, applications;
 
@@ -1322,6 +1327,14 @@
                 title === 'this' || title === 'type' || title === 'typedef' || title === 'throws';
         }
 
+        function scanDescription() {
+            var description = '';
+            while (index < length && source[index] != '@') {
+                description += advance();
+            }
+            return description;
+        }
+
         function next() {
             var tag, title, type, last, description;
 
@@ -1333,10 +1346,7 @@
                 return;
             }
 
-
-            if (source[index] !== '@') {
-                return;
-            }
+            assert(source[index] === '@');
 
             // scan title
             title = scanTitle();
@@ -1371,7 +1381,7 @@
             }
 
             // slice description
-            description = sliceSource(source, index, last).replace(/^\s+/, '').replace(/\s+$/, '');
+            description = trim(sliceSource(source, index, last));
             if (description) {
                 tag.description = description;
             }
@@ -1384,7 +1394,7 @@
         }
 
         function parse(comment, options) {
-            var result = [], tag;
+            var tags = [], tag, description;
 
             if (options === undefined) {
                 options = {};
@@ -1403,14 +1413,20 @@
             length = source.length;
             index = 0;
 
+            description = trim(scanDescription());
+
             while (true) {
                 tag = next();
                 if (!tag) {
                     break;
                 }
-                result.push(tag);
+                tags.push(tag);
             }
-            return result;
+
+            return {
+                description: description,
+                tags: tags
+            };
         }
 
         exports.parse = parse;
