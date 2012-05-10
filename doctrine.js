@@ -184,6 +184,7 @@
         var Syntax,
             Token,
             index,
+            previous,
             source,
             length,
             token,
@@ -1180,7 +1181,6 @@
 
     (function (exports) {
         var index,
-            previous,
             length,
             source;
 
