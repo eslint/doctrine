@@ -1262,7 +1262,7 @@
                         return typed.parseParamType(type);
                     }
                     return typed.parseType(type);
-                } catch (e) {
+                } catch (e1) {
                     // parse failed
                     return;
                 }
@@ -1276,7 +1276,7 @@
                     }
                     index += res.index;
                     return res.expr;
-                } catch (e) {
+                } catch (e2) {
                     // parse failed
                     return;
                 }
