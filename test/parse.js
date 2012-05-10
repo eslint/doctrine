@@ -57,9 +57,7 @@ describe('parse', function () {
                 " * @const @const",
                 " * @const @const",
                 " */"
-            ].join('\n'), {
-            unwrap: true
-        });
+            ].join('\n'), { unwrap: true });
         res.tags.should.have.length(3);
         res.tags[0].should.have.property('title', 'const');
         res.tags[1].should.have.property('title', 'const');
@@ -72,7 +70,7 @@ describe('parse', function () {
                 "/**",
                 " * @param {String} userName",
                 "*/",
-            ].join('\n'));
+            ].join('\n'), { unwrap: true });
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'param');
         res.tags[0].should.have.property('name', 'userName');
@@ -90,7 +88,7 @@ describe('parse', function () {
                 " * @param {String} userName",
                 " * @param {String userName",
                 "*/",
-            ].join('\n'));
+            ].join('\n'), { unwrap: true });
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'param');
         res.tags[0].should.have.property('name', 'userName');
@@ -107,7 +105,7 @@ describe('parse', function () {
                 "/**",
                 " * @param {{ok:String}} userName",
                 "*/"
-            ].join('\n'));
+            ].join('\n'), { unwrap: true });
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'param');
         res.tags[0].should.have.property('name', 'userName');
@@ -131,8 +129,26 @@ describe('parse', function () {
                 "/**",
                 " * @param {{ok:String} userName",
                 "*/"
-            ].join('\n'));
+            ].join('\n'), { unwrap: true });
         res.tags.should.be.empty;
+    });
+
+    it('param without braces', function () {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @param string name description",
+                "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'param');
+        res.tags[0].should.have.property('name', 'name');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'string'
+        });
+        res.tags[0].should.have.property('description', 'description');
     });
 });
 
