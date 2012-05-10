@@ -1,5 +1,13 @@
 doctrine ([doctrine](http://github.com/Constellation/doctrine)) is JSDoc parser.
 
+Doctrine can be used in a web browser:
+
+    <script src="doctrine.js"></script>
+
+or in a Node.js application via the package manager:
+
+    npm install doctrine
+
 simple example:
 
     doctrine.parse(

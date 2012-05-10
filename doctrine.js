@@ -35,7 +35,7 @@
         jsdoc;
 
     // Sync with package.json.
-    VERSION = '0.0.1-dev';
+    VERSION = '0.0.2-dev';
 
     // See also tools/generate-unicode-regex.py.
     Regex = {
