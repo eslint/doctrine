@@ -193,6 +193,54 @@ describe('parseType', function () {
             fields: []
         });
     });
+
+    it('type application', function () {
+        var type = doctrine.parseType("Array.<String>");
+        type.should.eql({
+            type: 'TypeApplication',
+            expr: {
+                type: 'NameExpression',
+                name: 'Array'
+            },
+            applications: [{
+                type: 'NameExpression',
+                name: 'String'
+            }]
+        });
+    });
+
+    it('type application with multiple patterns', function () {
+        var type = doctrine.parseType("Array.<String, Number>");
+        type.should.eql({
+            type: 'TypeApplication',
+            expr: {
+                type: 'NameExpression',
+                name: 'Array'
+            },
+            applications: [{
+                type: 'NameExpression',
+                name: 'String'
+            }, {
+                type: 'NameExpression',
+                name: 'Number'
+            }]
+        });
+    });
+
+    it('type application without dot', function () {
+        var type = doctrine.parseType("Array<String>");
+        type.should.eql({
+            type: 'TypeApplication',
+            expr: {
+                type: 'NameExpression',
+                name: 'Array'
+            },
+            applications: [{
+                type: 'NameExpression',
+                name: 'String'
+            }]
+        });
+    });
 });
 
 describe('parseParamType', function () {
