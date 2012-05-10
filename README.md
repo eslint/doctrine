@@ -46,6 +46,8 @@ and gets following information
 
 see [demo page](http://constellation.github.com/doctrine/demo/index.html) more detail.
 
+[![Build Status](https://secure.travis-ci.org/Constellation/doctrine.png)](http://travis-ci.org/Constellation/doctrine)
+
 ### License
 
 #### doctrine

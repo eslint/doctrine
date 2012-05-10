@@ -25,6 +25,6 @@
         "url": "http://github.com/Constellation/doctrine/raw/master/LICENSE.BSD"
     }],
     "scripts": {
-        "test": "node test/run.js"
+        "test": "./node_modules/.bin/mocha"
     }
 }
