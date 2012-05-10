@@ -35,7 +35,7 @@
         jsdoc;
 
     // Sync with package.json.
-    VERSION = '0.0.2-dev';
+    VERSION = '0.0.3-dev';
 
     // See also tools/generate-unicode-regex.py.
     Regex = {
@@ -482,6 +482,8 @@
 
         function next() {
             var ch;
+
+            previous = index;
 
             while (index < length && isWhiteSpace(source[index])) {
                 advance();
@@ -1118,6 +1120,7 @@
             source = src;
             length = source.length;
             index = 0;
+            previous = 0;
 
             if (!CanAccessStringByIndex) {
                 source = source.split('');
@@ -1129,7 +1132,7 @@
             if (opt && opt.midstream) {
                 return {
                     expr: expr,
-                    index: index
+                    index: previous
                 };
             }
 
@@ -1146,6 +1149,7 @@
             source = src;
             length = source.length;
             index = 0;
+            previous = 0;
 
             if (!CanAccessStringByIndex) {
                 source = source.split('');
@@ -1157,7 +1161,7 @@
             if (opt && opt.midstream) {
                 return {
                     expr: expr,
-                    index: index
+                    index: previous
                 };
             }
 
@@ -1176,6 +1180,7 @@
 
     (function (exports) {
         var index,
+            previous,
             length,
             source;
 
