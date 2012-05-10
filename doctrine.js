@@ -1336,7 +1336,9 @@
         function isTypeParameterRequired(title) {
             return title === 'define' || title === 'enum' || title === 'extends' ||
                 title === 'implements' || title === 'param' || title === 'return' ||
-                title === 'this' || title === 'type' || title === 'typedef' || title === 'throws';
+                title === 'this' || title === 'type' || title === 'typedef' ||
+                title === 'throws' || title === 'returns' || title === 'property' ||
+                title === 'augments';
         }
 
         function scanDescription() {
@@ -1384,8 +1386,8 @@
                 }
             }
 
-            // param requires name
-            if (title === 'param') {
+            // param, property requires name
+            if (title === 'param' || title === 'property') {
                 tag.name = parseName(last);
                 if (!tag.name) {
                     return;
