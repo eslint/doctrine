@@ -35,7 +35,7 @@
         jsdoc;
 
     // Sync with package.json.
-    VERSION = '0.0.1-dev';
+    VERSION = '0.0.2-dev';
 
     // See also tools/generate-unicode-regex.py.
     Regex = {
@@ -119,6 +119,10 @@
         };
     }
 
+    function trim(str) {
+        return str.replace(/^\s+/, '').replace(/\s+$/, '');
+    }
+
     function unwrapComment(doc) {
         // JSDoc comment is following form
         //   /**
@@ -134,7 +138,7 @@
             result,
             ch;
 
-        doc = doc.replace(/^\/\*\*([\s\S]+)\*\/$/, '$1');
+        doc = doc.replace(/^\/\*\*/, '').replace(/\*\/$/, '');
         index = 0;
         len = doc.length;
         mode = BEFORE_STAR;
@@ -781,7 +785,8 @@
         //     NameExpression
         //   | NameExpression TypeApplication
         //
-        // TypeApplication := '.<' TypeExpressionList '>'
+        // TypeApplication :=
+        //     '.<' TypeExpressionList '>'
         function parseTypeName() {
             var expr, applications;
 
@@ -1262,7 +1267,7 @@
                         return typed.parseParamType(type);
                     }
                     return typed.parseType(type);
-                } catch (e) {
+                } catch (e1) {
                     // parse failed
                     return;
                 }
@@ -1276,7 +1281,7 @@
                     }
                     index += res.index;
                     return res.expr;
-                } catch (e) {
+                } catch (e2) {
                     // parse failed
                     return;
                 }
@@ -1316,6 +1321,20 @@
             return name;
         }
 
+        function isTypeParameterRequired(title) {
+            return title === 'define' || title === 'enum' || title === 'extends' ||
+                title === 'implements' || title === 'param' || title === 'return' ||
+                title === 'this' || title === 'type' || title === 'typedef' || title === 'throws';
+        }
+
+        function scanDescription() {
+            var description = '';
+            while (index < length && source[index] != '@') {
+                description += advance();
+            }
+            return description;
+        }
+
         function next() {
             var tag, title, type, last, description;
 
@@ -1327,10 +1346,7 @@
                 return;
             }
 
-
-            if (source[index] !== '@') {
-                return;
-            }
+            assert(source[index] === '@');
 
             // scan title
             title = scanTitle();
@@ -1349,9 +1365,7 @@
             };
 
             // type required titles
-            if (title === 'define' || title === 'enum' || title === 'extends' ||
-                    title === 'implements' || title === 'param' || title === 'return' ||
-                    title === 'this' || title === 'type' || title === 'typedef') {
+            if (isTypeParameterRequired(title)) {
                 tag.type = parseType(title, last);
                 if (!tag.type) {
                     return;
@@ -1367,7 +1381,7 @@
             }
 
             // slice description
-            description = sliceSource(source, index, last).replace(/^\s+/, '').replace(/\s+$/, '');
+            description = trim(sliceSource(source, index, last));
             if (description) {
                 tag.description = description;
             }
@@ -1380,7 +1394,7 @@
         }
 
         function parse(comment, options) {
-            var result = [], tag;
+            var tags = [], tag, description;
 
             if (options === undefined) {
                 options = {};
@@ -1399,14 +1413,20 @@
             length = source.length;
             index = 0;
 
+            description = trim(scanDescription());
+
             while (true) {
                 tag = next();
                 if (!tag) {
                     break;
                 }
-                result.push(tag);
+                tags.push(tag);
             }
-            return result;
+
+            return {
+                description: description,
+                tags: tags
+            };
         }
 
         exports.parse = parse;

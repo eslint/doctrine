@@ -40,6 +40,7 @@
 <pre><code>doctrine.parse(
     [
         "/**",
+        " * This function commet is parsed by doctrine",
         " * @param {{ok:String}} userName",
         "*/"
     ].join('\n'), { unwrap: true });
@@ -47,21 +48,29 @@
 
 <p>and gets following information</p>
 
-<pre><code>[{
-    title: 'param',
-    name: 'userName'
-    type: {
-        type: 'RecordType',
-        fields: [{
-            type: 'FieldType',
-            key: 'ok',
-            value: {
-                type: 'NameExpression',
-                name: 'String'
-            }
-        }]
-    }
-}]
+<pre><code>{
+    "description": "This function commet is parsed by doctrine",
+    "tags": [
+        {
+            "title": "param",
+            "description": null,
+            "type": {
+                "type": "RecordType",
+                "fields": [
+                    {
+                        "type": "FieldType",
+                        "key": "ok",
+                        "value": {
+                            "type": "NameExpression",
+                            "name": "String"
+                        }
+                    }
+                ]
+            },
+            "name": "userName"
+        }
+    ]
+}
 </code></pre>
 
 <p>see <a href="http://constellation.github.com/doctrine/demo/index.html">demo page</a> more detail.</p>
