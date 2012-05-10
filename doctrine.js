@@ -106,7 +106,7 @@
     }
 
     function isTypeName(ch) {
-        return '><(){}[],:*|?!='.indexOf(ch) === -1 && !isWhiteSpace(ch);
+        return '><(){}[],:*|?!='.indexOf(ch) === -1 && !isWhiteSpace(ch) && !isLineTerminator(ch);
     }
 
     function assert(cond, text) { }
@@ -467,14 +467,11 @@
                     if ((index + 1) < length) {
                         ch2 = source[index + 1];
                         if (ch2 === '<') {
-                            advance();
                             break;
                         }
                     }
-                    value += ch;
-                } else {
-                    value += advance();
                 }
+                value += advance();
             }
             return Token.NAME;
         }
@@ -607,7 +604,7 @@
                     return token;
                 }
 
-                token = Token.INVALID;
+                token = Token.ILLEGAL;
                 return token;
             }
         }
@@ -1110,7 +1107,7 @@
             return expr;
         }
 
-        function parseType(src) {
+        function parseType(src, opt) {
             var expr;
 
             source = src;
@@ -1124,6 +1121,13 @@
             next();
             expr = parseTop();
 
+            if (opt && opt.midstream) {
+                return {
+                    expr: expr,
+                    index: index
+                };
+            }
+
             if (token !== Token.EOF) {
                 throw 'not reach to EOF';
             }
@@ -1131,7 +1135,7 @@
             return expr;
         }
 
-        function parseParamType(src) {
+        function parseParamType(src, opt) {
             var expr;
 
             source = src;
@@ -1144,6 +1148,13 @@
 
             next();
             expr = parseTopParamType();
+
+            if (opt && opt.midstream) {
+                return {
+                    expr: expr,
+                    index: index
+                };
+            }
 
             if (token !== Token.EOF) {
                 throw 'not reach to EOF';
@@ -1207,7 +1218,7 @@
         //
         // therefore, scanning type expression with balancing braces.
         function parseType(title, last) {
-            var ch, brace, type;
+            var ch, brace, type, direct = false, res;
 
             // search '{'
             while (index < last) {
@@ -1218,39 +1229,57 @@
                     advance();
                     break;
                 } else {
-                    return;
+                    // this is direct pattern
+                    direct = true;
+                    break;
                 }
             }
 
-            // type expression { is found
-            brace = 0;
-            type = '';
-            while (index < last) {
-                ch = source[index];
-                if (isLineTerminator(ch)) {
-                    return;
-                }
-                if (ch === '}') {
-                    if (brace === 0) {
-                        advance();
-                        break;
-                    } else {
-                        brace -= 1;
+            if (!direct) {
+                // type expression { is found
+                brace = 0;
+                type = '';
+                while (index < last) {
+                    ch = source[index];
+                    if (isLineTerminator(ch)) {
+                        return;
                     }
-                } else if (ch === '{') {
-                    brace += 1;
+                    if (ch === '}') {
+                        if (brace === 0) {
+                            advance();
+                            break;
+                        } else {
+                            brace -= 1;
+                        }
+                    } else if (ch === '{') {
+                        brace += 1;
+                    }
+                    type += advance();
                 }
-                type += advance();
-            }
 
-            try {
-                if (title === 'param') {
-                    return typed.parseParamType(type);
+                try {
+                    if (title === 'param') {
+                        return typed.parseParamType(type);
+                    }
+                    return typed.parseType(type);
+                } catch (e) {
+                    // parse failed
+                    return;
                 }
-                return typed.parseType(type);
-            } catch (e) {
-                // parse failed
-                return;
+            } else {
+                type = sliceSource(source, index, last);
+                try {
+                    if (title === 'param') {
+                        res = typed.parseParamType(type, { midstream: true });
+                    } else {
+                        res = typed.parseType(type, { midstream: true });
+                    }
+                    index += res.index;
+                    return res.expr;
+                } catch (e) {
+                    // parse failed
+                    return;
+                }
             }
         }
 
@@ -1288,7 +1317,7 @@
         }
 
         function next() {
-            var tag, title, type, last;
+            var tag, title, type, last, description;
 
             // skip to tag
             while (index < length && source[index] !== '@') {
@@ -1338,7 +1367,10 @@
             }
 
             // slice description
-            tag.description = sliceSource(source, index, last);
+            description = sliceSource(source, index, last).replace(/^\s+/, '').replace(/\s+$/, '');
+            if (description) {
+                tag.description = description;
+            }
             index = last;
             return tag;
         }
