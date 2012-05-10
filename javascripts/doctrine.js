@@ -35,7 +35,7 @@
         jsdoc;
 
     // Sync with package.json.
-    VERSION = '0.0.3-dev';
+    VERSION = '0.0.4-dev';
 
     // See also tools/generate-unicode-regex.py.
     Regex = {
@@ -215,24 +215,25 @@
             DOT: 1,        // .
             DOT_LT: 2,     // .<
             REST: 3,       // ...
-            GT: 4,         // >
-            LPAREN: 5,     // (
-            RPAREN: 6,     // )
-            LBRACE: 7,     // {
-            RBRACE: 8,     // }
-            LBRACK: 9,     // [
-            RBRACK: 10,    // ]
-            COMMA: 11,     // ,
-            COLON: 12,     // :
-            STAR: 13,      // *
-            PIPE: 14,      // |
-            QUESTION: 15,  // ?
-            BANG: 16,      // !
-            EQUAL: 17,     // =
-            NAME: 18,      // name token
-            STRING: 19,    // string
-            NUMBER: 20,    // number
-            EOF: 21
+            LT: 4,         // <
+            GT: 5,         // >
+            LPAREN: 6,     // (
+            RPAREN: 7,     // )
+            LBRACE: 8,     // {
+            RBRACE: 9,     // }
+            LBRACK: 10,    // [
+            RBRACK: 11,    // ]
+            COMMA: 12,     // ,
+            COLON: 13,     // :
+            STAR: 14,      // *
+            PIPE: 15,      // |
+            QUESTION: 16,  // ?
+            BANG: 17,      // !
+            EQUAL: 18,     // =
+            NAME: 19,      // name token
+            STRING: 20,    // string
+            NUMBER: 21,    // number
+            EOF: 22
         };
 
         function advance() {
@@ -565,6 +566,11 @@
                 token = Token.DOT;
                 return token;
 
+            case '<':
+                advance();
+                token = Token.LT;
+                return token;
+
             case '>':
                 advance();
                 token = Token.GT;
@@ -790,11 +796,12 @@
         //
         // TypeApplication :=
         //     '.<' TypeExpressionList '>'
+        //   | '<' TypeExpressionList '>'   // this is extension of doctrine
         function parseTypeName() {
             var expr, applications;
 
             expr = parseNameExpression();
-            if (token === Token.DOT_LT) {
+            if (token === Token.DOT_LT || token === Token.LT) {
                 next();
                 applications = parseTypeExpressionList();
                 expect(Token.GT);
@@ -1329,7 +1336,9 @@
         function isTypeParameterRequired(title) {
             return title === 'define' || title === 'enum' || title === 'extends' ||
                 title === 'implements' || title === 'param' || title === 'return' ||
-                title === 'this' || title === 'type' || title === 'typedef' || title === 'throws';
+                title === 'this' || title === 'type' || title === 'typedef' ||
+                title === 'throws' || title === 'returns' || title === 'property' ||
+                title === 'augments';
         }
 
         function scanDescription() {
@@ -1377,8 +1386,8 @@
                 }
             }
 
-            // param requires name
-            if (title === 'param') {
+            // param, property requires name
+            if (title === 'param' || title === 'property') {
                 tag.name = parseName(last);
                 if (!tag.name) {
                     return;
