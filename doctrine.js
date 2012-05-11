@@ -704,7 +704,7 @@
             }
 
             if (token === Token.NUMBER) {
-                next();
+                consume(Token.NUMBER);
                 return String(v);
             }
 
@@ -725,7 +725,7 @@
 
             key = parseFieldName();
             if (token === Token.COLON) {
-                next();
+                consume(Token.COLON);
                 return {
                     type: Syntax.FieldType,
                     key: key,
@@ -930,7 +930,7 @@
                     // 'this' or 'new'
                     // 'new' is Closure Compiler extension
                     isNew = value === 'new';
-                    next();
+                    consume(Token.NAME);
                     expect(Token.COLON);
                     thisBinding = parseTypeName();
                     if (token === Token.COMMA) {
@@ -1103,7 +1103,7 @@
             var expr;
 
             if (token === Token.REST) {
-                next();
+                consume(Token.REST);
                 return {
                     type: Syntax.RestType,
                     expression: parseTop()
@@ -1112,7 +1112,7 @@
 
             expr = parseTop();
             if (token === Token.EQUAL) {
-                next();
+                consume(Token.EQUAL);
                 return {
                     type: Syntax.OptionalType,
                     expression: expr
