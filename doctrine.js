@@ -679,7 +679,7 @@
                     consume(Token.REST);
                     elements.push({
                         type: Syntax.RestType,
-                        expr: parseTypeExpression()
+                        expression: parseTypeExpression()
                     });
                     break;
                 } else {
@@ -807,7 +807,7 @@
                 expect(Token.GT);
                 return {
                     type: Syntax.TypeApplication,
-                    expr: expr,
+                    expression: expr,
                     applications: applications
                 };
             }
@@ -868,7 +868,7 @@
                     }
                     params.push({
                         type: Syntax.RestType,
-                        expr: expr
+                        expression: expr
                     });
                     break;
                 }
@@ -880,14 +880,14 @@
                     expr = {
                         type: Syntax.ParameterType,
                         name: expr.name,
-                        expr: parseTypeExpression(),
+                        expression: parseTypeExpression(),
                     };
                 }
                 if (token === Token.EQUAL) {
                     consume(Token.EQUAL);
                     expr = {
                         type: Syntax.OptionalType,
-                        expr: expr
+                        expression: expr
                     };
                     normal = false;
                 } else {
@@ -1030,7 +1030,7 @@
                 }
                 return {
                     type: Syntax.NullableType,
-                    expr: parseBasicTypeExpression(),
+                    expression: parseBasicTypeExpression(),
                     prefix: true
                 };
             }
@@ -1039,7 +1039,7 @@
                 consume(Token.BANG);
                 return {
                     type: Syntax.NonNullableType,
-                    expr: parseBasicTypeExpression(),
+                    expression: parseBasicTypeExpression(),
                     prefix: true
                 };
             }
@@ -1049,7 +1049,7 @@
                 consume(Token.BANG);
                 return {
                     type: Syntax.NonNullableType,
-                    expr: expr,
+                    expression: expr,
                     prefix: false
                 };
             }
@@ -1058,7 +1058,7 @@
                 consume(Token.QUESTION);
                 return {
                     type: Syntax.NullableType,
-                    expr: expr,
+                    expression: expr,
                     prefix: false
                 };
             }
@@ -1106,7 +1106,7 @@
                 next();
                 return {
                     type: Syntax.RestType,
-                    expr: parseTop()
+                    expression: parseTop()
                 };
             }
 
@@ -1115,7 +1115,7 @@
                 next();
                 return {
                     type: Syntax.OptionalType,
-                    expr: expr
+                    expression: expr
                 };
             }
 
@@ -1139,7 +1139,7 @@
 
             if (opt && opt.midstream) {
                 return {
-                    expr: expr,
+                    expression: expr,
                     index: previous
                 };
             }
@@ -1168,7 +1168,7 @@
 
             if (opt && opt.midstream) {
                 return {
-                    expr: expr,
+                    expression: expr,
                     index: previous
                 };
             }
@@ -1292,7 +1292,7 @@
                         res = typed.parseType(type, { midstream: true });
                     }
                     index += res.index;
-                    return res.expr;
+                    return res.expression;
                 } catch (e2) {
                     // parse failed
                     return;

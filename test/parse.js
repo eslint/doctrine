@@ -198,7 +198,7 @@ describe('parseType', function () {
         var type = doctrine.parseType("Array.<String>");
         type.should.eql({
             type: 'TypeApplication',
-            expr: {
+            expression: {
                 type: 'NameExpression',
                 name: 'Array'
             },
@@ -213,7 +213,7 @@ describe('parseType', function () {
         var type = doctrine.parseType("Array.<String, Number>");
         type.should.eql({
             type: 'TypeApplication',
-            expr: {
+            expression: {
                 type: 'NameExpression',
                 name: 'Array'
             },
@@ -231,7 +231,7 @@ describe('parseType', function () {
         var type = doctrine.parseType("Array<String>");
         type.should.eql({
             type: 'TypeApplication',
-            expr: {
+            expression: {
                 type: 'NameExpression',
                 name: 'Array'
             },
@@ -255,7 +255,7 @@ describe('parseParamType', function () {
         var type = doctrine.parseParamType("?=");
         type.should.eql({
             type: 'OptionalType',
-            expr: {
+            expression: {
                 type: 'NullableLiteral'
             }
         });
