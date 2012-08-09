@@ -32,7 +32,8 @@
         Regex,
         CanAccessStringByIndex,
         typed,
-        jsdoc;
+        jsdoc,
+        isArray;
 
     // Sync with package.json.
     VERSION = '0.0.4-dev';
@@ -48,6 +49,13 @@
     function sliceSource(source, index, last) {
         return source.slice(index, last);
     }
+    
+    isArray = Array.isArray;
+	if (!isArray) {
+	    isArray = function isArray(ary) {
+	        return Object.prototype.toString.call(ary) === '[object Array]';
+	    };
+	}
 
     if (!CanAccessStringByIndex) {
         sliceSource = function sliceSource(source, index, last) {
@@ -1408,7 +1416,7 @@
         }
 
         function parse(comment, options) {
-            var tags = [], tag, description;
+            var tags = [], tag, description, interestingTags;
 
             if (options === undefined) {
                 options = {};
@@ -1419,6 +1427,22 @@
             } else {
                 source = comment;
             }
+            
+            // array of relevant tags
+            if (options.tags) {
+                if (isArray(options.tags)) {
+                    interestingTags = { };
+                    for (var i = 0; i < options.tags.length; i++) {
+                        if (typeof options.tags[i] === 'string') {
+                            interestingTags[options.tags[i]] = true;
+                        } else {
+                            throw new Error('Invalid "tags" parameter: ' + options.tags);
+                        }
+                    }
+                } else {
+                    throw new Error('Invalid "tags" parameter: ' + options.tags);
+                }
+            }
 
             if (!CanAccessStringByIndex) {
                 source = source.split('');
@@ -1428,13 +1452,15 @@
             index = 0;
 
             description = trim(scanDescription());
-
+            
             while (true) {
                 tag = next();
                 if (!tag) {
                     break;
                 }
-                tags.push(tag);
+                if (!interestingTags || interestingTags.hasOwnProperty(tag.title)) {
+                    tags.push(tag);
+                }
             }
 
             return {

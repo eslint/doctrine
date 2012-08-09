@@ -21,7 +21,7 @@
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
+/*global require describe it*/
 /*jslint node:true */
 'use strict';
 
@@ -69,7 +69,7 @@ describe('parse', function () {
             [
                 "/**",
                 " * @param {String} userName",
-                "*/",
+                "*/"
             ].join('\n'), { unwrap: true });
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'param');
@@ -87,7 +87,7 @@ describe('parse', function () {
                 "/**",
                 " * @param {String} userName",
                 " * @param {String userName",
-                "*/",
+                "*/"
             ].join('\n'), { unwrap: true });
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'param');
@@ -272,8 +272,8 @@ describe('parseParamType', function () {
                 name: 'number'
             }],
             result: null,
-            this: null,
-            new: false
+            'this': null,
+            'new': false
         });
     });
 
@@ -288,8 +288,8 @@ describe('parseParamType', function () {
                 type: 'NullableLiteral'
             }],
             result: null,
-            this: null,
-            new: false
+            'this': null,
+            'new': false
         });
     });
 
@@ -303,8 +303,8 @@ describe('parseParamType', function () {
                 result: {
                     type: 'NullableLiteral'
                 },
-                this: null,
-                new: false
+                'this': null,
+                'new': false
             }, {
                 type: 'NameExpression',
                 name: 'number'
@@ -328,4 +328,61 @@ describe('invalid', function () {
         doctrine.parseType.bind(doctrine, "{,,}").should.throw();
     });
 });
+
+describe('tags option', function() {
+	it ('only param', function() {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @const @const",
+                " * @param {String} y",
+                " */"
+            ].join('\n'), { tags: ['param'], unwrap:true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'param');
+        res.tags[0].should.have.property('name', 'y');
+     });
+
+	it ('param and type', function() {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @const x",
+                " * @param {String} y",
+                " * @type {String} ",
+                " */"
+            ].join('\n'), { tags: ['param', 'type'], unwrap:true });
+        res.tags.should.have.length(2);
+        res.tags[0].should.have.property('title', 'param');
+        res.tags[0].should.have.property('name', 'y');
+        res.tags[1].should.have.property('title', 'type');
+        res.tags[1].should.have.property('type');
+        res.tags[1].type.should.have.property('name', 'String');
+     });
+
+});
+
+describe('invalid tags', function() {
+	it ('bad tag 1', function() {
+        doctrine.parse.bind(doctrine,
+            [
+                "/**",
+                " * @param {String} hucairz",
+                " */"
+            ].join('\n'), { tags: 1, unwrap:true }).should.throw();
+     });
+
+	it ('bad tag 2', function() {
+        doctrine.parse.bind(doctrine,
+            [
+                "/**",
+                " * @param {String} hucairz",
+                " */"
+            ].join('\n'), { tags: ['a', 1], unwrap:true }).should.throw();
+     });
+
+
+});
+
+
 /* vim: set sw=4 ts=4 et tw=80 : */
