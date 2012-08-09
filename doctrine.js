@@ -32,7 +32,8 @@
         Regex,
         CanAccessStringByIndex,
         typed,
-        jsdoc;
+        jsdoc,
+        isArray;
 
     // Sync with package.json.
     VERSION = '0.0.4-dev';
@@ -48,6 +49,13 @@
     function sliceSource(source, index, last) {
         return source.slice(index, last);
     }
+    
+    isArray = Array.isArray;
+	if (!isArray) {
+	    isArray = function isArray(ary) {
+	        return Object.prototype.toString.call(ary) === '[object Array]';
+	    };
+	}
 
     if (!CanAccessStringByIndex) {
         sliceSource = function sliceSource(source, index, last) {
@@ -1422,7 +1430,7 @@
             
             // array of relevant tags
             if (options.tags) {
-                if (options.tags.constructor === Array) {
+                if (isArray(options.tags)) {
                     interestingTags = { };
                     for (var i = 0; i < options.tags.length; i++) {
                         if (typeof options.tags[i] === 'string') {
