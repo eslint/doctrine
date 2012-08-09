@@ -1408,7 +1408,7 @@
         }
 
         function parse(comment, options) {
-            var tags = [], tag, description;
+            var tags = [], tag, description, interestingTags;
 
             if (options === undefined) {
                 options = {};
@@ -1419,6 +1419,22 @@
             } else {
                 source = comment;
             }
+            
+            // array of relevant tags
+            if (options.tags) {
+                if (options.tags.constructor === Array) {
+                    interestingTags = { };
+                    for (var i = 0; i < options.tags.length; i++) {
+                        if (typeof options.tags[i] === 'string') {
+                            interestingTags[options.tags[i]] = true;
+                        } else {
+                            throw new Error('Invalid "tags" parameter: ' + options.tags);
+                        }
+                    }
+                } else {
+                    throw new Error('Invalid "tags" parameter: ' + options.tags);
+                }
+            }
 
             if (!CanAccessStringByIndex) {
                 source = source.split('');
@@ -1428,13 +1444,15 @@
             index = 0;
 
             description = trim(scanDescription());
-
+            
             while (true) {
                 tag = next();
                 if (!tag) {
                     break;
                 }
-                tags.push(tag);
+                if (!interestingTags || interestingTags.hasOwnProperty(tag.title)) {
+                    tags.push(tag);
+                }
             }
 
             return {
