@@ -888,7 +888,7 @@
                     expr = {
                         type: Syntax.ParameterType,
                         name: expr.name,
-                        expression: parseTypeExpression(),
+                        expression: parseTypeExpression()
                     };
                 }
                 if (token === Token.EQUAL) {
@@ -1197,7 +1197,8 @@
     (function (exports) {
         var index,
             length,
-            source;
+            source,
+            recoverable;
 
         function advance() {
             var ch = source[index];
@@ -1374,7 +1375,7 @@
             title = scanTitle();
 
             // empty title
-            if (!title) {
+            if (!title && !recoverable) {
                 return;
             }
 
@@ -1389,7 +1390,7 @@
             // type required titles
             if (isTypeParameterRequired(title)) {
                 tag.type = parseType(title, last);
-                if (!tag.type) {
+                if (!tag.type && !recoverable) {
                     return;
                 }
             }
@@ -1397,7 +1398,7 @@
             // param, property requires name
             if (title === 'param' || title === 'property') {
                 tag.name = parseName(last);
-                if (!tag.name) {
+                if (!tag.name && !recoverable) {
                     return;
                 }
             }
@@ -1450,6 +1451,7 @@
 
             length = source.length;
             index = 0;
+            recoverable = options.recoverable;
 
             description = trim(scanDescription());
             
