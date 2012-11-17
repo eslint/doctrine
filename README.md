@@ -1,5 +1,7 @@
 doctrine ([doctrine](http://github.com/Constellation/doctrine)) is JSDoc parser.
 
+It is now used by content assist system of [Eclipse Orion](http://www.eclipse.org/orion/) ([detail](http://planetorion.org/news/2012/10/orion-1-0-release/))
+
 Doctrine can be used in a web browser:
 
     <script src="doctrine.js"></script>
