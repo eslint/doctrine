@@ -32,7 +32,8 @@
         Regex,
         CanAccessStringByIndex,
         typed,
-        jsdoc;
+        jsdoc,
+        isArray;
 
     // Sync with package.json.
     VERSION = '0.0.4-dev';
@@ -48,6 +49,13 @@
     function sliceSource(source, index, last) {
         return source.slice(index, last);
     }
+    
+    isArray = Array.isArray;
+	if (!isArray) {
+	    isArray = function isArray(ary) {
+	        return Object.prototype.toString.call(ary) === '[object Array]';
+	    };
+	}
 
     if (!CanAccessStringByIndex) {
         sliceSource = function sliceSource(source, index, last) {
@@ -880,7 +888,7 @@
                     expr = {
                         type: Syntax.ParameterType,
                         name: expr.name,
-                        expression: parseTypeExpression(),
+                        expression: parseTypeExpression()
                     };
                 }
                 if (token === Token.EQUAL) {
@@ -1189,7 +1197,8 @@
     (function (exports) {
         var index,
             length,
-            source;
+            source,
+            recoverable;
 
         function advance() {
             var ch = source[index];
@@ -1366,7 +1375,7 @@
             title = scanTitle();
 
             // empty title
-            if (!title) {
+            if (!title && !recoverable) {
                 return;
             }
 
@@ -1381,7 +1390,7 @@
             // type required titles
             if (isTypeParameterRequired(title)) {
                 tag.type = parseType(title, last);
-                if (!tag.type) {
+                if (!tag.type && !recoverable) {
                     return;
                 }
             }
@@ -1389,7 +1398,7 @@
             // param, property requires name
             if (title === 'param' || title === 'property') {
                 tag.name = parseName(last);
-                if (!tag.name) {
+                if (!tag.name && !recoverable) {
                     return;
                 }
             }
@@ -1408,7 +1417,7 @@
         }
 
         function parse(comment, options) {
-            var tags = [], tag, description;
+            var tags = [], tag, description, interestingTags;
 
             if (options === undefined) {
                 options = {};
@@ -1419,6 +1428,22 @@
             } else {
                 source = comment;
             }
+            
+            // array of relevant tags
+            if (options.tags) {
+                if (isArray(options.tags)) {
+                    interestingTags = { };
+                    for (var i = 0; i < options.tags.length; i++) {
+                        if (typeof options.tags[i] === 'string') {
+                            interestingTags[options.tags[i]] = true;
+                        } else {
+                            throw new Error('Invalid "tags" parameter: ' + options.tags);
+                        }
+                    }
+                } else {
+                    throw new Error('Invalid "tags" parameter: ' + options.tags);
+                }
+            }
 
             if (!CanAccessStringByIndex) {
                 source = source.split('');
@@ -1426,15 +1451,18 @@
 
             length = source.length;
             index = 0;
+            recoverable = options.recoverable;
 
             description = trim(scanDescription());
-
+            
             while (true) {
                 tag = next();
                 if (!tag) {
                     break;
                 }
-                tags.push(tag);
+                if (!interestingTags || interestingTags.hasOwnProperty(tag.title)) {
+                    tags.push(tag);
+                }
             }
 
             return {

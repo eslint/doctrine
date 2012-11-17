@@ -21,7 +21,7 @@
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
+/*global require describe it*/
 /*jslint node:true */
 'use strict';
 
@@ -69,7 +69,7 @@ describe('parse', function () {
             [
                 "/**",
                 " * @param {String} userName",
-                "*/",
+                "*/"
             ].join('\n'), { unwrap: true });
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'param');
@@ -87,7 +87,7 @@ describe('parse', function () {
                 "/**",
                 " * @param {String} userName",
                 " * @param {String userName",
-                "*/",
+                "*/"
             ].join('\n'), { unwrap: true });
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'param');
@@ -272,8 +272,8 @@ describe('parseParamType', function () {
                 name: 'number'
             }],
             result: null,
-            this: null,
-            new: false
+            'this': null,
+            'new': false
         });
     });
 
@@ -288,8 +288,8 @@ describe('parseParamType', function () {
                 type: 'NullableLiteral'
             }],
             result: null,
-            this: null,
-            new: false
+            'this': null,
+            'new': false
         });
     });
 
@@ -303,8 +303,8 @@ describe('parseParamType', function () {
                 result: {
                     type: 'NullableLiteral'
                 },
-                this: null,
-                new: false
+                'this': null,
+                'new': false
             }, {
                 type: 'NameExpression',
                 name: 'number'
@@ -328,4 +328,246 @@ describe('invalid', function () {
         doctrine.parseType.bind(doctrine, "{,,}").should.throw();
     });
 });
+
+describe('tags option', function() {
+	it ('only param', function() {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @const @const",
+                " * @param {String} y",
+                " */"
+            ].join('\n'), { tags: ['param'], unwrap:true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'param');
+        res.tags[0].should.have.property('name', 'y');
+     });
+
+	it ('param and type', function() {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @const x",
+                " * @param {String} y",
+                " * @type {String} ",
+                " */"
+            ].join('\n'), { tags: ['param', 'type'], unwrap:true });
+        res.tags.should.have.length(2);
+        res.tags[0].should.have.property('title', 'param');
+        res.tags[0].should.have.property('name', 'y');
+        res.tags[1].should.have.property('title', 'type');
+        res.tags[1].should.have.property('type');
+        res.tags[1].type.should.have.property('name', 'String');
+     });
+
+});
+
+describe('invalid tags', function() {
+	it ('bad tag 1', function() {
+        doctrine.parse.bind(doctrine,
+            [
+                "/**",
+                " * @param {String} hucairz",
+                " */"
+            ].join('\n'), { tags: 1, unwrap:true }).should.throw();
+     });
+
+	it ('bad tag 2', function() {
+        doctrine.parse.bind(doctrine,
+            [
+                "/**",
+                " * @param {String} hucairz",
+                " */"
+            ].join('\n'), { tags: ['a', 1], unwrap:true }).should.throw();
+     });
+});
+
+describe('recovery tests', function() {
+	it ('not recoverable', function () {
+		var res = doctrine.parse(
+            [
+                "@param f"
+            ].join('\n'), { recoverable: false });
+            
+         // parser will mistakenly think that the type is 'f' and there is no name
+         res.tags.should.have.length(0);
+	});
+	
+	it ('params 1', function () {
+		var res = doctrine.parse(
+            [
+                "@param f"
+            ].join('\n'), { recoverable: true });
+            
+         // parser will mistakenly think that the type is 'f' and there is no name
+         res.tags.should.have.length(1);
+         res.tags[0].should.have.property('title', 'param');
+         res.tags[0].should.have.property('type');
+         res.tags[0].type.should.have.property('name', 'f');
+         res.tags[0].type.should.have.property('type', 'NameExpression');
+         res.tags[0].should.not.have.property('name');
+	});
+	it ('params 2', function () {
+		var res = doctrine.parse(
+            [
+                "@param f",
+                "@param {string} f2"
+            ].join('\n'), { recoverable: true });
+            
+         // ensure second parameter is OK
+         res.tags.should.have.length(2);
+         res.tags[0].should.have.property('title', 'param');
+         res.tags[0].should.have.property('type');
+         res.tags[0].type.should.have.property('name', 'f');
+         res.tags[0].type.should.have.property('type', 'NameExpression');
+         res.tags[0].should.not.have.property('name');
+         
+         res.tags[1].should.have.property('title', 'param');
+         res.tags[1].should.have.property('type');
+         res.tags[1].type.should.have.property('name', 'string');
+         res.tags[1].type.should.have.property('type', 'NameExpression');
+         res.tags[1].should.have.property('name', 'f2');
+	});
+	
+	it ('params 2', function () {
+		var res = doctrine.parse(
+            [
+                "@param string f",
+                "@param {string} f2"
+            ].join('\n'), { recoverable: true });
+            
+         // ensure first parameter is OK even with invalid type name
+         res.tags.should.have.length(2);
+         res.tags[0].should.have.property('title', 'param');
+         res.tags[0].should.have.property('type');
+         res.tags[0].type.should.have.property('name', 'string');
+         res.tags[0].type.should.have.property('type', 'NameExpression');
+         res.tags[0].should.have.property('name', 'f');
+         
+         res.tags[1].should.have.property('title', 'param');
+         res.tags[1].should.have.property('type');
+         res.tags[1].type.should.have.property('name', 'string');
+         res.tags[1].type.should.have.property('type', 'NameExpression');
+         res.tags[1].should.have.property('name', 'f2');
+	});
+	
+	it ('return 1', function() {
+		var res = doctrine.parse(
+            [
+                "@returns"
+            ].join('\n'), { recoverable: true });
+            
+         // return tag should exist
+         res.tags.should.have.length(1);
+         res.tags[0].should.have.property('title', 'returns');
+         res.tags[0].should.not.have.property('type');
+	});
+	it ('return 2', function() {
+		var res = doctrine.parse(
+            [
+                "@returns",
+				"@param {string} f2"
+            ].join('\n'), { recoverable: true });
+            
+         // return tag should exist as well as next tag
+         res.tags.should.have.length(2);
+         res.tags[0].should.have.property('title', 'returns');
+         res.tags[0].should.not.have.property('type');
+         
+         res.tags[1].should.have.property('title', 'param');
+         res.tags[1].should.have.property('type');
+         res.tags[1].type.should.have.property('name', 'string');
+         res.tags[1].type.should.have.property('type', 'NameExpression');
+         res.tags[1].should.have.property('name', 'f2');
+	});
+	
+	it ('extra @ 1', function() {
+		var res = doctrine.parse(
+            [
+                "@",
+                "@returns",
+				"@param {string} f2"
+            ].join('\n'), { recoverable: true });
+            
+         // empty tag name shouldn't affect subsequent tags
+         res.tags.should.have.length(3);
+         res.tags[0].should.have.property('title', '');
+         res.tags[0].should.not.have.property('type');
+
+         res.tags[1].should.have.property('title', 'returns');
+         res.tags[1].should.not.have.property('type');
+         
+         res.tags[2].should.have.property('title', 'param');
+         res.tags[2].should.have.property('type');
+         res.tags[2].type.should.have.property('name', 'string');
+         res.tags[2].type.should.have.property('type', 'NameExpression');
+         res.tags[2].should.have.property('name', 'f2');
+	});
+	
+	it ('extra @ 2', function() {
+		var res = doctrine.parse(
+            [
+                "@ invalid name",
+				"@param {string} f2"
+            ].join('\n'), { recoverable: true });
+            
+         // empty tag name shouldn't affect subsequent tags
+         res.tags.should.have.length(2);
+         res.tags[0].should.have.property('title', '');
+         res.tags[0].should.not.have.property('type');
+         res.tags[0].should.not.have.property('name');
+         res.tags[0].should.have.property('description', 'invalid name');
+         
+         res.tags[1].should.have.property('title', 'param');
+         res.tags[1].should.have.property('type');
+         res.tags[1].type.should.have.property('name', 'string');
+         res.tags[1].type.should.have.property('type', 'NameExpression');
+         res.tags[1].should.have.property('name', 'f2');
+	});
+
+	it ('invalid tag 1', function() {
+		var res = doctrine.parse(
+            [
+                "@111 invalid name",
+				"@param {string} f2"
+            ].join('\n'), { recoverable: true });
+            
+         // invalid tag name shouldn't affect subsequent tags
+         res.tags.should.have.length(2);
+         res.tags[0].should.have.property('title', '111');
+         res.tags[0].should.not.have.property('type');
+         res.tags[0].should.not.have.property('name');
+         res.tags[0].should.have.property('description', 'invalid name');
+         
+         res.tags[1].should.have.property('title', 'param');
+         res.tags[1].should.have.property('type');
+         res.tags[1].type.should.have.property('name', 'string');
+         res.tags[1].type.should.have.property('type', 'NameExpression');
+         res.tags[1].should.have.property('name', 'f2');
+	});
+
+	it ('invalid tag 1', function() {
+		var res = doctrine.parse(
+            [
+                "@111",
+				"@param {string} f2"
+            ].join('\n'), { recoverable: true });
+            
+         // invalid tag name shouldn't affect subsequent tags
+         res.tags.should.have.length(2);
+         res.tags[0].should.have.property('title', '111');
+         res.tags[0].should.not.have.property('type');
+         res.tags[0].should.not.have.property('name');
+         res.tags[0].should.have.property('description', null);
+         
+         res.tags[1].should.have.property('title', 'param');
+         res.tags[1].should.have.property('type');
+         res.tags[1].type.should.have.property('name', 'string');
+         res.tags[1].type.should.have.property('type', 'NameExpression');
+         res.tags[1].should.have.property('name', 'f2');
+	});
+
+});
+
+
 /* vim: set sw=4 ts=4 et tw=80 : */
