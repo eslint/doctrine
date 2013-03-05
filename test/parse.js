@@ -384,5 +384,60 @@ describe('invalid tags', function() {
 
 });
 
+describe('optional params', function() {
+    
+    // should fail since sloppy option not set
+    it('failure 0', function() {
+        doctrine.parse(
+        ["/**", " * @param {String} [val]", " */"].join('\n'), {
+            unwrap: true
+        }).should.eql({
+            "description": "",
+            "tags": []
+        });
+    });
+    it('success 1', function() {
+        
+        doctrine.parse(
+        ["/**", " * @param {String} [val]", " */"].join('\n'), {
+            unwrap: true, sloppy: true
+        }).should.eql({
+            "description": "",
+            "tags": [{
+                "title": "param",
+                "description": null,
+                "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                        "type": "NameExpression",
+                        "name": "String"
+                    }
+                },
+                "name": "val"
+            }]
+        });
+    });
+    it('success 2', function() {
+        doctrine.parse(
+        ["/**", " * @param {String=} val", " */"].join('\n'), {
+            unwrap: true, sloppy: true
+        }).should.eql({
+            "description": "",
+            "tags": [{
+                "title": "param",
+                "description": null,
+                "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                        "type": "NameExpression",
+                        "name": "String"
+                    }
+                },
+                "name": "val"
+            }]
+        });
+    });
+});
+
 
 /* vim: set sw=4 ts=4 et tw=80 : */

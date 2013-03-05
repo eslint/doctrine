@@ -1190,6 +1190,7 @@
 
         exports.parseType = parseType;
         exports.parseParamType = parseParamType;
+        exports.Syntax = Syntax;
     }(typed = {}));
 
     // JSDoc Tag Parser
@@ -1198,7 +1199,8 @@
         var index,
             length,
             source,
-            recoverable;
+            recoverable,
+            sloppy;
 
         function advance() {
             var ch = source[index];
@@ -1309,8 +1311,8 @@
             }
         }
 
-        function parseName(last) {
-            var range, ch, name, i, len;
+        function parseName(last, allowBraces) {
+            var range, ch, name, i, len, useBraces;
 
             // skip white spaces
             while (index < last && (isWhiteSpace(source[index]) || isLineTerminator(source[index]))) {
@@ -1322,7 +1324,11 @@
             }
 
             if (!isIdentifierStart(source[index])) {
-                return;
+                if (allowBraces && source[index] === '[') {
+                    useBraces = true;
+                } else {
+                    return;
+                }
             }
 
             name = advance();
@@ -1333,9 +1339,17 @@
                     advance();
                     break;
                 }
+                if (useBraces && source[index] === ']') {
+                    name += advance();
+                    break;
+                }
                 if (!isIdentifierPart(ch)) {
                     return;
                 }
+                name += advance();
+            }
+            
+            if (useBraces && source[index] === ']') {
                 name += advance();
             }
 
@@ -1360,6 +1374,13 @@
 
         function next() {
             var tag, title, type, last, description;
+            
+            function addError(errorText) {
+                if (!tag.errors) {
+                    tag.errors = [];
+                }
+                tag.errors.push(errorText);
+            }
 
             // skip to tag
             while (index < length && source[index] !== '@') {
@@ -1374,32 +1395,52 @@
             // scan title
             title = scanTitle();
 
-            // empty title
-            if (!title && !recoverable) {
-                return;
-            }
-
-            // seek to content last index
-            last = seekContent(title);
-
             tag = {
                 title: title,
                 description: null
             };
 
+            // empty title
+            if (!title) {
+                addError("Missing or invalid title");
+                if (!recoverable) {
+                    return;
+                }
+            }
+
+            // seek to content last index
+            last = seekContent(title);
+
             // type required titles
             if (isTypeParameterRequired(title)) {
                 tag.type = parseType(title, last);
-                if (!tag.type && !recoverable) {
-                    return;
+                if (!tag.type) {
+                    addError("Missing or invalid tag type");
+                    if (!recoverable) {
+                        return;
+                    }
                 }
             }
 
             // param, property requires name
             if (title === 'param' || title === 'property') {
-                tag.name = parseName(last);
-                if (!tag.name && !recoverable) {
-                    return;
+                tag.name = parseName(last, sloppy && title === 'param');
+                if (!tag.name) {
+                    addError("Missing or invalid tag name");
+                    if (!recoverable) {
+                        return;
+                    }
+                } else {
+                    if (tag.name.charAt(0) === '[' && tag.name.charAt(tag.name.length-1) === ']') {
+                        // convert to an optional type
+                        tag.name = tag.name.substring(1, tag.name.length-1);
+                        var newType = {  
+                            type: "OptionalType",
+                            expression: tag.type
+                        };
+                        tag.type = newType;
+                        
+                    }
                 }
             }
 
@@ -1452,6 +1493,7 @@
             length = source.length;
             index = 0;
             recoverable = options.recoverable;
+            sloppy = options.sloppy;
 
             description = trim(scanDescription());
             
@@ -1470,10 +1512,81 @@
                 tags: tags
             };
         }
-
         exports.parse = parse;
     }(jsdoc = {}));
+   
+    /**
+     * Converts a type expression into a string
+     * @param {{}} expression the expression to convert to a string
+     */
+    function stringify(exp) {
+        var hasElts, hasThisOrElts;
+        switch (exp.type) {
+        case exports.Syntax.NullableLiteral:
+            return '?';
+        case exports.Syntax.AllLiteral:
+            return '*';
+        case exports.Syntax.NullLiteral:
+            return 'null';
+        case exports.Syntax.UndefinedLiteral:
+            return 'undefined';
+        case exports.Syntax.VoidLiteral:
+            return 'void';
+        case exports.Syntax.UnionType:
+            return '(' + exp.elements.map(function(elt) {
+                return stringify(elt);
+            }).join('|') + ')';
 
+        case exports.Syntax.ArrayType:
+            return '[' + exp.elements.map(function(elt) {
+                return stringify(elt);
+            }).join(',') + ']';
+
+        case exports.Syntax.RecordType:
+            return '{' + exp.fields.map(function(elt) {
+                return stringify(elt);
+            }).join(',') + '}';
+
+        case exports.Syntax.FieldType:
+            return exp.key + (exp.value ? ':' + stringify(exp.value) : "");
+
+        case exports.Syntax.FunctionType:
+            hasElts = exp.params && exp.params.length > 0;
+            hasThisOrElts = exp.thisExpr || hasElts;
+            return 'function' + '(' +
+                // parameters
+                exp.params.map(function(elt) {
+                    return stringify(elt);
+                }).join(',') +
+                // this
+                (exp['this'] ? (hasElts ? "," : "") + "this:" + stringify(exp['this']) : '') +
+                // new
+                (exp['new'] ? (hasElts ? "," : "") + "new:" + stringify(exp['new']) : '') + ')' +
+                // result
+                (exp.result ? ':' + stringify(exp.result) : '');
+        
+        case exports.Syntax.ParameterType:
+            return exp.name + (exp.expression ? ':' + stringify(exp.expression) : '');
+            
+        case exports.Syntax.RestType:
+            return "..." + stringify(exp.expression);
+        case exports.Syntax.NonNullableType:
+            return "!" + stringify(exp.expression);
+        case exports.Syntax.OptionalType:
+            return stringify(exp.expression) + "=";
+        case exports.Syntax.NullableType:
+            return "?" + stringify(exp.expression);
+        case exports.Syntax.NameExpression:
+            return exp.name;
+        case exports.Syntax.TypeApplication:
+            return stringify(exp.expression) + '.<' +
+                exp.applications.map(function(elt) {
+                    return stringify(elt);
+                }).join(',') + '>';
+        }
+    }
+
+    exports.stringify = stringify;
     exports.version = VERSION;
     exports.parse = jsdoc.parse;
     exports.parseType = typed.parseType;
