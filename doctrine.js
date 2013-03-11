@@ -49,7 +49,7 @@
     function sliceSource(source, index, last) {
         return source.slice(index, last);
     }
-    
+
     isArray = Array.isArray;
 	if (!isArray) {
 	    isArray = function isArray(ary) {
@@ -1352,7 +1352,7 @@
 
         function scanDescription() {
             var description = '';
-            while (index < length && source[index] != '@') {
+            while (index < length && source[index] !== '@') {
                 description += advance();
             }
             return description;
@@ -1417,7 +1417,7 @@
         }
 
         function parse(comment, options) {
-            var tags = [], tag, description, interestingTags;
+            var tags = [], tag, description, interestingTags, i, iz;
 
             if (options === undefined) {
                 options = {};
@@ -1428,12 +1428,12 @@
             } else {
                 source = comment;
             }
-            
+
             // array of relevant tags
             if (options.tags) {
                 if (isArray(options.tags)) {
                     interestingTags = { };
-                    for (var i = 0; i < options.tags.length; i++) {
+                    for (i = 0, iz = options.tags.length; i < iz; i++) {
                         if (typeof options.tags[i] === 'string') {
                             interestingTags[options.tags[i]] = true;
                         } else {
@@ -1454,7 +1454,7 @@
             recoverable = options.recoverable;
 
             description = trim(scanDescription());
-            
+
             while (true) {
                 tag = next();
                 if (!tag) {
