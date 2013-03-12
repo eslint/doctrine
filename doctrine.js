@@ -22,7 +22,7 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/*jslint bitwise:true plusplus:true */
+/*jslint bitwise:true plusplus:true eqeq:true*/
 /*global doctrine:true, exports:true, parseTypeExpression:true, parseTop:true*/
 
 (function (exports) {
@@ -1188,8 +1188,174 @@
             return expr;
         }
 
+        function stringifyImpl(node, topLevel) {
+            var result, i, iz;
+
+            switch (node.type) {
+            case Syntax.NullableLiteral:
+                result = '?';
+                break;
+
+            case Syntax.AllLiteral:
+                result = '*';
+                break;
+
+            case Syntax.NullLiteral:
+                result = 'null';
+                break;
+
+            case Syntax.UndefinedLiteral:
+                result = 'undefined';
+                break;
+
+            case Syntax.VoidLiteral:
+                result = 'void';
+                break;
+
+            case Syntax.UnionType:
+                if (!topLevel) {
+                    result = '(';
+                } else {
+                    result = '';
+                }
+
+                for (i = 0, iz = node.elements.length; i < iz; ++i) {
+                    result += stringifyImpl(node.elements[i]);
+                    if ((i + 1) !== iz) {
+                        result += '|';
+                    }
+                }
+
+                if (!topLevel) {
+                    result += ')';
+                }
+                break;
+
+            case Syntax.ArrayType:
+                result = '[';
+                for (i = 0, iz = node.elements.length; i < iz; ++i) {
+                    result += stringifyImpl(node.elements[i]);
+                    if ((i + 1) !== iz) {
+                        result += ', ';
+                    }
+                }
+                result += ']';
+                break;
+
+            case Syntax.RecordType:
+                result = '{';
+                for (i = 0, iz = node.fields.length; i < iz; ++i) {
+                    result += stringifyImpl(node.fields[i]);
+                    if ((i + 1) !== iz) {
+                        result += ', ';
+                    }
+                }
+                result += '}';
+                break;
+
+            case Syntax.FieldType:
+                if (node.value) {
+                    result = node.key + ': ' + stringifyImpl(node.value);
+                } else {
+                    result = node.key;
+                }
+                break;
+
+            case Syntax.FunctionType:
+                result = 'function (';
+
+                if (node['this']) {
+                    if (node['new']) {
+                        result += 'new: ';
+                    } else {
+                        result += 'this: ';
+                    }
+
+                    result += stringifyImpl(node['this']);
+
+                    if (node.params.length !== 0) {
+                        result += ', ';
+                    }
+                }
+
+                for (i = 0, iz = node.params.length; i < iz; ++i) {
+                    result += stringifyImpl(node.params[i]);
+                    if ((i + 1) !== iz) {
+                        result += ', ';
+                    }
+                }
+
+                result += ')';
+
+                if (node.result) {
+                    result += ': ' + stringifyImpl(node.result);
+                }
+                break;
+
+            case Syntax.ParameterType:
+                result = node.name + ': ' + stringifyImpl(node.expression);
+                break;
+
+            case Syntax.RestType:
+                result = '...';
+                if (node.expression) {
+                    result += stringifyImpl(node.expression);
+                }
+                break;
+
+            case Syntax.NonNullableType:
+                if (node.prefix) {
+                    result = '!' + stringifyImpl(node.expression);
+                } else {
+                    result = stringifyImpl(node.expression) + '!';
+                }
+                break;
+
+            case Syntax.OptionalType:
+                result = stringifyImpl(node.expression) + '=';
+                break;
+
+            case Syntax.NullableType:
+                if (node.prefix) {
+                    result = '?' + stringifyImpl(node.expression);
+                } else {
+                    result = stringifyImpl(node.expression) + '?';
+                }
+                break;
+
+            case Syntax.NameExpression:
+                result = node.name;
+                break;
+
+            case Syntax.TypeApplication:
+                result = stringifyImpl(node.expression) + '.<';
+                for (i = 0, iz = node.applications.length; i < iz; ++i) {
+                    result += stringifyImpl(node.applications[i]);
+                    if ((i + 1) !== iz) {
+                        result += ', ';
+                    }
+                }
+                result += '>';
+                break;
+
+            default:
+                throw new Error('Unknown type ' + node.type);
+            }
+
+            return result;
+        }
+
+        function stringify(node, options) {
+            if (options == null) {
+                options = {};
+            }
+            return stringifyImpl(node, options.topLevel);
+        }
+
         exports.parseType = parseType;
         exports.parseParamType = parseParamType;
+        exports.stringify = stringify;
+        exports.Syntax = Syntax;
     }(typed = {}));
 
     // JSDoc Tag Parser
@@ -1480,5 +1646,11 @@
     exports.parseParamType = typed.parseParamType;
     exports.unwrapComment = unwrapComment;
     exports.Syntax = shallowCopy(typed.Syntax);
+    exports.type = {
+        Syntax: exports.Syntax,
+        parseType: typed.parseType,
+        parseParamType: typed.parseParamType,
+        stringify: typed.stringify
+    };
 }(typeof exports === 'undefined' ? (doctrine = {}) : exports));
 /* vim: set sw=4 ts=4 et tw=80 : */
