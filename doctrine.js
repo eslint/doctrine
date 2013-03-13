@@ -1520,7 +1520,7 @@
      * @param {{}} expression the expression to convert to a string
      */
     function stringify(exp) {
-        var hasElts, hasThisOrElts;
+        var hasElts, hasThisOrElts, params;
         switch (exp.type) {
         case exports.Syntax.NullableLiteral:
             return '?';
@@ -1551,11 +1551,12 @@
             return exp.key + (exp.value ? ':' + stringify(exp.value) : "");
 
         case exports.Syntax.FunctionType:
-            hasElts = exp.params && exp.params.length > 0;
+            params = exp.params || [];
+            hasElts = params.length > 0;
             hasThisOrElts = exp.thisExpr || hasElts;
             return 'function' + '(' +
                 // parameters
-                exp.params.map(function(elt) {
+                params.map(function(elt) {
                     return stringify(elt);
                 }).join(',') +
                 // this
