@@ -919,7 +919,7 @@
         //   | TypeParameters '(' 'this' ':' TypeName ')' ResultType
         //   | TypeParameters '(' 'this' ':' TypeName ',' ParametersType ')' ResultType
         function parseFunctionType() {
-            var isNew, thisBinding, params, result;
+            var isNew, thisBinding, params, result, fnType;
             assert(token === Token.NAME && value === 'function', 'FunctionType should start with \'function\'');
             consume(Token.NAME);
 
@@ -957,13 +957,16 @@
                 result = parseResultType();
             }
 
-            return {
+			fnType = {
                 type: Syntax.FunctionType,
                 params: params,
                 result: result,
-                'this': thisBinding,
-                'new': isNew
             };
+            if (thisBinding) {
+            	var name = isNew ? 'new' : 'this';
+            	fnType[name] = thisBinding;
+            }
+            return fnType;
         }
 
         // BasicTypeExpression :=
