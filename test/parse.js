@@ -241,6 +241,159 @@ describe('parseType', function () {
             }]
         });
     });
+
+    it('function type simple', function () {
+        var type = doctrine.parseType("function()");
+        type.should.eql({
+		 "type": "FunctionType",
+		 "params": [],
+		 "result": null
+		});
+    });
+    it('function type with name', function () {
+        var type = doctrine.parseType("function(a)");
+        type.should.eql({
+		 "type": "FunctionType",
+		 "params": [
+		{
+		   "type": "NameExpression",
+		   "name": "a"
+		  }
+			 ],
+		 "result": null
+		});
+    });
+    it('function type with name and type', function () {
+        var type = doctrine.parseType("function(a:b)");
+        type.should.eql({
+		 "type": "FunctionType",
+		 "params": [
+		  {
+		   "type": "ParameterType",
+		   "name": "a",
+		   "expression": {
+		    "type": "NameExpression",
+		    "name": "b"
+		   }
+		  }
+		 ],
+		 "result": null
+		});
+    });
+    it('function type with optional param', function () {
+        var type = doctrine.parseType("function(a=)");
+        type.should.eql({
+		 "type": "FunctionType",
+		 "params": [
+		  {
+		   "type": "OptionalType",
+		   "expression": {
+		    "type": "NameExpression",
+		    "name": "a"
+		   }
+		  }
+		 ],
+		 "result": null
+		});
+    });
+    it('function type with optional param name and type', function () {
+        var type = doctrine.parseType("function(a:b=)");
+        type.should.eql({
+		 "type": "FunctionType",
+		 "params": [
+		  {
+		   "type": "OptionalType",
+		   "expression": {
+		    "type": "ParameterType",
+		    "name": "a",
+		    "expression": {
+		     "type": "NameExpression",
+		     "name": "b"
+		    }
+		   }
+		  }
+		 ],
+		 "result": null
+		});
+    });
+    it('function type with rest param', function () {
+        var type = doctrine.parseType("function(...a)");
+        type.should.eql({
+		 "type": "FunctionType",
+		 "params": [
+		  {
+		   "type": "RestType",
+		   "expression": {
+		    "type": "NameExpression",
+		    "name": "a"
+		   }
+		  }
+		 ],
+		 "result": null
+		});
+    });
+    it('function type with rest param name and type', function () {
+        var type = doctrine.parseType("function(...a:b)");
+        type.should.eql({
+		 "type": "FunctionType",
+		 "params": [
+		  {
+		   "type": "RestType",
+		   "expression": {
+		    "type": "ParameterType",
+		    "name": "a",
+		    "expression": {
+		     "type": "NameExpression",
+		     "name": "b"
+		    }
+		   }
+		  }
+		 ],
+		 "result": null
+		});
+    });
+
+    it('function type with optional rest param', function () {
+        var type = doctrine.parseType("function(...a=)");
+        type.should.eql({
+		 "type": "FunctionType",
+		 "params": [
+		  {
+			"type": "RestType", 
+			"expression": {
+			   "type": "OptionalType",
+			   "expression": {
+			    "type": "NameExpression",
+			    "name": "a"
+			   }
+			  }
+			}
+		 ],
+		 "result": null
+		});
+    });
+    it('function type with optional rest param name and type', function () {
+        var type = doctrine.parseType("function(...a:b=)");
+        type.should.eql({
+		 "type": "FunctionType",
+		 "params": [
+		  {
+			"type": "RestType", 
+			"expression": {
+			   "type": "OptionalType",
+			   "expression": {
+			    "type": "ParameterType",
+			    "name": "a",
+			    "expression": {
+			     "type": "NameExpression",
+			     "name": "b"
+			    }
+			  }
+			}
+		 }],
+		 "result": null
+		});
+    });
 });
 
 describe('parseParamType', function () {
@@ -271,9 +424,7 @@ describe('parseParamType', function () {
                 type: 'NameExpression',
                 name: 'number'
             }],
-            result: null,
-            'this': null,
-            'new': false
+            result: null
         });
     });
 
@@ -287,9 +438,7 @@ describe('parseParamType', function () {
             }, {
                 type: 'NullableLiteral'
             }],
-            result: null,
-            'this': null,
-            'new': false
+            result: null
         });
     });
 
@@ -302,9 +451,7 @@ describe('parseParamType', function () {
                 params: [],
                 result: {
                     type: 'NullableLiteral'
-                },
-                'this': null,
-                'new': false
+                }
             }, {
                 type: 'NameExpression',
                 name: 'number'

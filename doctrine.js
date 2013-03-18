@@ -864,21 +864,13 @@
         //
         // Identifier is "new" or "this"
         function parseParametersType() {
-            var params = [], normal = true, expr;
+            var params = [], normal = true, expr, rest = false;
 
             while (token !== Token.RPAREN) {
                 if (token === Token.REST) {
                     // RestParameterType
                     consume(Token.REST);
-                    expr = null;
-                    if (token !== Token.RPAREN) {
-                        expr = parseNameExpression();
-                    }
-                    params.push({
-                        type: Syntax.RestType,
-                        expression: expr
-                    });
-                    break;
+                    rest = true;
                 }
 
                 expr = parseTypeExpression();
@@ -902,6 +894,12 @@
                     if (!normal) {
                         throw 'unexpected token';
                     }
+                }
+                if (rest) {
+                    expr = {
+                        type: Syntax.RestType,
+                        expression: expr
+                    };
                 }
                 params.push(expr);
                 if (token !== Token.RPAREN) {
