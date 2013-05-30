@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012 Yusuke Suzuki <utatane.tea@gmail.com>
+  Copyright (C) 2013 Yusuke Suzuki <utatane.tea@gmail.com>
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are met:
@@ -37,12 +37,12 @@ describe('stringify', function () {
         it (text, function() {
             var result = doctrine.parse("@param {" + text + "} name");
             //    console.log("Parse Tree: " + JSON.stringify(result, null, " "));
-            var stringed = doctrine.stringify(result.tags[0].type);
-            text.should.equal(stringed);
+            var stringed = doctrine.type.stringify(result.tags[0].type, {compact:true});
+            stringed.should.equal(text);
         });
     }
     
-        // simple
+    // simple
     testStringify("String");
     testStringify("*");
     testStringify("null");
@@ -92,17 +92,318 @@ describe('stringify', function () {
     testStringify("function(a:number,callback:function(a:Array.<(String|Number|Object)>):boolean):String");
     testStringify("function(a:(string|number),this:string,new:true):function():number");
     testStringify("function(a:(string|number),this:string,new:true):function(a:function(val):result):number");
-  
-
-    
 });
 
+describe('literals', function() {
+    it('NullableLiteral', function () {
+        doctrine.type.stringify({
+            type: doctrine.Syntax.NullableLiteral
+        }).should.equal('?');
+    });
 
+    it('AllLiteral', function () {
+        doctrine.type.stringify({
+            type: doctrine.Syntax.AllLiteral
+        }).should.equal('*');
+    });
 
-// node unit variant of test. OK to delete. Use this if we want to switch back to nodeunit
-//    function testStringify(text) {
-//        var result = doctrine.parse("@param {" + text + "} name");
-//        //    console.log("Parse Tree: " + JSON.stringify(result, null, " "));
-//        var stringed = doctrine.stringify(result.tags[0].type);
-//        test.equal(text, stringed, "Parse Tree: " + JSON.stringify(result, null, " "));
-//    }
+    it('NullLiteral', function () {
+        doctrine.type.stringify({
+            type: doctrine.Syntax.NullLiteral
+        }).should.equal('null');
+    });
+
+    it('UndefinedLiteral', function () {
+        doctrine.type.stringify({
+            type: doctrine.Syntax.UndefinedLiteral
+        }).should.equal('undefined');
+    });
+});
+
+describe('Expression', function () {
+    it('NameExpression', function () {
+        doctrine.type.stringify({
+            type: doctrine.Syntax.NameExpression,
+            name: 'this.is.valid'
+        }).should.equal('this.is.valid');
+
+        doctrine.type.stringify({
+            type: doctrine.Syntax.NameExpression,
+            name: 'String'
+        }).should.equal('String');
+    });
+
+    it('ArrayType', function () {
+        doctrine.type.stringify({
+            type: doctrine.Syntax.ArrayType,
+            elements: [{
+                type: doctrine.Syntax.NameExpression,
+                name: 'String'
+            }]
+        }).should.equal('[String]');
+
+        doctrine.type.stringify({
+            type: doctrine.Syntax.ArrayType,
+            elements: [{
+                type: doctrine.Syntax.NameExpression,
+                name: 'String'
+            }, {
+                type: doctrine.Syntax.NameExpression,
+                name: 'Number'
+            }]
+        }).should.equal('[String, Number]');
+
+        doctrine.type.stringify({
+            type: doctrine.Syntax.ArrayType,
+            elements: []
+        }).should.equal('[]');
+    });
+
+    it('RecordType', function () {
+        doctrine.type.stringify({
+            type: doctrine.Syntax.RecordType,
+            fields: [{
+                type: doctrine.Syntax.FieldType,
+                key: 'name',
+                value: null
+            }]
+        }).should.equal('{name}');
+
+        doctrine.type.stringify({
+            type: doctrine.Syntax.RecordType,
+            fields: [{
+                type: doctrine.Syntax.FieldType,
+                key: 'name',
+                value: {
+                    type: doctrine.Syntax.NameExpression,
+                    name: 'String'
+                }
+            }]
+        }).should.equal('{name: String}');
+
+        doctrine.type.stringify({
+            type: doctrine.Syntax.RecordType,
+            fields: [{
+                type: doctrine.Syntax.FieldType,
+                key: 'string',
+                value: {
+                    type: doctrine.Syntax.NameExpression,
+                    name: 'String'
+                }
+            }, {
+                type: doctrine.Syntax.FieldType,
+                key: 'number',
+                value: {
+                    type: doctrine.Syntax.NameExpression,
+                    name: 'Number'
+                }
+            }]
+        }).should.equal('{string: String, number: Number}');
+
+        doctrine.type.stringify({
+            type: doctrine.Syntax.RecordType,
+            fields: []
+        }).should.equal('{}');
+    });
+
+    it('UnionType', function () {
+        doctrine.type.stringify({
+            type: doctrine.Syntax.UnionType,
+            elements: [{
+                type: doctrine.Syntax.NameExpression,
+                name: 'String'
+            }]
+        }).should.equal('(String)');
+
+        doctrine.type.stringify({
+            type: doctrine.Syntax.UnionType,
+            elements: [{
+                type: doctrine.Syntax.NameExpression,
+                name: 'String'
+            }, {
+                type: doctrine.Syntax.NameExpression,
+                name: 'Number'
+            }]
+        }).should.equal('(String|Number)');
+
+        doctrine.type.stringify({
+            type: doctrine.Syntax.UnionType,
+            elements: [{
+                type: doctrine.Syntax.NameExpression,
+                name: 'String'
+            }, {
+                type: doctrine.Syntax.NameExpression,
+                name: 'Number'
+            }]
+        }, { topLevel: true }).should.equal('String|Number');
+    });
+
+    it('RestType', function () {
+        doctrine.type.stringify({
+            type: doctrine.Syntax.RestType,
+            expression: {
+                type: doctrine.Syntax.NameExpression,
+                name: 'String'
+            }
+        }).should.equal('...String');
+    });
+
+    it('NonNullableType', function () {
+        doctrine.type.stringify({
+            type: doctrine.Syntax.NonNullableType,
+            expression: {
+                type: doctrine.Syntax.NameExpression,
+                name: 'String',
+            },
+            prefix: true
+        }).should.equal('!String');
+
+        doctrine.type.stringify({
+            type: doctrine.Syntax.NonNullableType,
+            expression: {
+                type: doctrine.Syntax.NameExpression,
+                name: 'String',
+            },
+            prefix: false
+        }).should.equal('String!');
+    });
+
+    it('OptionalType', function () {
+        doctrine.type.stringify({
+            type: doctrine.Syntax.OptionalType,
+            expression: {
+                type: doctrine.Syntax.NameExpression,
+                name: 'String',
+            }
+        }).should.equal('String=');
+    });
+
+    it('NullableType', function () {
+        doctrine.type.stringify({
+            type: doctrine.Syntax.NullableType,
+            expression: {
+                type: doctrine.Syntax.NameExpression,
+                name: 'String',
+            },
+            prefix: true
+        }).should.equal('?String');
+
+        doctrine.type.stringify({
+            type: doctrine.Syntax.NullableType,
+            expression: {
+                type: doctrine.Syntax.NameExpression,
+                name: 'String',
+            },
+            prefix: false
+        }).should.equal('String?');
+    });
+
+    it('TypeApplication', function () {
+        doctrine.type.stringify({
+            type: doctrine.Syntax.TypeApplication,
+            expression: {
+                type: doctrine.Syntax.NameExpression,
+                name: 'Array',
+            },
+            applications: [
+                {
+                    type: doctrine.Syntax.NameExpression,
+                    name: 'String',
+                }
+            ],
+        }).should.equal('Array.<String>');
+
+        doctrine.type.stringify({
+            type: doctrine.Syntax.TypeApplication,
+            expression: {
+                type: doctrine.Syntax.NameExpression,
+                name: 'Array',
+            },
+            applications: [
+                {
+                    type: doctrine.Syntax.NameExpression,
+                    name: 'String',
+                },
+                {
+                    type: doctrine.Syntax.AllLiteral
+                }
+            ],
+        }).should.equal('Array.<String, *>');
+    });
+});
+
+describe('Complex identity', function () {
+    it('Functions', function () {
+        var data01 = 'function (): void';
+        doctrine.type.stringify(
+            doctrine.type.parseType(data01)
+        ).should.equal(data01);
+
+        var data02 = 'function (): String';
+        doctrine.type.stringify(
+            doctrine.type.parseType(data02)
+        ).should.equal(data02);
+
+        var data03 = 'function (test: string): String';
+        doctrine.type.stringify(
+            doctrine.type.parseType(data03)
+        ).should.equal(data03);
+
+        var data04 = 'function (this: Date, test: String): String';
+        doctrine.type.stringify(
+            doctrine.type.parseType(data04)
+        ).should.equal(data04);
+
+        var data05 = 'function (this: Date, a: String, b: Number): String';
+        doctrine.type.stringify(
+            doctrine.type.parseType(data05)
+        ).should.equal(data05);
+
+        var data06 = 'function (this: Date, a: Array.<String, Number>, b: Number): String';
+        doctrine.type.stringify(
+            doctrine.type.parseType(data06)
+        ).should.equal(data06);
+
+        var data07 = 'function (new: Date, a: Array.<String, Number>, b: Number): HashMap.<String, Number>';
+        doctrine.type.stringify(
+            doctrine.type.parseType(data07)
+        ).should.equal(data07);
+
+        var data08 = 'function (new: Date, a: Array.<String, Number>, b: (Number|String|Date)): HashMap.<String, Number>';
+        doctrine.type.stringify(
+            doctrine.type.parseType(data08)
+        ).should.equal(data08);
+
+        var data09 = 'function (new: Date)';
+        doctrine.type.stringify(
+            doctrine.type.parseType(data09)
+        ).should.equal(data09);
+
+        var data10 = 'function (this: Date)';
+        doctrine.type.stringify(
+            doctrine.type.parseType(data10)
+        ).should.equal(data10);
+
+        var data11 = 'function (this: Date, ...list)';
+        doctrine.type.stringify(
+            doctrine.type.parseType(data11)
+        ).should.equal(data11);
+
+        var data11 = 'function (this: Date, test: String=)';
+        doctrine.type.stringify(
+            doctrine.type.parseType(data11)
+        ).should.equal(data11);
+
+        var data12 = 'function (this: Date, ...)';
+        doctrine.type.stringify(
+            doctrine.type.parseType(data12)
+        ).should.equal(data12);
+
+        var data12 = 'function (this: Date, ?=)'
+        doctrine.type.stringify(
+            doctrine.type.parseType(data12)
+        ).should.equal(data12);
+    });
+});
+
+/* vim: set sw=4 ts=4 et tw=80 : */

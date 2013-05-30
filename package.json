@@ -17,14 +17,16 @@
         "url": "http://github.com/Constellation/doctrine.git"
     },
     "devDependencies": {
-      "mocha": "*",
-      "should": "*"
+        "jslint": "~0.1.9",
+        "mocha": "*",
+        "should": "*"
     },
     "licenses": [{
         "type": "BSD",
         "url": "http://github.com/Constellation/doctrine/raw/master/LICENSE.BSD"
     }],
     "scripts": {
-        "test": "./node_modules/.bin/mocha"
+        "test": "npm run-script lint && ./node_modules/.bin/mocha",
+        "lint": "node_modules/jslint/bin/jslint.js doctrine.js"
     }
 }

@@ -22,7 +22,7 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/*jslint bitwise:true plusplus:true */
+/*jslint bitwise:true plusplus:true eqeq:true*/
 /*global doctrine:true, exports:true, parseTypeExpression:true, parseTop:true*/
 
 (function (exports) {
@@ -49,13 +49,13 @@
     function sliceSource(source, index, last) {
         return source.slice(index, last);
     }
-    
+
     isArray = Array.isArray;
-	if (!isArray) {
-	    isArray = function isArray(ary) {
-	        return Object.prototype.toString.call(ary) === '[object Array]';
-	    };
-	}
+    if (!isArray) {
+        isArray = function isArray(ary) {
+            return Object.prototype.toString.call(ary) === '[object Array]';
+        };
+    }
 
     if (!CanAccessStringByIndex) {
         sliceSource = function sliceSource(source, index, last) {
@@ -917,7 +917,7 @@
         //   | TypeParameters '(' 'this' ':' TypeName ')' ResultType
         //   | TypeParameters '(' 'this' ':' TypeName ',' ParametersType ')' ResultType
         function parseFunctionType() {
-            var isNew, thisBinding, params, result, fnType;
+            var isNew, thisBinding, params, result, fnType, name;
             assert(token === Token.NAME && value === 'function', 'FunctionType should start with \'function\'');
             consume(Token.NAME);
 
@@ -955,14 +955,14 @@
                 result = parseResultType();
             }
 
-			fnType = {
+            fnType = {
                 type: Syntax.FunctionType,
                 params: params,
-                result: result,
+                result: result
             };
             if (thisBinding) {
-            	var name = isNew ? 'new' : 'this';
-            	fnType[name] = thisBinding;
+                name = isNew ? 'new' : 'this';
+                fnType[name] = thisBinding;
             }
             return fnType;
         }
@@ -1189,8 +1189,173 @@
             return expr;
         }
 
+        function stringifyImpl(node, compact, topLevel) {
+            var result, i, iz;
+
+            switch (node.type) {
+            case Syntax.NullableLiteral:
+                result = '?';
+                break;
+
+            case Syntax.AllLiteral:
+                result = '*';
+                break;
+
+            case Syntax.NullLiteral:
+                result = 'null';
+                break;
+
+            case Syntax.UndefinedLiteral:
+                result = 'undefined';
+                break;
+
+            case Syntax.VoidLiteral:
+                result = 'void';
+                break;
+
+            case Syntax.UnionType:
+                if (!topLevel) {
+                    result = '(';
+                } else {
+                    result = '';
+                }
+
+                for (i = 0, iz = node.elements.length; i < iz; ++i) {
+                    result += stringifyImpl(node.elements[i], compact);
+                    if ((i + 1) !== iz) {
+                        result += '|';
+                    }
+                }
+
+                if (!topLevel) {
+                    result += ')';
+                }
+                break;
+
+            case Syntax.ArrayType:
+                result = '[';
+                for (i = 0, iz = node.elements.length; i < iz; ++i) {
+                    result += stringifyImpl(node.elements[i], compact);
+                    if ((i + 1) !== iz) {
+                        result += compact ? ',' : ', ';
+                    }
+                }
+                result += ']';
+                break;
+
+            case Syntax.RecordType:
+                result = '{';
+                for (i = 0, iz = node.fields.length; i < iz; ++i) {
+                    result += stringifyImpl(node.fields[i], compact);
+                    if ((i + 1) !== iz) {
+                        result += compact ? ',' : ', ';
+                    }
+                }
+                result += '}';
+                break;
+
+            case Syntax.FieldType:
+                if (node.value) {
+                    result = node.key + (compact ? ':' : ': ') + stringifyImpl(node.value, compact);
+                } else {
+                    result = node.key;
+                }
+                break;
+
+            case Syntax.FunctionType:
+                result = compact ? 'function(' : 'function (';
+
+                if (node['this']) {
+                    if (node['new']) {
+                        result += (compact ? 'new:' : 'new: ');
+                    } else {
+                        result += (compact ? 'this:' : 'this: ');
+                    }
+
+                    result += stringifyImpl(node['this'], compact);
+
+                    if (node.params.length !== 0) {
+                        result += compact ? ',' : ', ';
+                    }
+                }
+
+                for (i = 0, iz = node.params.length; i < iz; ++i) {
+                    result += stringifyImpl(node.params[i], compact);
+                    if ((i + 1) !== iz) {
+                        result += compact ? ',' : ', ';
+                    }
+                }
+
+                result += ')';
+
+                if (node.result) {
+                    result += (compact ? ':' : ': ') + stringifyImpl(node.result, compact);
+                }
+                break;
+
+            case Syntax.ParameterType:
+                result = node.name + (compact ? ':' : ': ') + stringifyImpl(node.expression, compact);
+                break;
+
+            case Syntax.RestType:
+                result = '...';
+                if (node.expression) {
+                    result += stringifyImpl(node.expression, compact);
+                }
+                break;
+
+            case Syntax.NonNullableType:
+                if (node.prefix) {
+                    result = '!' + stringifyImpl(node.expression, compact);
+                } else {
+                    result = stringifyImpl(node.expression, compact) + '!';
+                }
+                break;
+
+            case Syntax.OptionalType:
+                result = stringifyImpl(node.expression, compact) + '=';
+                break;
+
+            case Syntax.NullableType:
+                if (node.prefix) {
+                    result = '?' + stringifyImpl(node.expression, compact);
+                } else {
+                    result = stringifyImpl(node.expression, compact) + '?';
+                }
+                break;
+
+            case Syntax.NameExpression:
+                result = node.name;
+                break;
+
+            case Syntax.TypeApplication:
+                result = stringifyImpl(node.expression, compact) + '.<';
+                for (i = 0, iz = node.applications.length; i < iz; ++i) {
+                    result += stringifyImpl(node.applications[i], compact);
+                    if ((i + 1) !== iz) {
+                        result += compact ? ',' : ', ';
+                    }
+                }
+                result += '>';
+                break;
+
+            default:
+                throw new Error('Unknown type ' + node.type);
+            }
+
+            return result;
+        }
+
+        function stringify(node, options) {
+            if (options == null) {
+                options = {};
+            }
+            return stringifyImpl(node, options.compact, options.topLevel);
+        }
+
         exports.parseType = parseType;
         exports.parseParamType = parseParamType;
+        exports.stringify = stringify;
         exports.Syntax = Syntax;
     }(typed = {}));
 
@@ -1349,7 +1514,6 @@
                 }
                 name += advance();
             }
-            
             if (useBraces && source[index] === ']') {
                 name += advance();
             }
@@ -1367,15 +1531,14 @@
 
         function scanDescription() {
             var description = '';
-            while (index < length && source[index] != '@') {
+            while (index < length && source[index] !== '@') {
                 description += advance();
             }
             return description;
         }
 
         function next() {
-            var tag, title, type, last, description;
-            
+            var tag, title, type, last, description, newType;
             function addError(errorText) {
                 if (!tag.errors) {
                     tag.errors = [];
@@ -1432,15 +1595,14 @@
                         return;
                     }
                 } else {
-                    if (tag.name.charAt(0) === '[' && tag.name.charAt(tag.name.length-1) === ']') {
+                    if (tag.name.charAt(0) === '[' && tag.name.charAt(tag.name.length - 1) === ']') {
                         // convert to an optional type
-                        tag.name = tag.name.substring(1, tag.name.length-1);
-                        var newType = {  
+                        tag.name = tag.name.substring(1, tag.name.length - 1);
+                        newType = {
                             type: "OptionalType",
                             expression: tag.type
                         };
                         tag.type = newType;
-                        
                     }
                 }
             }
@@ -1459,7 +1621,7 @@
         }
 
         function parse(comment, options) {
-            var tags = [], tag, description, interestingTags;
+            var tags = [], tag, description, interestingTags, i, iz;
 
             if (options === undefined) {
                 options = {};
@@ -1470,12 +1632,12 @@
             } else {
                 source = comment;
             }
-            
+
             // array of relevant tags
             if (options.tags) {
                 if (isArray(options.tags)) {
                     interestingTags = { };
-                    for (var i = 0; i < options.tags.length; i++) {
+                    for (i = 0, iz = options.tags.length; i < iz; i++) {
                         if (typeof options.tags[i] === 'string') {
                             interestingTags[options.tags[i]] = true;
                         } else {
@@ -1497,7 +1659,7 @@
             sloppy = options.sloppy;
 
             description = trim(scanDescription());
-            
+
             while (true) {
                 tag = next();
                 if (!tag) {
@@ -1515,85 +1677,18 @@
         }
         exports.parse = parse;
     }(jsdoc = {}));
-   
-    /**
-     * Converts a type expression into a string
-     * @param {{}} expression the expression to convert to a string
-     */
-    function stringify(exp) {
-        var hasElts, hasThisOrElts, params;
-        switch (exp.type) {
-        case exports.Syntax.NullableLiteral:
-            return '?';
-        case exports.Syntax.AllLiteral:
-            return '*';
-        case exports.Syntax.NullLiteral:
-            return 'null';
-        case exports.Syntax.UndefinedLiteral:
-            return 'undefined';
-        case exports.Syntax.VoidLiteral:
-            return 'void';
-        case exports.Syntax.UnionType:
-            return '(' + exp.elements.map(function(elt) {
-                return stringify(elt);
-            }).join('|') + ')';
 
-        case exports.Syntax.ArrayType:
-            return '[' + exp.elements.map(function(elt) {
-                return stringify(elt);
-            }).join(',') + ']';
-
-        case exports.Syntax.RecordType:
-            return '{' + exp.fields.map(function(elt) {
-                return stringify(elt);
-            }).join(',') + '}';
-
-        case exports.Syntax.FieldType:
-            return exp.key + (exp.value ? ':' + stringify(exp.value) : "");
-
-        case exports.Syntax.FunctionType:
-            params = exp.params || [];
-            hasElts = params.length > 0;
-            hasThisOrElts = exp.thisExpr || hasElts;
-            return 'function' + '(' +
-                // parameters
-                params.map(function(elt) {
-                    return stringify(elt);
-                }).join(',') +
-                // this
-                (exp['this'] ? (hasElts ? "," : "") + "this:" + stringify(exp['this']) : '') +
-                // new
-                (exp['new'] ? (hasElts ? "," : "") + "new:" + stringify(exp['new']) : '') + ')' +
-                // result
-                (exp.result ? ':' + stringify(exp.result) : '');
-        
-        case exports.Syntax.ParameterType:
-            return exp.name + (exp.expression ? ':' + stringify(exp.expression) : '');
-            
-        case exports.Syntax.RestType:
-            return "..." + stringify(exp.expression);
-        case exports.Syntax.NonNullableType:
-            return "!" + stringify(exp.expression);
-        case exports.Syntax.OptionalType:
-            return stringify(exp.expression) + "=";
-        case exports.Syntax.NullableType:
-            return "?" + stringify(exp.expression);
-        case exports.Syntax.NameExpression:
-            return exp.name;
-        case exports.Syntax.TypeApplication:
-            return stringify(exp.expression) + '.<' +
-                exp.applications.map(function(elt) {
-                    return stringify(elt);
-                }).join(',') + '>';
-        }
-    }
-
-    exports.stringify = stringify;
     exports.version = VERSION;
     exports.parse = jsdoc.parse;
     exports.parseType = typed.parseType;
     exports.parseParamType = typed.parseParamType;
     exports.unwrapComment = unwrapComment;
     exports.Syntax = shallowCopy(typed.Syntax);
+    exports.type = {
+        Syntax: exports.Syntax,
+        parseType: typed.parseType,
+        parseParamType: typed.parseParamType,
+        stringify: typed.stringify
+    };
 }(typeof exports === 'undefined' ? (doctrine = {}) : exports));
 /* vim: set sw=4 ts=4 et tw=80 : */
