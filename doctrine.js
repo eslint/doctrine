@@ -928,7 +928,6 @@
             isNew = false;
             params = [];
             thisBinding = null;
-
             if (token !== Token.RPAREN) {
                 // ParametersType or 'this'
                 if (token === Token.NAME &&
@@ -961,8 +960,11 @@
                 result: result
             };
             if (thisBinding) {
-                name = isNew ? 'new' : 'this';
-                fnType[name] = thisBinding;
+                // avoid adding null 'new' and 'this' properties
+                fnType['this'] = thisBinding;
+                if (isNew) {
+                    fnType['new'] = true;
+                }
             }
             return fnType;
         }

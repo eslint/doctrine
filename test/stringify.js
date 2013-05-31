@@ -253,7 +253,7 @@ describe('Expression', function () {
             type: doctrine.Syntax.NonNullableType,
             expression: {
                 type: doctrine.Syntax.NameExpression,
-                name: 'String',
+                name: 'String'
             },
             prefix: true
         }).should.equal('!String');
@@ -262,7 +262,7 @@ describe('Expression', function () {
             type: doctrine.Syntax.NonNullableType,
             expression: {
                 type: doctrine.Syntax.NameExpression,
-                name: 'String',
+                name: 'String'
             },
             prefix: false
         }).should.equal('String!');
@@ -273,7 +273,7 @@ describe('Expression', function () {
             type: doctrine.Syntax.OptionalType,
             expression: {
                 type: doctrine.Syntax.NameExpression,
-                name: 'String',
+                name: 'String'
             }
         }).should.equal('String=');
     });
@@ -283,7 +283,7 @@ describe('Expression', function () {
             type: doctrine.Syntax.NullableType,
             expression: {
                 type: doctrine.Syntax.NameExpression,
-                name: 'String',
+                name: 'String'
             },
             prefix: true
         }).should.equal('?String');
@@ -292,7 +292,7 @@ describe('Expression', function () {
             type: doctrine.Syntax.NullableType,
             expression: {
                 type: doctrine.Syntax.NameExpression,
-                name: 'String',
+                name: 'String'
             },
             prefix: false
         }).should.equal('String?');
@@ -303,31 +303,31 @@ describe('Expression', function () {
             type: doctrine.Syntax.TypeApplication,
             expression: {
                 type: doctrine.Syntax.NameExpression,
-                name: 'Array',
+                name: 'Array'
             },
             applications: [
                 {
                     type: doctrine.Syntax.NameExpression,
-                    name: 'String',
+                    name: 'String'
                 }
-            ],
+            ]
         }).should.equal('Array.<String>');
 
         doctrine.type.stringify({
             type: doctrine.Syntax.TypeApplication,
             expression: {
                 type: doctrine.Syntax.NameExpression,
-                name: 'Array',
+                name: 'Array'
             },
             applications: [
                 {
                     type: doctrine.Syntax.NameExpression,
-                    name: 'String',
+                    name: 'String'
                 },
                 {
                     type: doctrine.Syntax.AllLiteral
                 }
-            ],
+            ]
         }).should.equal('Array.<String, *>');
     });
 });
@@ -389,20 +389,21 @@ describe('Complex identity', function () {
             doctrine.type.parseType(data11)
         ).should.equal(data11);
 
-        var data11 = 'function (this: Date, test: String=)';
+        var data11a = 'function (this: Date, test: String=)';
         doctrine.type.stringify(
-            doctrine.type.parseType(data11)
-        ).should.equal(data11);
+            doctrine.type.parseType(data11a)
+        ).should.equal(data11a);
 
-        var data12 = 'function (this: Date, ...)';
-        doctrine.type.stringify(
-            doctrine.type.parseType(data12)
-        ).should.equal(data12);
+        // raw ... are not supported
+//        var data12 = 'function (this: Date, ...)';
+//        doctrine.type.stringify(
+//            doctrine.type.parseType(data12)
+//        ).should.equal(data12);
 
-        var data12 = 'function (this: Date, ?=)'
+        var data12a = 'function (this: Date, ?=)';
         doctrine.type.stringify(
-            doctrine.type.parseType(data12)
-        ).should.equal(data12);
+            doctrine.type.parseType(data12a)
+        ).should.equal(data12a);
     });
 });
 
