@@ -51,11 +51,11 @@
     }
 
     isArray = Array.isArray;
-	if (!isArray) {
-	    isArray = function isArray(ary) {
-	        return Object.prototype.toString.call(ary) === '[object Array]';
-	    };
-	}
+    if (!isArray) {
+        isArray = function isArray(ary) {
+            return Object.prototype.toString.call(ary) === '[object Array]';
+        };
+    }
 
     if (!CanAccessStringByIndex) {
         sliceSource = function sliceSource(source, index, last) {
@@ -864,21 +864,13 @@
         //
         // Identifier is "new" or "this"
         function parseParametersType() {
-            var params = [], normal = true, expr;
+            var params = [], normal = true, expr, rest = false;
 
             while (token !== Token.RPAREN) {
                 if (token === Token.REST) {
                     // RestParameterType
                     consume(Token.REST);
-                    expr = null;
-                    if (token !== Token.RPAREN) {
-                        expr = parseNameExpression();
-                    }
-                    params.push({
-                        type: Syntax.RestType,
-                        expression: expr
-                    });
-                    break;
+                    rest = true;
                 }
 
                 expr = parseTypeExpression();
@@ -903,6 +895,12 @@
                         throw 'unexpected token';
                     }
                 }
+                if (rest) {
+                    expr = {
+                        type: Syntax.RestType,
+                        expression: expr
+                    };
+                }
                 params.push(expr);
                 if (token !== Token.RPAREN) {
                     expect(Token.COMMA);
@@ -919,7 +917,7 @@
         //   | TypeParameters '(' 'this' ':' TypeName ')' ResultType
         //   | TypeParameters '(' 'this' ':' TypeName ',' ParametersType ')' ResultType
         function parseFunctionType() {
-            var isNew, thisBinding, params, result;
+            var isNew, thisBinding, params, result, fnType, name;
             assert(token === Token.NAME && value === 'function', 'FunctionType should start with \'function\'');
             consume(Token.NAME);
 
@@ -930,7 +928,6 @@
             isNew = false;
             params = [];
             thisBinding = null;
-
             if (token !== Token.RPAREN) {
                 // ParametersType or 'this'
                 if (token === Token.NAME &&
@@ -957,13 +954,19 @@
                 result = parseResultType();
             }
 
-            return {
+            fnType = {
                 type: Syntax.FunctionType,
                 params: params,
-                result: result,
-                'this': thisBinding,
-                'new': isNew
+                result: result
             };
+            if (thisBinding) {
+                // avoid adding null 'new' and 'this' properties
+                fnType['this'] = thisBinding;
+                if (isNew) {
+                    fnType['new'] = true;
+                }
+            }
+            return fnType;
         }
 
         // BasicTypeExpression :=
@@ -1188,7 +1191,7 @@
             return expr;
         }
 
-        function stringifyImpl(node, topLevel) {
+        function stringifyImpl(node, compact, topLevel) {
             var result, i, iz;
 
             switch (node.type) {
@@ -1220,7 +1223,7 @@
                 }
 
                 for (i = 0, iz = node.elements.length; i < iz; ++i) {
-                    result += stringifyImpl(node.elements[i]);
+                    result += stringifyImpl(node.elements[i], compact);
                     if ((i + 1) !== iz) {
                         result += '|';
                     }
@@ -1234,9 +1237,9 @@
             case Syntax.ArrayType:
                 result = '[';
                 for (i = 0, iz = node.elements.length; i < iz; ++i) {
-                    result += stringifyImpl(node.elements[i]);
+                    result += stringifyImpl(node.elements[i], compact);
                     if ((i + 1) !== iz) {
-                        result += ', ';
+                        result += compact ? ',' : ', ';
                     }
                 }
                 result += ']';
@@ -1245,9 +1248,9 @@
             case Syntax.RecordType:
                 result = '{';
                 for (i = 0, iz = node.fields.length; i < iz; ++i) {
-                    result += stringifyImpl(node.fields[i]);
+                    result += stringifyImpl(node.fields[i], compact);
                     if ((i + 1) !== iz) {
-                        result += ', ';
+                        result += compact ? ',' : ', ';
                     }
                 }
                 result += '}';
@@ -1255,71 +1258,71 @@
 
             case Syntax.FieldType:
                 if (node.value) {
-                    result = node.key + ': ' + stringifyImpl(node.value);
+                    result = node.key + (compact ? ':' : ': ') + stringifyImpl(node.value, compact);
                 } else {
                     result = node.key;
                 }
                 break;
 
             case Syntax.FunctionType:
-                result = 'function (';
+                result = compact ? 'function(' : 'function (';
 
                 if (node['this']) {
                     if (node['new']) {
-                        result += 'new: ';
+                        result += (compact ? 'new:' : 'new: ');
                     } else {
-                        result += 'this: ';
+                        result += (compact ? 'this:' : 'this: ');
                     }
 
-                    result += stringifyImpl(node['this']);
+                    result += stringifyImpl(node['this'], compact);
 
                     if (node.params.length !== 0) {
-                        result += ', ';
+                        result += compact ? ',' : ', ';
                     }
                 }
 
                 for (i = 0, iz = node.params.length; i < iz; ++i) {
-                    result += stringifyImpl(node.params[i]);
+                    result += stringifyImpl(node.params[i], compact);
                     if ((i + 1) !== iz) {
-                        result += ', ';
+                        result += compact ? ',' : ', ';
                     }
                 }
 
                 result += ')';
 
                 if (node.result) {
-                    result += ': ' + stringifyImpl(node.result);
+                    result += (compact ? ':' : ': ') + stringifyImpl(node.result, compact);
                 }
                 break;
 
             case Syntax.ParameterType:
-                result = node.name + ': ' + stringifyImpl(node.expression);
+                result = node.name + (compact ? ':' : ': ') + stringifyImpl(node.expression, compact);
                 break;
 
             case Syntax.RestType:
                 result = '...';
                 if (node.expression) {
-                    result += stringifyImpl(node.expression);
+                    result += stringifyImpl(node.expression, compact);
                 }
                 break;
 
             case Syntax.NonNullableType:
                 if (node.prefix) {
-                    result = '!' + stringifyImpl(node.expression);
+                    result = '!' + stringifyImpl(node.expression, compact);
                 } else {
-                    result = stringifyImpl(node.expression) + '!';
+                    result = stringifyImpl(node.expression, compact) + '!';
                 }
                 break;
 
             case Syntax.OptionalType:
-                result = stringifyImpl(node.expression) + '=';
+                result = stringifyImpl(node.expression, compact) + '=';
                 break;
 
             case Syntax.NullableType:
                 if (node.prefix) {
-                    result = '?' + stringifyImpl(node.expression);
+                    result = '?' + stringifyImpl(node.expression, compact);
                 } else {
-                    result = stringifyImpl(node.expression) + '?';
+                    result = stringifyImpl(node.expression, compact) + '?';
                 }
                 break;
 
@@ -1328,11 +1331,11 @@
                 break;
 
             case Syntax.TypeApplication:
-                result = stringifyImpl(node.expression) + '.<';
+                result = stringifyImpl(node.expression, compact) + '.<';
                 for (i = 0, iz = node.applications.length; i < iz; ++i) {
-                    result += stringifyImpl(node.applications[i]);
+                    result += stringifyImpl(node.applications[i], compact);
                     if ((i + 1) !== iz) {
-                        result += ', ';
+                        result += compact ? ',' : ', ';
                     }
                 }
                 result += '>';
@@ -1349,7 +1352,7 @@
             if (options == null) {
                 options = {};
             }
-            return stringifyImpl(node, options.topLevel);
+            return stringifyImpl(node, options.compact, options.topLevel);
         }
 
         exports.parseType = parseType;
@@ -1364,7 +1367,8 @@
         var index,
             length,
             source,
-            recoverable;
+            recoverable,
+            sloppy;
 
         function advance() {
             var ch = source[index];
@@ -1475,8 +1479,8 @@
             }
         }
 
-        function parseName(last) {
-            var range, ch, name, i, len;
+        function parseName(last, allowBraces) {
+            var range, ch, name, i, len, useBraces;
 
             // skip white spaces
             while (index < last && (isWhiteSpace(source[index]) || isLineTerminator(source[index]))) {
@@ -1488,7 +1492,11 @@
             }
 
             if (!isIdentifierStart(source[index])) {
-                return;
+                if (allowBraces && source[index] === '[') {
+                    useBraces = true;
+                } else {
+                    return;
+                }
             }
 
             name = advance();
@@ -1499,9 +1507,16 @@
                     advance();
                     break;
                 }
+                if (useBraces && source[index] === ']') {
+                    name += advance();
+                    break;
+                }
                 if (!isIdentifierPart(ch)) {
                     return;
                 }
+                name += advance();
+            }
+            if (useBraces && source[index] === ']') {
                 name += advance();
             }
 
@@ -1525,7 +1540,13 @@
         }
 
         function next() {
-            var tag, title, type, last, description;
+            var tag, title, type, last, description, newType;
+            function addError(errorText) {
+                if (!tag.errors) {
+                    tag.errors = [];
+                }
+                tag.errors.push(errorText);
+            }
 
             // skip to tag
             while (index < length && source[index] !== '@') {
@@ -1540,32 +1561,51 @@
             // scan title
             title = scanTitle();
 
-            // empty title
-            if (!title && !recoverable) {
-                return;
-            }
-
-            // seek to content last index
-            last = seekContent(title);
-
             tag = {
                 title: title,
                 description: null
             };
 
+            // empty title
+            if (!title) {
+                addError("Missing or invalid title");
+                if (!recoverable) {
+                    return;
+                }
+            }
+
+            // seek to content last index
+            last = seekContent(title);
+
             // type required titles
             if (isTypeParameterRequired(title)) {
                 tag.type = parseType(title, last);
-                if (!tag.type && !recoverable) {
-                    return;
+                if (!tag.type) {
+                    addError("Missing or invalid tag type");
+                    if (!recoverable) {
+                        return;
+                    }
                 }
             }
 
             // param, property requires name
             if (title === 'param' || title === 'property') {
-                tag.name = parseName(last);
-                if (!tag.name && !recoverable) {
-                    return;
+                tag.name = parseName(last, sloppy && title === 'param');
+                if (!tag.name) {
+                    addError("Missing or invalid tag name");
+                    if (!recoverable) {
+                        return;
+                    }
+                } else {
+                    if (tag.name.charAt(0) === '[' && tag.name.charAt(tag.name.length - 1) === ']') {
+                        // convert to an optional type
+                        tag.name = tag.name.substring(1, tag.name.length - 1);
+                        newType = {
+                            type: "OptionalType",
+                            expression: tag.type
+                        };
+                        tag.type = newType;
+                    }
                 }
             }
 
@@ -1618,6 +1658,7 @@
             length = source.length;
             index = 0;
             recoverable = options.recoverable;
+            sloppy = options.sloppy;
 
             description = trim(scanDescription());
 
@@ -1636,7 +1677,6 @@
                 tags: tags
             };
         }
-
         exports.parse = parse;
     }(jsdoc = {}));
 
