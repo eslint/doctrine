@@ -1533,8 +1533,22 @@
         }
 
         function scanDescription() {
-            var description = '';
-            while (index < length && source[index] !== '@') {
+            var description = '', ch, atAllowed;
+
+            atAllowed = true;
+            while (index < length) {
+                ch = source[index];
+
+                if (atAllowed && ch === '@') {
+                    break;
+                }
+
+                if (isLineTerminator(ch)) {
+                    atAllowed = true;
+                } else if (atAllowed && !isWhiteSpace(ch)) {
+                    atAllowed = false;
+                }
+
                 description += advance();
             }
             return description;
@@ -1694,4 +1708,4 @@
         stringify: typed.stringify
     };
 }(typeof exports === 'undefined' ? (doctrine = {}) : exports));
-/* vim: set sw=4 ts=4 et tw=80 : */
+/* vim: set sw=5 ts=4 et tw=80 : */

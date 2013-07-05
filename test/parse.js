@@ -30,20 +30,20 @@ require('should');
 
 describe('parse', function () {
     it('const', function () {
-        var res = doctrine.parse('/** @const */');
+        var res = doctrine.parse('/** @const */', { unwrap: true });
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'const');
     });
 
     it('const multiple', function () {
-        var res = doctrine.parse("/**@const\n @const*/");
+        var res = doctrine.parse("/**@const\n @const*/", { unwrap: true });
         res.tags.should.have.length(2);
         res.tags[0].should.have.property('title', 'const');
         res.tags[1].should.have.property('title', 'const');
     });
 
     it('const double', function () {
-        var res = doctrine.parse("/**@const\n @const*/");
+        var res = doctrine.parse("/**@const\n @const*/", { unwrap: true });
         res.tags.should.have.length(2);
         res.tags[0].should.have.property('title', 'const');
         res.tags[1].should.have.property('title', 'const');
@@ -359,7 +359,7 @@ describe('parseType', function () {
 		 "type": "FunctionType",
 		 "params": [
 		  {
-			"type": "RestType", 
+			"type": "RestType",
 			"expression": {
 			   "type": "OptionalType",
 			   "expression": {
@@ -378,7 +378,7 @@ describe('parseType', function () {
 		 "type": "FunctionType",
 		 "params": [
 		  {
-			"type": "RestType", 
+			"type": "RestType",
 			"expression": {
 			   "type": "OptionalType",
 			   "expression": {
@@ -530,7 +530,7 @@ describe('invalid tags', function() {
 });
 
 describe('optional params', function() {
-    
+
     // should fail since sloppy option not set
     it('failure 0', function() {
         doctrine.parse(
@@ -542,7 +542,7 @@ describe('optional params', function() {
         });
     });
     it('success 1', function() {
-        
+
         doctrine.parse(
         ["/**", " * @param {String} [val]", " */"].join('\n'), {
             unwrap: true, sloppy: true
@@ -791,6 +791,64 @@ describe('exported Syntax', function() {
             NullableType: 'NullableType',
             NameExpression: 'NameExpression',
             TypeApplication: 'TypeApplication'
+        });
+    });
+});
+
+describe('@ mark contained descriptions', function () {
+    it ('comment description #10', function () {
+        doctrine.parse(
+            [
+                '/**',
+                ' * Prevents the default action. It is equivalent to',
+                ' * {@code e.preventDefault()}, but can be used as the callback argument of',
+                ' * {@link goog.events.listen} without declaring another function.',
+                ' * @param {!goog.events.Event} e An event.',
+                ' */'
+            ].join('\n'),
+            { unwrap: true, sloppy: true }).should.eql({
+            'description': 'Prevents the default action. It is equivalent to\n{@code e.preventDefault()}, but can be used as the callback argument of\n{@link goog.events.listen} without declaring another function.',
+            'tags': [{
+                'title': 'param',
+                'description': 'An event.',
+                'type': {
+                    'type': 'NonNullableType',
+                    'expression': {
+                        'type': 'NameExpression',
+                        'name': 'goog.events.Event'
+                    },
+                    'prefix': true
+                },
+                'name': 'e'
+            }]
+        });
+    });
+
+    it ('tag description', function () {
+        doctrine.parse(
+            [
+                '/**',
+                ' * Prevents the default action. It is equivalent to',
+                ' * @param {!goog.events.Event} e An event.',
+                ' * {@code e.preventDefault()}, but can be used as the callback argument of',
+                ' * {@link goog.events.listen} without declaring another function.',
+                ' */'
+            ].join('\n'),
+            { unwrap: true, sloppy: true }).should.eql({
+            'description': 'Prevents the default action. It is equivalent to',
+            'tags': [{
+                'title': 'param',
+                'description': 'An event.\n{@code e.preventDefault()}, but can be used as the callback argument of\n{@link goog.events.listen} without declaring another function.',
+                'type': {
+                    'type': 'NonNullableType',
+                    'expression': {
+                        'type': 'NameExpression',
+                        'name': 'goog.events.Event'
+                    },
+                    'prefix': true
+                },
+                'name': 'e'
+            }]
         });
     });
 });
