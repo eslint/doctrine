@@ -1708,4 +1708,4 @@
         stringify: typed.stringify
     };
 }(typeof exports === 'undefined' ? (doctrine = {}) : exports));
-/* vim: set sw=5 ts=4 et tw=80 : */
+/* vim: set sw=4 ts=4 et tw=80 : */
