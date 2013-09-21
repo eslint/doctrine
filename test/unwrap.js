@@ -49,5 +49,9 @@ describe('unwrapComment', function () {
   it('2 lines with space', function () {
     doctrine.unwrapComment('/**x\n *    y\n*/').should.equal('x\n   y\n');
   });
+
+  it('3 lines with blank line', function () {
+    doctrine.unwrapComment('/**x\n *\n \* y\n*/').should.equal('x\n\ny\n');
+  });
 });
 /* vim: set sw=4 ts=4 et tw=80 : */

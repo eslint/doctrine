@@ -150,6 +150,28 @@ describe('parse', function () {
         });
         res.tags[0].should.have.property('description', 'description');
     });
+
+    it('description and param separated by blank line', function () {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * Description",
+                " * blah blah blah",
+                " *",
+                " * @param string name description",
+                "*/"
+            ].join('\n'), { unwrap: true });
+        res.description.should.eql('Description\nblah blah blah');
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'param');
+        res.tags[0].should.have.property('name', 'name');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'string'
+        });
+        res.tags[0].should.have.property('description', 'description');
+    });
 });
 
 describe('parseType', function () {
