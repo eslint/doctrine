@@ -171,7 +171,7 @@
                 if (!isWhiteSpace(ch)) {
                     result += ch;
                 }
-                mode = AFTER_STAR;
+                mode = isLineTerminator(ch) ? BEFORE_STAR : AFTER_STAR;
                 break;
 
             case AFTER_STAR:
