@@ -172,6 +172,17 @@ describe('parse', function () {
         });
         res.tags[0].should.have.property('description', 'description');
     });
+
+    it('regular block comment instead of jsdoc-style block comment', function () {
+        var res = doctrine.parse(
+            [
+                "/*",
+                " * Description",
+                " * blah blah blah",
+                "*/"
+            ].join('\n'), { unwrap: true });
+        res.description.should.eql("Description\nblah blah blah");
+    });
 });
 
 describe('parseType', function () {
