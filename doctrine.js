@@ -147,7 +147,7 @@
             result,
             ch;
 
-        doc = doc.replace(/^\/\*\*/, '').replace(/^\/\*/, '').replace(/\*\/$/, '');
+        doc = doc.replace(/^\/\*\*?/, '').replace(/\*\/$/, '');
         index = 0;
         len = doc.length;
         mode = BEFORE_STAR;
