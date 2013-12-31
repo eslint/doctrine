@@ -1480,45 +1480,65 @@
             }
         }
 
-        function parseName(last, allowBraces) {
-            var range, ch, name, i, len, useBraces;
+        function scanIdentifier(last) {
+            var identifier;
+            if (!isIdentifierStart(source[index])) {
+                return;
+            }
+            identifier = advance();
+            while (index < last && isIdentifierPart(source[index])) {
+                identifier += advance();
+            }
+            return identifier;
+        }
 
-            // skip white spaces
+        function skipWhiteSpace(last) {
             while (index < last && (isWhiteSpace(source[index]) || isLineTerminator(source[index]))) {
                 advance();
             }
+        }
+
+        function parseName(last, allowBraces) {
+            var range, ch, name = '', i, len, useBraces;
+
+            skipWhiteSpace(last);
 
             if (index >= last) {
                 return;
             }
 
+            if (allowBraces && source[index] === '[') {
+                useBraces = true;
+                name = advance();
+            }
+
             if (!isIdentifierStart(source[index])) {
-                if (allowBraces && source[index] === '[') {
-                    useBraces = true;
-                } else {
-                    return;
-                }
+                return;
             }
 
-            name = advance();
+            name += scanIdentifier(last);
 
-            while (index < last) {
-                ch = source[index];
-                if (isWhiteSpace(ch) || isLineTerminator(ch)) {
-                    advance();
-                    break;
-                }
-                if (useBraces && source[index] === ']') {
+            if (useBraces) {
+
+                // do we have a default value for this?
+                if (source[index] === '=') {
+
+                    // consume the '='' symbol
                     name += advance();
-                    break;
+                    // scan in the default value
+                    while (index < last && source[index] !== ']') {
+                        name += advance();
+                    }
                 }
-                if (!isIdentifierPart(ch)) {
+
+                if (index >= last  || source[index] !== ']') {
+                    // we never found a closing ']'
                     return;
                 }
+
+                // collect the last ']'
                 name += advance();
-            }
-            if (useBraces && source[index] === ']') {
-                name += advance();
+
             }
 
             return name;
@@ -1613,13 +1633,19 @@
                     }
                 } else {
                     if (tag.name.charAt(0) === '[' && tag.name.charAt(tag.name.length - 1) === ']') {
+                        // extract the default value if there is one
+                        tag.name = tag.name.substring(1, tag.name.length - 1).split('=');
+                        if (tag.name[1]) {
+                            tag.default = tag.name[1];
+                        }
+                        tag.name = tag.name[0];
                         // convert to an optional type
-                        tag.name = tag.name.substring(1, tag.name.length - 1);
-                        newType = {
-                            type: "OptionalType",
-                            expression: tag.type
-                        };
-                        tag.type = newType;
+                        if (tag.type.type !== "OptionalType") {
+                            tag.type = {
+                                type: "OptionalType",
+                                expression: tag.type
+                            };
+                        }
                     }
                 }
             }
