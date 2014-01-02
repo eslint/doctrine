@@ -575,7 +575,6 @@ describe('optional params', function() {
         });
     });
     it('success 1', function() {
-
         doctrine.parse(
         ["/**", " * @param {String} [val]", " */"].join('\n'), {
             unwrap: true, sloppy: true
@@ -612,6 +611,28 @@ describe('optional params', function() {
                     }
                 },
                 "name": "val"
+            }]
+        });
+    });
+
+    it('success 3', function() {
+        doctrine.parse(
+            ["/**", " * @param {String=} [val=abc] some description", " */"].join('\n'),
+            { unwrap: true, sloppy: true}
+        ).should.eql({
+            "description": "",
+            "tags": [{
+                "title": "param",
+                "description": "some description",
+                "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                        "type": "NameExpression",
+                        "name": "String"
+                    }
+                },
+                "name": "val",
+                "default": "abc"
             }]
         });
     });
