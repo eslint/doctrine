@@ -1029,6 +1029,7 @@
         //   | BasicTypeExpression '?'
         //   | BasicTypeExpression '!'
         //   | '?'
+        //   | BasicTypeExpression '[]'
         function parseTypeExpression() {
             var expr;
 
@@ -1072,6 +1073,19 @@
                     type: Syntax.NullableType,
                     expression: expr,
                     prefix: false
+                };
+            }
+
+            if (token === Token.LBRACK) {
+                consume(Token.LBRACK);
+                consume(Token.RBRACK, 'expected an array-style type declaration (' + value + '[])');
+                return {
+                    type: Syntax.TypeApplication,
+                    expression: {
+                        type: Syntax.NameExpression,
+                        name: 'Array'
+                    },
+                    applications: [expr]
                 };
             }
 
