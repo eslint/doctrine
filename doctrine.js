@@ -1676,6 +1676,10 @@
             // slice description
             description = trim(sliceSource(source, index, last));
             if (description) {
+                if ((/^-\s+/).test(description)) {
+                    description = description.substring(2);
+                }
+
                 tag.description = description;
             }
 

@@ -167,6 +167,25 @@ describe('parse', function () {
         res.tags[0].should.have.property('description', 'description');
     });
 
+    it('param w/ hyphen before description', function () {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @param {string} name - description",
+                "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.eql({
+            title: 'param',
+            type: {
+                type: 'NameExpression',
+                name: 'string'
+            },
+            name: 'name',
+            description: 'description'
+        });
+    });
+
     it('description and param separated by blank line', function () {
         var res = doctrine.parse(
             [
