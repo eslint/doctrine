@@ -81,6 +81,22 @@ describe('parse', function () {
         });
     });
 
+    it('param typeless', function () {
+        var res = doctrine.parse(
+        [
+            "/**",
+            " * @param userName",
+            "*/"
+        ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.eql({
+            title: 'param',
+            type: null,
+            name: 'userName',
+            description: null
+        });
+    });
+
     it('param broken', function () {
         var res = doctrine.parse(
             [
@@ -639,30 +655,6 @@ describe('optional params', function() {
 });
 
 describe('recovery tests', function() {
-	it ('not recoverable', function () {
-		var res = doctrine.parse(
-            [
-                "@param f"
-            ].join('\n'), { recoverable: false });
-
-         // parser will mistakenly think that the type is 'f' and there is no name
-         res.tags.should.have.length(0);
-	});
-
-	it ('params 1', function () {
-		var res = doctrine.parse(
-            [
-                "@param f"
-            ].join('\n'), { recoverable: true });
-
-         // parser will mistakenly think that the type is 'f' and there is no name
-         res.tags.should.have.length(1);
-         res.tags[0].should.have.property('title', 'param');
-         res.tags[0].should.have.property('type');
-         res.tags[0].type.should.have.property('name', 'f');
-         res.tags[0].type.should.have.property('type', 'NameExpression');
-         res.tags[0].should.not.have.property('name');
-	});
 	it ('params 2', function () {
 		var res = doctrine.parse(
             [
@@ -670,13 +662,11 @@ describe('recovery tests', function() {
                 "@param {string} f2"
             ].join('\n'), { recoverable: true });
 
-         // ensure second parameter is OK
+         // ensure both parameters are OK
          res.tags.should.have.length(2);
          res.tags[0].should.have.property('title', 'param');
-         res.tags[0].should.have.property('type');
-         res.tags[0].type.should.have.property('name', 'f');
-         res.tags[0].type.should.have.property('type', 'NameExpression');
-         res.tags[0].should.not.have.property('name');
+         res.tags[0].should.have.property('type', null);
+         res.tags[0].should.have.property('name', 'f');
 
          res.tags[1].should.have.property('title', 'param');
          res.tags[1].should.have.property('type');
