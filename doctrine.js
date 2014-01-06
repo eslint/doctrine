@@ -1,5 +1,6 @@
 /*
-  Copyright (C) 2012-2013 Yusuke Suzuki <utatane.tea@gmail.com>
+  Copyright (C) 2012-2014 Yusuke Suzuki <utatane.tea@gmail.com>
+  Copyright (C) 2014 Dan Tao <daniel.tao@gmail.com>
   Copyright (C) 2013 Andrew Eisenberg <andrew@eisenberg.as>
 
   Redistribution and use in source and binary forms, with or without
