@@ -1627,9 +1627,18 @@
             if (title === 'param' || title === 'property') {
                 tag.name = parseName(last, sloppy && title === 'param');
                 if (!tag.name) {
-                    addError("Missing or invalid tag name");
-                    if (!recoverable) {
-                        return;
+                    // param actually does not require type:
+                    // http://usejsdoc.org/tags-param.html
+                    // it's possible the name has already been parsed but
+                    // interpreted as a type
+                    if (title === 'param' && tag.type.name) {
+                        tag.name = tag.type.name;
+                        tag.type = null;
+                    } else {
+                        addError("Missing or invalid tag name");
+                        if (!recoverable) {
+                            return;
+                        }
                     }
                 } else {
                     if (tag.name.charAt(0) === '[' && tag.name.charAt(tag.name.length - 1) === ']') {

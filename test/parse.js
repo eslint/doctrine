@@ -81,6 +81,22 @@ describe('parse', function () {
         });
     });
 
+    it('param typeless', function () {
+        var res = doctrine.parse(
+        [
+            "/**",
+            " * @param userName",
+            "*/"
+        ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.eql({
+            title: 'param',
+            type: null,
+            name: 'userName',
+            description: null
+        });
+    });
+
     it('param broken', function () {
         var res = doctrine.parse(
             [
