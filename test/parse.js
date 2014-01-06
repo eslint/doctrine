@@ -655,30 +655,6 @@ describe('optional params', function() {
 });
 
 describe('recovery tests', function() {
-	it ('not recoverable', function () {
-		var res = doctrine.parse(
-            [
-                "@param f"
-            ].join('\n'), { recoverable: false });
-
-         // parser will mistakenly think that the type is 'f' and there is no name
-         res.tags.should.have.length(0);
-	});
-
-	it ('params 1', function () {
-		var res = doctrine.parse(
-            [
-                "@param f"
-            ].join('\n'), { recoverable: true });
-
-         // parser will mistakenly think that the type is 'f' and there is no name
-         res.tags.should.have.length(1);
-         res.tags[0].should.have.property('title', 'param');
-         res.tags[0].should.have.property('type');
-         res.tags[0].type.should.have.property('name', 'f');
-         res.tags[0].type.should.have.property('type', 'NameExpression');
-         res.tags[0].should.not.have.property('name');
-	});
 	it ('params 2', function () {
 		var res = doctrine.parse(
             [
