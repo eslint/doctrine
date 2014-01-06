@@ -1614,7 +1614,7 @@
 
             // type required titles
             if (isTypeParameterRequired(title)) {
-                tag.type = parseType(title, last);
+                type = tag.type = parseType(title, last);
                 if (!tag.type) {
                     addError("Missing or invalid tag type");
                     if (!recoverable) {
@@ -1627,12 +1627,11 @@
             if (title === 'param' || title === 'property') {
                 tag.name = parseName(last, sloppy && title === 'param');
                 if (!tag.name) {
-                    // param actually does not require type:
-                    // http://usejsdoc.org/tags-param.html
-                    // it's possible the name has already been parsed but
-                    // interpreted as a type
-                    if (title === 'param' && tag.type.name) {
-                        tag.name = tag.type.name;
+                    // it's possible the name has already been parsed but interpreted as a type
+                    // it's also possible this is a sloppy declaration, in which case it will be
+                    // fixed at the end
+                    if (title === 'param' && type.name) {
+                        tag.name = type.name;
                         tag.type = null;
                     } else {
                         addError("Missing or invalid tag name");
@@ -1664,6 +1663,20 @@
             if (description) {
                 tag.description = description;
             }
+
+            // un-fix potentially sloppy declaration
+            if (title === 'param' && !tag.type && description.charAt(0) === '[') {
+                tag.type = type;
+                tag.name = undefined;
+
+                if (!sloppy) {
+                    addError("Missing or invalid tag name");
+                    if (!recoverable) {
+                        return;
+                    }
+                }
+            }
+
             index = last;
             return tag;
         }

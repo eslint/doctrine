@@ -662,13 +662,11 @@ describe('recovery tests', function() {
                 "@param {string} f2"
             ].join('\n'), { recoverable: true });
 
-         // ensure second parameter is OK
+         // ensure both parameters are OK
          res.tags.should.have.length(2);
          res.tags[0].should.have.property('title', 'param');
-         res.tags[0].should.have.property('type');
-         res.tags[0].type.should.have.property('name', 'f');
-         res.tags[0].type.should.have.property('type', 'NameExpression');
-         res.tags[0].should.not.have.property('name');
+         res.tags[0].should.have.property('type', null);
+         res.tags[0].should.have.property('name', 'f');
 
          res.tags[1].should.have.property('title', 'param');
          res.tags[1].should.have.property('type');
