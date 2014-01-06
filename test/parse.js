@@ -291,6 +291,21 @@ describe('parseType', function () {
         });
     });
 
+    it('array-style type application', function () {
+        var type = doctrine.parseType("String[]");
+        type.should.eql({
+            type: 'TypeApplication',
+            expression: {
+                type: 'NameExpression',
+                name: 'Array'
+            },
+            applications: [{
+                type: 'NameExpression',
+                name: 'String'
+            }]
+        });
+    });
+
     it('function type simple', function () {
         var type = doctrine.parseType("function()");
         type.should.eql({
@@ -299,6 +314,7 @@ describe('parseType', function () {
 		 "result": null
 		});
     });
+
     it('function type with name', function () {
         var type = doctrine.parseType("function(a)");
         type.should.eql({
