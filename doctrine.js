@@ -38,7 +38,7 @@
         isArray;
 
     // Sync with package.json.
-    VERSION = '0.1.1-dev';
+    VERSION = '0.2.0';
 
     // See also tools/generate-unicode-regex.py.
     Regex = {
