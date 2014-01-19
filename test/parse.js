@@ -760,7 +760,9 @@ describe('recovery tests', function() {
          // return tag should exist
          res.tags.should.have.length(1);
          res.tags[0].should.have.property('title', 'returns');
-         res.tags[0].should.not.have.property('type');
+         // Since @returns requires type parameter, its type value becomes
+         // undefined. But property exists.
+         res.tags[0].should.have.property('type', undefined);
 	});
 	it ('return 2', function() {
 		var res = doctrine.parse(
@@ -772,7 +774,9 @@ describe('recovery tests', function() {
          // return tag should exist as well as next tag
          res.tags.should.have.length(2);
          res.tags[0].should.have.property('title', 'returns');
-         res.tags[0].should.not.have.property('type');
+         // Since @returns requires type parameter, its type value becomes
+         // undefined. But property exists.
+         res.tags[0].should.have.property('type', undefined);
 
          res.tags[1].should.have.property('title', 'param');
          res.tags[1].should.have.property('type');
@@ -795,7 +799,9 @@ describe('recovery tests', function() {
          res.tags[0].should.not.have.property('type');
 
          res.tags[1].should.have.property('title', 'returns');
-         res.tags[1].should.not.have.property('type');
+         // Since @returns requires type parameter, its type value becomes
+         // undefined. But property exists.
+         res.tags[1].should.have.property('type', undefined);
 
          res.tags[2].should.have.property('title', 'param');
          res.tags[2].should.have.property('type');
