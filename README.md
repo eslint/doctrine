@@ -1,4 +1,4 @@
-doctrine ([doctrine](http://github.com/Constellation/doctrine)) is JSDoc parser.
+doctrine ([doctrine](http://github.com/Constellation/doctrine)) is JSDoc parser. [![Build Status](https://secure.travis-ci.org/Constellation/doctrine.png)](http://travis-ci.org/Constellation/doctrine)
 
 It is now used by content assist system of [Eclipse Orion](http://www.eclipse.org/orion/) ([detail](http://planetorion.org/news/2012/10/orion-1-0-release/))
 
@@ -48,7 +48,52 @@ and gets following information
 
 see [demo page](http://constellation.github.com/doctrine/demo/index.html) more detail.
 
-[![Build Status](https://secure.travis-ci.org/Constellation/doctrine.png)](http://travis-ci.org/Constellation/doctrine)
+### Options
+
+#### doctrine.parse
+We can pass options to `doctrine.parse(comment, options)`.
+```js
+{
+    unwrap: boolean,          // default: false
+    tags: [ string ] | null,  // default: null
+    recoverable: boolean,     // default: false
+    sloppy: boolean           // default: false
+}
+```
+
+##### unwrap
+
+When `unwrap` is `true`, doctrine attempt to unwrap comment specific string from a provided comment text. (removes `/**`, `*/` and `*`)
+For example, `unwrap` transforms
+```
+/**
+ * @param use
+ */
+```
+to
+```
+@param use
+```
+If a provded comment has these comment specific strings, you need to specify this `unwrap` option to `true`.
+
+##### tags
+
+When `tags` array is specified, doctrine only produce tags that is specified in this array.
+For example, if you specify `[ 'param' ]`, doctrine only produces `param` tags.
+If null is specified, doctrine produces all tags that doctrine can recognize.
+
+##### recoverable
+
+When `recoverable` is `true`, doctrine becomes `recoverable` - When failing to parse jsdoc comment, doctrine recovers its state and attempt to continue parsing.
+
+##### sloppy
+
+When `sloppy` is `true`,
+```
+@param String [foo]
+```
+'s `[foo]` is interpreted as a optional parameter, not interpreted as a name of this `@param`.
+
 
 ### License
 
