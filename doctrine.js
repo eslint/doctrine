@@ -119,12 +119,23 @@
         return '><(){}[],:*|?!='.indexOf(ch) === -1 && !isWhiteSpace(ch) && !isLineTerminator(ch);
     }
 
+    function DoctrineError(message) {
+        this.name = 'DoctrineError';
+        this.message = message;
+    }
+    DoctrineError.prototype = new Error();
+    DoctrineError.prototype.constructor = DoctrineError;
+
+    function throwError(message) {
+        throw new DoctrineError(message);
+    }
+
     function assert(cond, text) { }
 
     if (VERSION.slice(-3) === 'dev') {
         assert = function assert(cond, text) {
             if (!cond) {
-                throw new Error(text);
+                throwError(text);
             }
         };
     }
@@ -352,7 +363,7 @@
             }
 
             if (quote !== '') {
-                throw 'unexpected quote';
+                throwError('unexpected quote');
             }
 
             value = str;
@@ -380,13 +391,13 @@
 
                         if (number.length <= 2) {
                             // only 0x
-                            throw 'unexpected token';
+                            throwError('unexpected token');
                         }
 
                         if (index < length) {
                             ch = source[index];
                             if (isIdentifierStart(ch)) {
-                                throw 'unexpected token';
+                                throwError('unexpected token');
                             }
                         }
                         value = parseInt(number, 16);
@@ -406,7 +417,7 @@
                         if (index < length) {
                             ch = source[index];
                             if (isIdentifierStart(ch) || isDecimalDigit(ch)) {
-                                throw 'unexpected token';
+                                throwError('unexpected token');
                             }
                         }
                         value = parseInt(number, 8);
@@ -414,7 +425,7 @@
                     }
 
                     if (isDecimalDigit(ch)) {
-                        throw 'unexpected token';
+                        throwError('unexpected token');
                     }
                 }
 
@@ -457,14 +468,14 @@
                         number += advance();
                     }
                 } else {
-                    throw 'unexpected token';
+                    throwError('unexpected token');
                 }
             }
 
             if (index < length) {
                 ch = source[index];
                 if (isIdentifierStart(ch)) {
-                    throw 'unexpected token';
+                    throwError('unexpected token');
                 }
             }
 
@@ -639,7 +650,7 @@
 
         function expect(target) {
             if (token !== target) {
-                throw 'unexpected token';
+                throwError('unexpected token');
             }
             next();
         }
@@ -718,7 +729,7 @@
                 return String(v);
             }
 
-            throw 'unexpected token';
+            throwError('unexpected token');
         }
 
         // FieldType :=
@@ -894,7 +905,7 @@
                     normal = false;
                 } else {
                     if (!normal) {
-                        throw 'unexpected token';
+                        throwError('unexpected token');
                     }
                 }
                 if (rest) {
@@ -1019,7 +1030,7 @@
                 return parseTypeName();
 
             default:
-                throw "unexpected token";
+                throwError("unexpected token");
             }
         }
 
@@ -1172,7 +1183,7 @@
             }
 
             if (token !== Token.EOF) {
-                throw 'not reach to EOF';
+                throwError('not reach to EOF');
             }
 
             return expr;
@@ -1201,7 +1212,7 @@
             }
 
             if (token !== Token.EOF) {
-                throw 'not reach to EOF';
+                throwError('not reach to EOF');
             }
 
             return expr;
@@ -1358,7 +1369,7 @@
                 break;
 
             default:
-                throw new Error('Unknown type ' + node.type);
+                throwError('Unknown type ' + node.type);
             }
 
             return result;
@@ -1384,7 +1395,8 @@
             length,
             source,
             recoverable,
-            sloppy;
+            sloppy,
+            strict;
 
         function advance() {
             var ch = source[index];
@@ -1449,24 +1461,28 @@
 
             if (!direct) {
                 // type expression { is found
-                brace = 0;
+                brace = 1;
                 type = '';
                 while (index < last) {
                     ch = source[index];
                     if (isLineTerminator(ch)) {
-                        return;
+                        break;
                     }
                     if (ch === '}') {
+                        brace -= 1;
                         if (brace === 0) {
                             advance();
                             break;
-                        } else {
-                            brace -= 1;
                         }
                     } else if (ch === '{') {
                         brace += 1;
                     }
                     type += advance();
+                }
+
+                if (brace !== 0) {
+                    // braces is not balanced
+                    return throwError('Braces are not balanced');
                 }
 
                 try {
@@ -1595,6 +1611,9 @@
                 if (!tag.errors) {
                     tag.errors = [];
                 }
+                if (strict) {
+                    throwError(errorText);
+                }
                 tag.errors.push(errorText);
             }
 
@@ -1629,9 +1648,17 @@
 
             // type required titles
             if (isTypeParameterRequired(title)) {
-                type = tag.type = parseType(title, last);
-                if (!tag.type) {
-                    addError("Missing or invalid tag type");
+                try {
+                    type = tag.type = parseType(title, last);
+                    if (!tag.type) {
+                        addError("Missing or invalid tag type");
+                        if (!recoverable) {
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    type = tag.type = null;
+                    addError(error.message);
                     if (!recoverable) {
                         return;
                     }
@@ -1725,11 +1752,11 @@
                         if (typeof options.tags[i] === 'string') {
                             interestingTags[options.tags[i]] = true;
                         } else {
-                            throw new Error('Invalid "tags" parameter: ' + options.tags);
+                            throwError('Invalid "tags" parameter: ' + options.tags);
                         }
                     }
                 } else {
-                    throw new Error('Invalid "tags" parameter: ' + options.tags);
+                    throwError('Invalid "tags" parameter: ' + options.tags);
                 }
             }
 
@@ -1741,6 +1768,7 @@
             index = 0;
             recoverable = options.recoverable;
             sloppy = options.sloppy;
+            strict = options.strict;
 
             description = trim(scanDescription());
 
@@ -1768,6 +1796,7 @@
     exports.parseParamType = typed.parseParamType;
     exports.unwrapComment = unwrapComment;
     exports.Syntax = shallowCopy(typed.Syntax);
+    exports.Error = DoctrineError;
     exports.type = {
         Syntax: exports.Syntax,
         parseType: typed.parseType,
