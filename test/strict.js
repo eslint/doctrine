@@ -70,6 +70,26 @@ describe('strict parse', function () {
                     " */"
                 ].join('\n'), { unwrap: true });
         }).should.not.throw();
+
+        (function () {
+            doctrine.parse(
+                [
+                    "/**",
+                    " * Description",
+                    " * @returns {int",
+                    " */"
+                ].join('\n'), { unwrap: true, strict: true });
+        }).should.throw('Braces are not balanced');
+
+        (function () {
+            doctrine.parse(
+                [
+                    "/**",
+                    " * Description",
+                    " * @returns {int",
+                    " */"
+                ].join('\n'), { unwrap: true });
+        }).should.not.throw();
     });
 
     // https://github.com/Constellation/doctrine/issues/21
