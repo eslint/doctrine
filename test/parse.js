@@ -95,6 +95,20 @@ describe('parse', function () {
             name: 'userName',
             description: null
         });
+
+        var res = doctrine.parse(
+        [
+            "/**",
+            " * @param userName Something descriptive",
+            "*/"
+        ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.eql({
+            title: 'param',
+            type: null,
+            name: 'userName',
+            description: 'Something descriptive'
+        });
     });
 
     it('param broken', function () {
@@ -158,13 +172,9 @@ describe('parse', function () {
             ].join('\n'), { unwrap: true });
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'param');
-        res.tags[0].should.have.property('name', 'name');
-        res.tags[0].should.have.property('type');
-        res.tags[0].type.should.eql({
-            type: 'NameExpression',
-            name: 'string'
-        });
-        res.tags[0].should.have.property('description', 'description');
+        res.tags[0].should.have.property('name', 'string');
+        res.tags[0].should.have.property('type', null);
+        res.tags[0].should.have.property('description', 'name description');
     });
 
     it('param w/ hyphen before description', function () {
@@ -212,7 +222,7 @@ describe('parse', function () {
                 " * Description",
                 " * blah blah blah",
                 " *",
-                " * @param string name description",
+                " * @param {string} name description",
                 "*/"
             ].join('\n'), { unwrap: true });
         res.description.should.eql('Description\nblah blah blah');
@@ -739,10 +749,9 @@ describe('recovery tests', function() {
          // ensure first parameter is OK even with invalid type name
          res.tags.should.have.length(2);
          res.tags[0].should.have.property('title', 'param');
-         res.tags[0].should.have.property('type');
-         res.tags[0].type.should.have.property('name', 'string');
-         res.tags[0].type.should.have.property('type', 'NameExpression');
-         res.tags[0].should.have.property('name', 'f');
+         res.tags[0].should.have.property('type', null);
+         res.tags[0].should.have.property('name', 'string');
+         res.tags[0].should.have.property('description', 'f');
 
          res.tags[1].should.have.property('title', 'param');
          res.tags[1].should.have.property('type');

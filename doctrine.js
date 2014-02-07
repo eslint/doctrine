@@ -119,6 +119,18 @@
         return '><(){}[],:*|?!='.indexOf(ch) === -1 && !isWhiteSpace(ch) && !isLineTerminator(ch);
     }
 
+    function isParamTitle(title) {
+        return title === 'param' || title === 'arguments' || title === 'arg';
+    }
+
+    function isTypeParameterRequired(title) {
+        return isParamTitle(title) || title === 'define' || title === 'enum' ||
+            title === 'extends' || title === 'implements' || title === 'return' ||
+            title === 'this' || title === 'type' || title === 'typedef' ||
+            title === 'throws' || title === 'returns' || title === 'property' ||
+            title === 'augments';
+    }
+
     function DoctrineError(message) {
         this.name = 'DoctrineError';
         this.message = message;
@@ -1486,7 +1498,7 @@
                 }
 
                 try {
-                    if (title === 'param') {
+                    if (isParamTitle(title)) {
                         return typed.parseParamType(type);
                     }
                     return typed.parseType(type);
@@ -1495,19 +1507,7 @@
                     return;
                 }
             } else {
-                type = sliceSource(source, index, last);
-                try {
-                    if (title === 'param') {
-                        res = typed.parseParamType(type, { midstream: true });
-                    } else {
-                        res = typed.parseType(type, { midstream: true });
-                    }
-                    index += res.index;
-                    return res.expression;
-                } catch (e2) {
-                    // parse failed
-                    return;
-                }
+                return;
             }
         }
 
@@ -1573,14 +1573,6 @@
             }
 
             return name;
-        }
-
-        function isTypeParameterRequired(title) {
-            return title === 'define' || title === 'enum' || title === 'extends' ||
-                title === 'implements' || title === 'param' || title === 'return' ||
-                title === 'this' || title === 'type' || title === 'typedef' ||
-                title === 'throws' || title === 'returns' || title === 'property' ||
-                title === 'augments';
         }
 
         function scanDescription() {
@@ -1651,9 +1643,11 @@
                 try {
                     type = tag.type = parseType(title, last);
                     if (!tag.type) {
-                        addError("Missing or invalid tag type");
-                        if (!recoverable) {
-                            return;
+                        if (!isParamTitle(title)) {
+                            addError("Missing or invalid tag type");
+                            if (!recoverable) {
+                                return;
+                            }
                         }
                     }
                 } catch (error) {
@@ -1666,13 +1660,13 @@
             }
 
             // param, property requires name
-            if (title === 'param' || title === 'property') {
-                tag.name = parseName(last, sloppy && title === 'param');
+            if (isParamTitle(title) || title === 'property') {
+                tag.name = parseName(last, sloppy && isParamTitle(title));
                 if (!tag.name) {
                     // it's possible the name has already been parsed but interpreted as a type
                     // it's also possible this is a sloppy declaration, in which case it will be
                     // fixed at the end
-                    if (title === 'param' && type.name) {
+                    if (isParamTitle(title) && type.name) {
                         tag.name = type.name;
                         tag.type = null;
                     } else {
@@ -1711,7 +1705,7 @@
             }
 
             // un-fix potentially sloppy declaration
-            if (title === 'param' && !tag.type && description.charAt(0) === '[') {
+            if (isParamTitle(title) && !tag.type && description.charAt(0) === '[') {
                 tag.type = type;
                 tag.name = undefined;
 
