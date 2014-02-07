@@ -29,6 +29,7 @@ var doctrine = require('../doctrine');
 require('should');
 
 describe('strict parse', function () {
+    // https://github.com/Constellation/doctrine/issues/21
     it('unbalanced braces', function () {
         (function () {
             doctrine.parse(
@@ -47,8 +48,31 @@ describe('strict parse', function () {
                     " */"
                 ].join('\n'), { unwrap: true });
         }).should.not.throw();
+
+        (function () {
+            doctrine.parse(
+                [
+                    "/**",
+                    " * Description",
+                    " * @param {string name Param description",
+                    " * @param {int} foo Bar",
+                    " */"
+                ].join('\n'), { unwrap: true, strict: true });
+        }).should.throw('Braces are not balanced');
+
+        (function () {
+            doctrine.parse(
+                [
+                    "/**",
+                    " * Description",
+                    " * @param {string name Param description",
+                    " * @param {int} foo Bar",
+                    " */"
+                ].join('\n'), { unwrap: true });
+        }).should.not.throw();
     });
 
+    // https://github.com/Constellation/doctrine/issues/21
     it('incorrect tag starting with @@', function () {
         (function () {
             doctrine.parse(
@@ -64,6 +88,26 @@ describe('strict parse', function () {
                 [
                     "/**",
                     " * @@version",
+                    " */"
+                ].join('\n'), { unwrap: true });
+        }).should.not.throw();
+
+        (function () {
+            doctrine.parse(
+                [
+                    "/**",
+                    " * Description",
+                    " * @@param {string} name Param description",
+                    " */"
+                ].join('\n'), { unwrap: true, strict: true });
+        }).should.throw('Missing or invalid title');
+
+        (function () {
+            doctrine.parse(
+                [
+                    "/**",
+                    " * Description",
+                    " * @@param {string} name Param description",
                     " */"
                 ].join('\n'), { unwrap: true });
         }).should.not.throw();
