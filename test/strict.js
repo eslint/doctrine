@@ -48,4 +48,24 @@ describe('strict parse', function () {
                 ].join('\n'), { unwrap: true });
         }).should.not.throw();
     });
+
+    it('incorrect tag starting with @@', function () {
+        (function () {
+            doctrine.parse(
+                [
+                    "/**",
+                    " * @@version",
+                    " */"
+                ].join('\n'), { unwrap: true, strict: true });
+        }).should.throw('Missing or invalid title');
+
+        (function () {
+            doctrine.parse(
+                [
+                    "/**",
+                    " * @@version",
+                    " */"
+                ].join('\n'), { unwrap: true });
+        }).should.not.throw();
+    });
 });
