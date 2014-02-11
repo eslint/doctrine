@@ -131,6 +131,10 @@
             title === 'augments';
     }
 
+    function stringToArray(str) {
+        return str.split('');
+    }
+
     function DoctrineError(message) {
         this.name = 'DoctrineError';
         this.message = message;
@@ -1719,10 +1723,6 @@
 
             index = last;
             return tag;
-        }
-
-        function stringToArray(str) {
-            return str.split('');
         }
 
         function parse(comment, options) {
