@@ -1579,30 +1579,19 @@
             return name;
         }
 
-        function scanDescription() {
-            var description = '', ch, atAllowed;
-
-            atAllowed = true;
-            while (index < length) {
-                ch = source[index];
-
-                if (atAllowed && ch === '@') {
-                    break;
+        function parseDescription(source, index, last) {
+            var description = trim(sliceSource(source, index, last));
+            if (description) {
+                if ((/^-\s+/).test(description)) {
+                    description = description.substring(2);
                 }
-
-                if (isLineTerminator(ch)) {
-                    atAllowed = true;
-                } else if (atAllowed && !isWhiteSpace(ch)) {
-                    atAllowed = false;
-                }
-
-                description += advance();
+                return description;
             }
-            return description;
+            return null;
         }
 
-        function next() {
-            var tag, title, type, last, description, newType;
+        function parseTag() {
+            var tag, title, type, last, newType, assign;
             function addError(errorText) {
                 if (!tag.errors) {
                     tag.errors = [];
@@ -1682,11 +1671,13 @@
                 } else {
                     if (tag.name.charAt(0) === '[' && tag.name.charAt(tag.name.length - 1) === ']') {
                         // extract the default value if there is one
-                        tag.name = tag.name.substring(1, tag.name.length - 1).split('=');
-                        if (tag.name[1]) {
-                            tag.default = tag.name[1];
+                        // example: @param {string} [somebody=John Doe] description
+                        assign = tag.name.substring(1, tag.name.length - 1).split('=');
+                        if (assign[1]) {
+                            tag.default = assign[1];
                         }
-                        tag.name = tag.name[0];
+                        tag.name = assign[0];
+
                         // convert to an optional type
                         if (tag.type.type !== "OptionalType") {
                             tag.type = {
@@ -1699,17 +1690,10 @@
             }
 
             // slice description
-            description = trim(sliceSource(source, index, last));
-            if (description) {
-                if ((/^-\s+/).test(description)) {
-                    description = description.substring(2);
-                }
-
-                tag.description = description;
-            }
+            tag.description = parseDescription(source, index, last);
 
             // un-fix potentially sloppy declaration
-            if (isParamTitle(title) && !tag.type && description.charAt(0) === '[') {
+            if (isParamTitle(title) && !tag.type && tag.description && tag.description.charAt(0) === '[') {
                 tag.type = type;
                 tag.name = undefined;
 
@@ -1723,6 +1707,32 @@
 
             index = last;
             return tag;
+        }
+
+        //
+        // Parse JSDoc
+        //
+
+        function scanJSDocDescription() {
+            var description = '', ch, atAllowed;
+
+            atAllowed = true;
+            while (index < length) {
+                ch = source[index];
+
+                if (atAllowed && ch === '@') {
+                    break;
+                }
+
+                if (isLineTerminator(ch)) {
+                    atAllowed = true;
+                } else if (atAllowed && !isWhiteSpace(ch)) {
+                    atAllowed = false;
+                }
+
+                description += advance();
+            }
+            return trim(description);
         }
 
         function parse(comment, options) {
@@ -1764,10 +1774,10 @@
             sloppy = options.sloppy;
             strict = options.strict;
 
-            description = trim(scanDescription());
+            description = scanJSDocDescription();
 
             while (true) {
-                tag = next();
+                tag = parseTag();
                 if (!tag) {
                     break;
                 }
