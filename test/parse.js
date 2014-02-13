@@ -966,4 +966,22 @@ describe('@ mark contained descriptions', function () {
     });
 });
 
+describe('function', function () {
+    it ('recognize "function" type', function () {
+		var res = doctrine.parse(
+            [
+                "@param {function} foo description",
+            ].join('\n'), {});
+         res.tags.should.have.length(1);
+         res.tags[0].should.have.property('title', 'param');
+         res.tags[0].should.have.property('type');
+         res.tags[0].type.should.eql({
+             "name": "function",
+             "type": "NameExpression"
+         });
+         res.tags[0].should.have.property('name', 'foo');
+         res.tags[0].should.have.property('description', 'description');
+    });
+});
+
 /* vim: set sw=4 ts=4 et tw=80 : */

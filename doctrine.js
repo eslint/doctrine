@@ -24,7 +24,7 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/*jslint bitwise:true plusplus:true eqeq:true*/
+/*jslint bitwise:true plusplus:true eqeq:true nomen:true*/
 /*global doctrine:true, exports:true, parseTypeExpression:true, parseTop:true*/
 
 (function (exports) {
@@ -220,10 +220,10 @@
     (function (exports) {
         var Syntax,
             Token,
-            index,
-            previous,
             source,
             length,
+            index,
+            previous,
             token,
             value;
 
@@ -271,6 +271,24 @@
             STRING: 20,    // string
             NUMBER: 21,    // number
             EOF: 22
+        };
+
+        function Context(previous, index, token, value) {
+            this._previous = previous;
+            this._index = index;
+            this._token = token;
+            this._value = value;
+        }
+
+        Context.prototype.restore = function () {
+            previous = this._previous;
+            index = this._index;
+            token = this._token;
+            value = this._value;
+        };
+
+        Context.save = function () {
+            return new Context(previous, index, token, value);
         };
 
         function advance() {
@@ -1008,6 +1026,7 @@
         //   | RecordType
         //   | ArrayType
         function parseBasicTypeExpression() {
+            var context;
             switch (token) {
             case Token.STAR:
                 consume(Token.STAR);
@@ -1039,8 +1058,13 @@
                     };
                 }
 
+                context = Context.save();
                 if (value === 'function') {
-                    return parseFunctionType();
+                    try {
+                        return parseFunctionType();
+                    } catch (e) {
+                        context.restore();
+                    }
                 }
 
                 return parseTypeName();
