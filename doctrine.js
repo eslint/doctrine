@@ -1432,6 +1432,7 @@
 
     (function (exports) {
         var index,
+            lineNumber,
             length,
             source,
             recoverable,
@@ -1441,6 +1442,9 @@
         function advance() {
             var ch = source[index];
             index += 1;
+            if (isLineTerminator(ch)) {
+                lineNumber += 1;
+            }
             return ch;
         }
 
@@ -1463,6 +1467,7 @@
             while (last < length) {
                 ch = source[last];
                 if (isLineTerminator(ch)) {
+                    lineNumber += 1;
                     waiting = true;
                 } else if (waiting) {
                     if (ch === '@') {
@@ -1614,7 +1619,7 @@
             return null;
         }
 
-        function parseTag() {
+        function parseTag(options) {
             var tag, title, type, last, newType, assign;
             function addError(errorText) {
                 if (!tag.errors) {
@@ -1643,6 +1648,10 @@
                 title: title,
                 description: null
             };
+
+            if (options.lineNumbers) {
+                tag.lineNumber = lineNumber;
+            }
 
             // empty title
             if (!title) {
@@ -1794,6 +1803,7 @@
 
             length = source.length;
             index = 0;
+            lineNumber = 0;
             recoverable = options.recoverable;
             sloppy = options.sloppy;
             strict = options.strict;
@@ -1801,7 +1811,7 @@
             description = scanJSDocDescription();
 
             while (true) {
-                tag = parseTag();
+                tag = parseTag(options);
                 if (!tag) {
                     break;
                 }
