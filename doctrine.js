@@ -128,7 +128,7 @@
             title === 'extends' || title === 'implements' || title === 'return' ||
             title === 'this' || title === 'type' || title === 'typedef' ||
             title === 'throws' || title === 'returns' || title === 'property' ||
-            title === 'augments';
+            title === 'prop';
     }
 
     function stringToArray(str) {

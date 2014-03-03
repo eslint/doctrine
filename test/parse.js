@@ -247,6 +247,13 @@ describe('parse', function () {
             ].join('\n'), { unwrap: true });
         res.description.should.eql("Description\nblah blah blah");
     });
+
+    it('augments', function () {
+        var res = doctrine.parse('/** @augments ClassName */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'augments');
+    });
+
 });
 
 describe('parseType', function () {
