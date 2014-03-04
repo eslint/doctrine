@@ -254,6 +254,56 @@ describe('parse', function () {
         res.tags[0].should.have.property('title', 'augments');
     });
 
+
+    it('prop', function () {
+        var res = doctrine.parse(
+            [
+              "/**",
+              " * @prop {string} thingName - does some stuff",
+              "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'prop');
+        res.tags[0].should.have.property('description', 'does some stuff');
+        res.tags[0].type.should.have.property('name', 'string');
+        res.tags[0].should.have.property('name', 'thingName');
+    });
+
+    it('prop without type', function () {
+        var res = doctrine.parse(
+            [
+              "/**",
+              " * @prop thingName - does some stuff",
+              "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(0);
+    });
+
+
+    it('property', function () {
+        var res = doctrine.parse(
+            [
+              "/**",
+              " * @property {string} thingName - does some stuff",
+              "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'property');
+        res.tags[0].should.have.property('description', 'does some stuff');
+        res.tags[0].type.should.have.property('name', 'string');
+        res.tags[0].should.have.property('name', 'thingName');
+    });
+
+    it('property without type', function () {
+        var res = doctrine.parse(
+            [
+              "/**",
+              " * @property thingName - does some stuff",
+              "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(0);
+    });
+
 });
 
 describe('parseType', function () {
