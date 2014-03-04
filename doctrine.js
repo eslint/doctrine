@@ -128,7 +128,7 @@
             title === 'extends' || title === 'implements' || title === 'return' ||
             title === 'this' || title === 'type' || title === 'typedef' ||
             title === 'throws' || title === 'returns' || title === 'property' ||
-            title === 'augments';
+            title === 'prop';
     }
 
     function stringToArray(str) {
@@ -1686,7 +1686,7 @@
             }
 
             // param, property requires name
-            if (isParamTitle(title) || title === 'property') {
+            if (isParamTitle(title) || title === 'property' || title === 'prop') {
                 tag.name = parseName(last, sloppy && isParamTitle(title));
                 if (!tag.name) {
                     // it's possible the name has already been parsed but interpreted as a type
