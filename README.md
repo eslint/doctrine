@@ -57,7 +57,8 @@ We can pass options to `doctrine.parse(comment, options)`.
     unwrap: boolean,          // default: false
     tags: [ string ] | null,  // default: null
     recoverable: boolean,     // default: false
-    sloppy: boolean           // default: false
+    sloppy: boolean,          // default: false
+    lineNumbers: boolean      // default: false
 }
 ```
 
@@ -74,7 +75,7 @@ to
 ```
 @param use
 ```
-If a provded comment has these comment specific strings, you need to specify this `unwrap` option to `true`.
+If a provided comment has these comment specific strings, you need to specify this `unwrap` option to `true`.
 
 ##### tags
 
@@ -93,6 +94,17 @@ When `sloppy` is `true`,
 @param String [foo]
 ```
 's `[foo]` is interpreted as a optional parameter, not interpreted as a name of this `@param`.
+
+##### lineNumbers
+
+When `lineNumbers` is `true`, parsed tags will include a `lineNumber` property indicating the line (relative to the start of the comment block) where each tag is located in the source. So, given the following comment:
+```
+/**
+ * @param {String} foo
+ * @return {number}
+ */
+```
+The `@param` tag will have `lineNumber: 1`, and the `@return` tag will have `lineNumber: 2`.
 
 
 ### License

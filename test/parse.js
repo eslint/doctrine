@@ -716,6 +716,25 @@ describe('optional params', function() {
             }]
         });
     });
+
+    it('line numbers', function() {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @param {string} foo",
+                " * @returns {string}",
+                " *",
+                " * @example",
+                " * f('blah'); // => undefined",
+                " */"
+            ].join('\n'),
+            { unwrap: true, lineNumbers: true }
+        );
+
+        res.tags[0].should.have.property('lineNumber', 1);
+        res.tags[1].should.have.property('lineNumber', 2);
+        res.tags[2].should.have.property('lineNumber', 4);
+    });
 });
 
 describe('recovery tests', function() {
