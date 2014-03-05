@@ -304,6 +304,32 @@ describe('parse', function () {
         res.tags.should.have.length(0);
     });
 
+    it('throws', function () {
+        var res = doctrine.parse(
+            [
+              "/**",
+              " * @throws {Error} if something goes wrong",
+              " */"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'throws');
+        res.tags[0].should.have.property('description', 'if something goes wrong');
+        res.tags[0].type.should.have.property('name', 'Error');
+    });
+
+    it('property without type', function () {
+        var res = doctrine.parse(
+            [
+              "/**",
+              " * @throws if something goes wrong",
+              " */"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'throws');
+        res.tags[0].should.have.property('description', 'if something goes wrong');
+    });
+
+
 });
 
 describe('parseType', function () {
