@@ -1619,6 +1619,17 @@
             return null;
         }
 
+        function skipToTag() {
+            while (index < length && source[index] !== '@') {
+                advance();
+            }
+            if (index >= length) {
+                return false;
+            }
+            assert(source[index] === '@');
+            return true;
+        }
+
         function parseTag(options) {
             var tag, title, type, last, newType, assign;
             function addError(errorText) {
@@ -1632,15 +1643,9 @@
             }
 
             // skip to tag
-            while (index < length && source[index] !== '@') {
-                advance();
-            }
-            if (index >= length) {
+            if (!skipToTag()) {
                 return;
             }
-
-            assert(source[index] === '@');
-
             // scan title
             title = scanTitle();
 
