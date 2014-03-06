@@ -50,7 +50,11 @@
     CanAccessStringByIndex = typeof 'doctrine'[0] !== undefined;
 
     function sliceSource(source, index, last) {
-        return source.slice(index, last);
+        if (!CanAccessStringByIndex) {
+            return source.slice(index, last).join('');
+        } else {
+            return source.slice(index, last);
+        }
     }
 
     isArray = Array.isArray;
@@ -66,12 +70,6 @@
             return func.call(obj, name);
         };
     }());
-
-    if (!CanAccessStringByIndex) {
-        sliceSource = function sliceSource(source, index, last) {
-            return source.slice(index, last).join('');
-        };
-    }
 
     function shallowCopy(obj) {
         var ret = {}, key;
