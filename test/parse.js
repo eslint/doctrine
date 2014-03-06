@@ -329,7 +329,20 @@ describe('parse', function () {
         res.tags[0].should.have.property('description', 'if something goes wrong');
     });
 
+    it('kind', function () {
+        var res = doctrine.parse('/** @kind class */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'kind');
+        res.tags[0].should.have.property('kind', 'class');
+    });
 
+    it('kind error', function () {
+        var res = doctrine.parse('/** @kind ng */', { unwrap: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('errors');
+        res.tags[0].errors.should.have.length(1);
+        res.tags[0].errors[0].should.equal('Invalid kind name \'ng\'');
+    });
 });
 
 describe('parseType', function () {

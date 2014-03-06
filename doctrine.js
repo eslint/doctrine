@@ -1643,14 +1643,24 @@
             this._extra = { };
         }
 
+        // addError(err, ...)
         TagParser.prototype.addError = function addError(errorText) {
+            var args = Array.prototype.slice.call(arguments, 1),
+                msg = errorText.replace(
+                    /%(\d)/g,
+                    function (whole, index) {
+                        assert(index < args.length, 'Message reference must be in range');
+                        return args[index];
+                    }
+                );
+
             if (!this._tag.errors) {
                 this._tag.errors = [];
             }
             if (strict) {
-                throwError(errorText);
+                throwError(msg);
             }
-            this._tag.errors.push(errorText);
+            this._tag.errors.push(msg);
             return recoverable;
         };
 
@@ -1736,6 +1746,31 @@
             return true;
         };
 
+        TagParser.prototype.parseKind = function parseKind() {
+            var kind, kinds;
+            kinds = {
+                'class': true,
+                'constant': true,
+                'event': true,
+                'external': true,
+                'file': true,
+                'function': true,
+                'member': true,
+                'mixin': true,
+                'module': true,
+                'namespace': true,
+                'typedef': true
+            };
+            kind = trim(sliceSource(source, index, this._last));
+            this._tag.kind = kind;
+            if (!hasOwnProperty(kinds, kind)) {
+                if (!this.addError("Invalid kind name '%0'", kind)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+
         TagParser.prototype.epilogue = function epilogue() {
             var description;
 
@@ -1756,6 +1791,8 @@
         };
 
         Rules = {
+            // http://usejsdoc.org/tags-kind.html
+            'kind': ['parseKind']
         };
 
         TagParser.prototype.parse = function parse() {

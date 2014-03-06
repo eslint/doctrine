@@ -131,5 +131,15 @@ describe('strict parse', function () {
                     " */"
                 ].join('\n'), { unwrap: true });
         }).should.not.throw();
+
+        (function () {
+            doctrine.parse(
+                [
+                    "/**",
+                    " * Description",
+                    " * @kind ng",
+                    " */"
+                ].join('\n'), { unwrap: true, strict: true });
+        }).should.throw('Invalid kind name \'ng\'');
     });
 });
