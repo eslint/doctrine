@@ -1631,7 +1631,13 @@
         }
 
         function parseTag(options) {
-            var tag, title, type, last, newType, assign;
+            var tag,
+                title,
+                type,
+                last,
+                newType,
+                assign;
+
             function addError(errorText) {
                 if (!tag.errors) {
                     tag.errors = [];
@@ -1646,6 +1652,7 @@
             if (!skipToTag()) {
                 return;
             }
+
             // scan title
             title = scanTitle();
 
@@ -1654,16 +1661,16 @@
                 description: null
             };
 
-            if (options.lineNumbers) {
-                tag.lineNumber = lineNumber;
-            }
-
             // empty title
             if (!title) {
                 addError("Missing or invalid title");
                 if (!recoverable) {
                     return;
                 }
+            }
+
+            if (options.lineNumbers) {
+                tag.lineNumber = lineNumber;
             }
 
             // seek to content last index
