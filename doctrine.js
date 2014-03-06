@@ -35,7 +35,8 @@
         CanAccessStringByIndex,
         typed,
         jsdoc,
-        isArray;
+        isArray,
+        hasOwnProperty;
 
     // Sync with package.json.
     VERSION = '0.3.1-dev';
@@ -58,6 +59,13 @@
             return Object.prototype.toString.call(ary) === '[object Array]';
         };
     }
+
+    hasOwnProperty = (function () {
+        var func = Object.prototype.hasOwnProperty;
+        return function hasOwnProperty(obj, name) {
+            return func.call(obj, name);
+        };
+    }());
 
     if (!CanAccessStringByIndex) {
         sliceSource = function sliceSource(source, index, last) {
@@ -1431,7 +1439,8 @@
     // JSDoc Tag Parser
 
     (function (exports) {
-        var index,
+        var Rules,
+            index,
             lineNumber,
             length,
             source,
@@ -1746,7 +1755,12 @@
             return true;
         };
 
+        Rules = {
+        };
+
         TagParser.prototype.parse = function parse() {
+            var i, iz, sequences, method;
+
             // empty title
             if (!this._title) {
                 if (!this.addError("Missing or invalid title")) {
@@ -1757,23 +1771,18 @@
             // Seek to content last index.
             this._last = seekContent(this._title);
 
-            // Parse type.
-            if (!this.parseType()) {
-                return;
+            if (hasOwnProperty(Rules, this._title)) {
+                sequences = Rules[this._title];
+            } else {
+                // default sequences
+                sequences = ['parseType', 'parseName', 'parseDescription', 'epilogue'];
             }
 
-            // Parse name.
-            if (!this.parseName()) {
-                return;
-            }
-
-            // Parse description.
-            if (!this.parseDescription()) {
-                return;
-            }
-
-            if (!this.epilogue()) {
-                return;
+            for (i = 0, iz = sequences.length; i < iz; ++i) {
+                method = sequences[i];
+                if (!this[method]()) {
+                    return;
+                }
             }
 
             // Seek global index to end of this tag.
