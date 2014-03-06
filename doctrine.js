@@ -1771,7 +1771,19 @@
             return true;
         };
 
-        TagParser.prototype.parseVariation = function parseKind() {
+        TagParser.prototype.parseAccess = function parseAccess() {
+            var access;
+            access = trim(sliceSource(source, index, this._last));
+            this._tag.access = access;
+            if (access !== 'private' && access !== 'protected' && access !== 'public') {
+                if (!this.addError("Invalid access name '%0'", access)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        TagParser.prototype.parseVariation = function parseVariation() {
             var variation, text;
             text = trim(sliceSource(source, index, this._last));
             variation = parseFloat(text, 10);
@@ -1804,6 +1816,8 @@
         };
 
         Rules = {
+            // http://usejsdoc.org/tags-access.html
+            'access': ['parseAccess'],
             // http://usejsdoc.org/tags-kind.html
             'kind': ['parseKind'],
             // http://usejsdoc.org/tags-summary.html

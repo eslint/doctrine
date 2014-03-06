@@ -375,6 +375,21 @@ describe('parse', function () {
         res.tags[0].errors.should.have.length(1);
         res.tags[0].errors[0].should.equal('Invalid variation \'Animation\'');
     });
+
+    it('access', function () {
+        var res = doctrine.parse('/** @access public */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'access');
+        res.tags[0].should.have.property('access', 'public');
+    });
+
+    it('access error', function () {
+        var res = doctrine.parse('/** @access ng */', { unwrap: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('errors');
+        res.tags[0].errors.should.have.length(1);
+        res.tags[0].errors[0].should.equal('Invalid access name \'ng\'');
+    });
 });
 
 describe('parseType', function () {
