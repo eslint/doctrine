@@ -317,7 +317,7 @@ describe('parse', function () {
         res.tags[0].type.should.have.property('name', 'Error');
     });
 
-    it('property without type', function () {
+    it('throws without type', function () {
         var res = doctrine.parse(
             [
               "/**",
