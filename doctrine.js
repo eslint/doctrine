@@ -315,7 +315,7 @@
         }
 
         function scanString() {
-            var str = '', quote, ch, code, unescaped, restore, octal = false;
+            var str = '', quote, ch, code, unescaped, restore; //TODO review removal octal = false
             quote = source[index];
             ++index;
 
@@ -364,12 +364,13 @@
                                 code = '01234567'.indexOf(ch);
 
                                 // \0 is not octal escape sequence
-                                if (code !== 0) {
-                                    octal = true;
-                                }
+                                // Deprecating unused code. TODO review removal
+                                //if (code !== 0) {
+                                //    octal = true;
+                                //}
 
                                 if (index < length && isOctalDigit(source[index])) {
-                                    octal = true;
+                                    //TODO Review Removal octal = true;
                                     code = code * 8 + '01234567'.indexOf(advance());
 
                                     // 3 digits are only allowed when string starts
