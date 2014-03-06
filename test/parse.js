@@ -350,6 +350,14 @@ describe('parse', function () {
         res.tags[0].should.have.property('title', 'todo');
         res.tags[0].should.have.property('description', 'Write the documentation');
     });
+
+    it('summary', function () {
+        // japanese lang
+        var res = doctrine.parse('/** @summary ゆるゆり3期おめでとー */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'summary');
+        res.tags[0].should.have.property('description', 'ゆるゆり3期おめでとー');
+    });
 });
 
 describe('parseType', function () {

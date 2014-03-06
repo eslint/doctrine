@@ -1793,6 +1793,8 @@
         Rules = {
             // http://usejsdoc.org/tags-kind.html
             'kind': ['parseKind'],
+            // http://usejsdoc.org/tags-summary.html
+            'summary': ['parseDescription'],
             // http://usejsdoc.org/tags-todo.html
             'todo': ['parseDescription']
         };
