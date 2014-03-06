@@ -127,7 +127,7 @@
         return isParamTitle(title) || title === 'define' || title === 'enum' ||
             title === 'extends' || title === 'implements' || title === 'return' ||
             title === 'this' || title === 'type' || title === 'typedef' ||
-            title === 'throws' || title === 'returns' || title === 'property' ||
+            title === 'returns' || title === 'property' ||
             title === 'prop';
     }
 
@@ -1683,6 +1683,11 @@
                         return;
                     }
                 }
+            }
+
+            // optional types
+            if (title === 'throws') {
+                tag.type = parseType(title, last);
             }
 
             // param, property requires name
