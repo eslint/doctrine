@@ -1608,17 +1608,6 @@
             return name;
         }
 
-        function parseDescription(source, index, last) {
-            var description = trim(sliceSource(source, index, last));
-            if (description) {
-                if ((/^-\s+/).test(description)) {
-                    description = description.substring(2);
-                }
-                return description;
-            }
-            return null;
-        }
-
         function skipToTag() {
             while (index < length && source[index] !== '@') {
                 advance();
@@ -1630,23 +1619,170 @@
             return true;
         }
 
-        function parseTag(options) {
-            var tag,
-                title,
-                type,
-                last,
-                newType,
-                assign;
-
-            function addError(errorText) {
-                if (!tag.errors) {
-                    tag.errors = [];
-                }
-                if (strict) {
-                    throwError(errorText);
-                }
-                tag.errors.push(errorText);
+        function TagParser(options, title) {
+            this._options = options;
+            this._title = title;
+            this._tag = {
+                title: title,
+                description: null
+            };
+            if (this._options.lineNumbers) {
+                this._tag.lineNumber = lineNumber;
             }
+            this._last = 0;
+            // space to save special information for title parsers.
+            this._extra = { };
+        }
+
+        TagParser.prototype.addError = function addError(errorText) {
+            if (!this._tag.errors) {
+                this._tag.errors = [];
+            }
+            if (strict) {
+                throwError(errorText);
+            }
+            this._tag.errors.push(errorText);
+            return recoverable;
+        };
+
+        TagParser.prototype.parseType = function () {
+            // type required titles
+            if (isTypeParameterRequired(this._title)) {
+                try {
+                    this._tag.type = parseType(this._title, this._last);
+                    if (!this._tag.type) {
+                        if (!isParamTitle(this._title)) {
+                            if (!this.addError("Missing or invalid tag type")) {
+                                return false;
+                            }
+                        }
+                    }
+                } catch (error) {
+                    this._tag.type = null;
+                    if (!this.addError(error.message)) {
+                        return false;
+                    }
+                }
+            }
+
+            // optional types
+            if (this._title === 'throws') {
+                this._tag.type = parseType(this._title, this._last);
+            }
+            return true;
+        };
+
+        TagParser.prototype.parseName = function () {
+            var assign, name;
+
+            // param, property requires name
+            if (isParamTitle(this._title) || this._title === 'property' || this._title === 'prop') {
+                this._tag.name = parseName(this._last, sloppy && isParamTitle(this._title));
+                if (!this._tag.name) {
+                    // it's possible the name has already been parsed but interpreted as a type
+                    // it's also possible this is a sloppy declaration, in which case it will be
+                    // fixed at the end
+                    if (isParamTitle(this._title) && this._tag.type.name) {
+                        this._extra.name = this._tag.type;
+                        this._tag.name = this._tag.type.name;
+                        this._tag.type = null;
+                    } else {
+                        if (!this.addError("Missing or invalid tag name")) {
+                            return false;
+                        }
+                    }
+                } else {
+                    name = this._tag.name;
+                    if (name.charAt(0) === '[' && name.charAt(name.length - 1) === ']') {
+                        // extract the default value if there is one
+                        // example: @param {string} [somebody=John Doe] description
+                        assign = name.substring(1, name.length - 1).split('=');
+                        if (assign[1]) {
+                            this._tag['default'] = assign[1];
+                        }
+                        this._tag.name = assign[0];
+
+                        // convert to an optional type
+                        if (this._tag.type.type !== "OptionalType") {
+                            this._tag.type = {
+                                type: "OptionalType",
+                                expression: this._tag.type
+                            };
+                        }
+                    }
+                }
+            }
+
+            return true;
+        };
+
+        TagParser.prototype.parseDescription = function parseDescription() {
+            var description = trim(sliceSource(source, index, this._last));
+            if (description) {
+                if ((/^-\s+/).test(description)) {
+                    description = description.substring(2);
+                }
+                this._tag.description = description;
+            }
+            return true;
+        };
+
+        TagParser.prototype.epilogue = function epilogue() {
+            var description;
+
+            description = this._tag.description;
+            // un-fix potentially sloppy declaration
+            if (isParamTitle(this._title) && !this._tag.type && description && description.charAt(0) === '[') {
+                this._tag.type = this._extra.name;
+                this._tag.name = undefined;
+
+                if (!sloppy) {
+                    if (!this.addError("Missing or invalid tag name")) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        };
+
+        TagParser.prototype.parse = function parse() {
+            // empty title
+            if (!this._title) {
+                if (!this.addError("Missing or invalid title")) {
+                    return;
+                }
+            }
+
+            // Seek to content last index.
+            this._last = seekContent(this._title);
+
+            // Parse type.
+            if (!this.parseType()) {
+                return;
+            }
+
+            // Parse name.
+            if (!this.parseName()) {
+                return;
+            }
+
+            // Parse description.
+            if (!this.parseDescription()) {
+                return;
+            }
+
+            if (!this.epilogue()) {
+                return;
+            }
+
+            // Seek global index to end of this tag.
+            index = this._last;
+            return this._tag;
+        };
+
+        function parseTag(options) {
+            var title, parser;
 
             // skip to tag
             if (!skipToTag()) {
@@ -1656,107 +1792,9 @@
             // scan title
             title = scanTitle();
 
-            tag = {
-                title: title,
-                description: null
-            };
-
-            // empty title
-            if (!title) {
-                addError("Missing or invalid title");
-                if (!recoverable) {
-                    return;
-                }
-            }
-
-            if (options.lineNumbers) {
-                tag.lineNumber = lineNumber;
-            }
-
-            // seek to content last index
-            last = seekContent(title);
-
-            // type required titles
-            if (isTypeParameterRequired(title)) {
-                try {
-                    type = tag.type = parseType(title, last);
-                    if (!tag.type) {
-                        if (!isParamTitle(title)) {
-                            addError("Missing or invalid tag type");
-                            if (!recoverable) {
-                                return;
-                            }
-                        }
-                    }
-                } catch (error) {
-                    type = tag.type = null;
-                    addError(error.message);
-                    if (!recoverable) {
-                        return;
-                    }
-                }
-            }
-
-            // optional types
-            if (title === 'throws') {
-                tag.type = parseType(title, last);
-            }
-
-            // param, property requires name
-            if (isParamTitle(title) || title === 'property' || title === 'prop') {
-                tag.name = parseName(last, sloppy && isParamTitle(title));
-                if (!tag.name) {
-                    // it's possible the name has already been parsed but interpreted as a type
-                    // it's also possible this is a sloppy declaration, in which case it will be
-                    // fixed at the end
-                    if (isParamTitle(title) && type.name) {
-                        tag.name = type.name;
-                        tag.type = null;
-                    } else {
-                        addError("Missing or invalid tag name");
-                        if (!recoverable) {
-                            return;
-                        }
-                    }
-                } else {
-                    if (tag.name.charAt(0) === '[' && tag.name.charAt(tag.name.length - 1) === ']') {
-                        // extract the default value if there is one
-                        // example: @param {string} [somebody=John Doe] description
-                        assign = tag.name.substring(1, tag.name.length - 1).split('=');
-                        if (assign[1]) {
-                            tag.default = assign[1];
-                        }
-                        tag.name = assign[0];
-
-                        // convert to an optional type
-                        if (tag.type.type !== "OptionalType") {
-                            tag.type = {
-                                type: "OptionalType",
-                                expression: tag.type
-                            };
-                        }
-                    }
-                }
-            }
-
-            // slice description
-            tag.description = parseDescription(source, index, last);
-
-            // un-fix potentially sloppy declaration
-            if (isParamTitle(title) && !tag.type && tag.description && tag.description.charAt(0) === '[') {
-                tag.type = type;
-                tag.name = undefined;
-
-                if (!sloppy) {
-                    addError("Missing or invalid tag name");
-                    if (!recoverable) {
-                        return;
-                    }
-                }
-            }
-
-            index = last;
-            return tag;
+            // construct tag parser
+            parser = new TagParser(options, title);
+            return parser.parse();
         }
 
         //
