@@ -1419,7 +1419,7 @@
         }
 
         function stringify(node, options) {
-            if (options == null) {
+            if (options === null || options === undefined) {
                 options = {};
             }
             return stringifyImpl(node, options.compact, options.topLevel);
