@@ -139,10 +139,6 @@
             title === 'prop';
     }
 
-    function stringToArray(str) {
-        return str.split('');
-    }
-
     function DoctrineError(message) {
         this.name = 'DoctrineError';
         this.message = message;
@@ -154,14 +150,12 @@
         throw new DoctrineError(message);
     }
 
-    function assert(cond, text) { }
-
-    if (VERSION.slice(-3) === 'dev') {
-        assert = function assert(cond, text) {
+    function assert(cond, text) {
+        if (VERSION.slice(-3) === 'dev') {
             if (!cond) {
                 throwError(text);
             }
-        };
+        }
     }
 
     function trim(str) {
@@ -809,7 +803,7 @@
         //   | FieldType
         //   | FieldType ',' FieldTypeList
         function parseRecordType() {
-            var fields, field;
+            var fields;
 
             consume(Token.LBRACE, 'RecordType should start with {');
             fields = [];
@@ -972,7 +966,7 @@
         //   | TypeParameters '(' 'this' ':' TypeName ')' ResultType
         //   | TypeParameters '(' 'this' ':' TypeName ',' ParametersType ')' ResultType
         function parseFunctionType() {
-            var isNew, thisBinding, params, result, fnType, name;
+            var isNew, thisBinding, params, result, fnType;
             assert(token === Token.NAME && value === 'function', 'FunctionType should start with \'function\'');
             consume(Token.NAME);
 
@@ -1496,7 +1490,7 @@
         //
         // therefore, scanning type expression with balancing braces.
         function parseType(title, last) {
-            var ch, brace, type, direct = false, res;
+            var ch, brace, type, direct = false;
 
             // search '{'
             while (index < last) {
@@ -1572,7 +1566,7 @@
         }
 
         function parseName(last, allowBraces) {
-            var range, ch, name = '', i, len, useBraces;
+            var name = '', useBraces;
 
             skipWhiteSpace(last);
 
