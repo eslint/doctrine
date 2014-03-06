@@ -1539,17 +1539,17 @@
                     return typed.parseType(type);
                 } catch (e1) {
                     // parse failed
-                    return;
+                    return null;
                 }
             } else {
-                return;
+                return null;
             }
         }
 
         function scanIdentifier(last) {
             var identifier;
             if (!isIdentifierStart(source[index])) {
-                return;
+                return null;
             }
             identifier = advance();
             while (index < last && isIdentifierPart(source[index])) {
@@ -1570,7 +1570,7 @@
             skipWhiteSpace(last);
 
             if (index >= last) {
-                return;
+                return null;
             }
 
             if (allowBraces && source[index] === '[') {
@@ -1579,7 +1579,7 @@
             }
 
             if (!isIdentifierStart(source[index])) {
-                return;
+                return null;
             }
 
             name += scanIdentifier(last);
@@ -1599,7 +1599,7 @@
 
                 if (index >= last  || source[index] !== ']') {
                     // we never found a closing ']'
-                    return;
+                    return null;
                 }
 
                 // collect the last ']'
@@ -1813,7 +1813,7 @@
             // empty title
             if (!this._title) {
                 if (!this.addError('Missing or invalid title')) {
-                    return;
+                    return null;
                 }
             }
 
@@ -1830,7 +1830,7 @@
             for (i = 0, iz = sequences.length; i < iz; ++i) {
                 method = sequences[i];
                 if (!this[method]()) {
-                    return;
+                    return null;
                 }
             }
 
@@ -1844,7 +1844,7 @@
 
             // skip to tag
             if (!skipToTag()) {
-                return;
+                return null;
             }
 
             // scan title
