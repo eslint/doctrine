@@ -343,6 +343,13 @@ describe('parse', function () {
         res.tags[0].errors.should.have.length(1);
         res.tags[0].errors[0].should.equal('Invalid kind name \'ng\'');
     });
+
+    it('todo', function () {
+        var res = doctrine.parse('/** @todo Write the documentation */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'todo');
+        res.tags[0].should.have.property('description', 'Write the documentation');
+    });
 });
 
 describe('parseType', function () {

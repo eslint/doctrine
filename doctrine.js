@@ -1792,7 +1792,9 @@
 
         Rules = {
             // http://usejsdoc.org/tags-kind.html
-            'kind': ['parseKind']
+            'kind': ['parseKind'],
+            // http://usejsdoc.org/tags-todo.html
+            'todo': ['parseDescription']
         };
 
         TagParser.prototype.parse = function parse() {
