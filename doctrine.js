@@ -123,12 +123,15 @@
         return title === 'param' || title === 'arguments' || title === 'arg';
     }
 
+    function isProperty(title) {
+        return title === 'property' || title === 'prop';
+    }
+
     function isTypeParameterRequired(title) {
         return isParamTitle(title) || title === 'define' || title === 'enum' ||
             title === 'extends' || title === 'implements' || title === 'return' ||
             title === 'this' || title === 'type' || title === 'typedef' ||
-            title === 'returns' || title === 'property' ||
-            title === 'prop';
+            title === 'returns' || isProperty(title);
     }
 
     function stringToArray(str) {
@@ -1562,7 +1565,7 @@
             }
         }
 
-        function parseName(last, allowBraces) {
+        function parseName(last, allowBraces, allowNestedParams) {
             var range, ch, name = '', i, len, useBraces;
 
             skipWhiteSpace(last);
@@ -1581,6 +1584,14 @@
             }
 
             name += scanIdentifier(last);
+
+            if (allowNestedParams) {
+              while (source[index] === '.') {
+                name += '.';
+                index += 1;
+                name += scanIdentifier(last);
+              }
+            }
 
             if (useBraces) {
 
@@ -1691,8 +1702,8 @@
             }
 
             // param, property requires name
-            if (isParamTitle(title) || title === 'property' || title === 'prop') {
-                tag.name = parseName(last, sloppy && isParamTitle(title));
+            if (isParamTitle(title) || isProperty(title)) {
+                tag.name = parseName(last, sloppy && isParamTitle(title), isProperty(title));
                 if (!tag.name) {
                     // it's possible the name has already been parsed but interpreted as a type
                     // it's also possible this is a sloppy declaration, in which case it will be

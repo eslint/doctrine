@@ -304,6 +304,20 @@ describe('parse', function () {
         res.tags.should.have.length(0);
     });
 
+    it('property with nested name', function () {
+        var res = doctrine.parse(
+            [
+              "/**",
+              " * @property {string} thingName.name - does some stuff",
+              "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'property');
+        res.tags[0].should.have.property('description', 'does some stuff');
+        res.tags[0].type.should.have.property('name', 'string');
+        res.tags[0].should.have.property('name', 'thingName.name');
+    });
+
     it('throws', function () {
         var res = doctrine.parse(
             [
