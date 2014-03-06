@@ -1078,7 +1078,7 @@
                 return parseTypeName();
 
             default:
-                throwError("unexpected token");
+                throwError('unexpected token');
             }
         }
 
@@ -1671,7 +1671,7 @@
                     this._tag.type = parseType(this._title, this._last);
                     if (!this._tag.type) {
                         if (!isParamTitle(this._title)) {
-                            if (!this.addError("Missing or invalid tag type")) {
+                            if (!this.addError('Missing or invalid tag type')) {
                                 return false;
                             }
                         }
@@ -1706,7 +1706,7 @@
                         this._tag.name = this._tag.type.name;
                         this._tag.type = null;
                     } else {
-                        if (!this.addError("Missing or invalid tag name")) {
+                        if (!this.addError('Missing or invalid tag name')) {
                             return false;
                         }
                     }
@@ -1722,9 +1722,9 @@
                         this._tag.name = assign[0];
 
                         // convert to an optional type
-                        if (this._tag.type.type !== "OptionalType") {
+                        if (this._tag.type.type !== 'OptionalType') {
                             this._tag.type = {
-                                type: "OptionalType",
+                                type: 'OptionalType',
                                 expression: this._tag.type
                             };
                         }
@@ -1764,7 +1764,7 @@
             kind = trim(sliceSource(source, index, this._last));
             this._tag.kind = kind;
             if (!hasOwnProperty(kinds, kind)) {
-                if (!this.addError("Invalid kind name '%0'", kind)) {
+                if (!this.addError('Invalid kind name \'%0\'', kind)) {
                     return false;
                 }
             }
@@ -1777,7 +1777,7 @@
             variation = parseFloat(text, 10);
             this._tag.variation = variation;
             if (isNaN(variation)) {
-                if (!this.addError("Invalid variation '%0'", text)) {
+                if (!this.addError('Invalid variation \'%0\'', text)) {
                     return false;
                 }
             }
@@ -1794,7 +1794,7 @@
                 this._tag.name = undefined;
 
                 if (!sloppy) {
-                    if (!this.addError("Missing or invalid tag name")) {
+                    if (!this.addError('Missing or invalid tag name')) {
                         return false;
                     }
                 }
@@ -1819,7 +1819,7 @@
 
             // empty title
             if (!this._title) {
-                if (!this.addError("Missing or invalid title")) {
+                if (!this.addError('Missing or invalid title')) {
                     return;
                 }
             }
