@@ -1586,11 +1586,11 @@
             name += scanIdentifier(last);
 
             if (allowNestedParams) {
-              while (source[index] === '.') {
-                name += '.';
-                index += 1;
-                name += scanIdentifier(last);
-              }
+                while (source[index] === '.') {
+                    name += '.';
+                    index += 1;
+                    name += scanIdentifier(last);
+                }
             }
 
             if (useBraces) {
