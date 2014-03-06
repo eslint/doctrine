@@ -18,6 +18,7 @@
     },
     "devDependencies": {
         "jslint": "~0.1.9",
+        "eslint": "~0.4.2",
         "mocha": "*",
         "should": "*"
     },
