@@ -141,5 +141,15 @@ describe('strict parse', function () {
                     " */"
                 ].join('\n'), { unwrap: true, strict: true });
         }).should.throw('Invalid kind name \'ng\'');
+
+        (function () {
+            doctrine.parse(
+                [
+                    "/**",
+                    " * Description",
+                    " * @variation Animation",
+                    " */"
+                ].join('\n'), { unwrap: true, strict: true });
+        }).should.throw('Invalid variation \'Animation\'');
     });
 });

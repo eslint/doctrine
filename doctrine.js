@@ -1771,6 +1771,19 @@
             return true;
         };
 
+        TagParser.prototype.parseVariation = function parseKind() {
+            var variation, text;
+            text = trim(sliceSource(source, index, this._last));
+            variation = parseFloat(text, 10);
+            this._tag.variation = variation;
+            if (isNaN(variation)) {
+                if (!this.addError("Invalid variation '%0'", text)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+
         TagParser.prototype.epilogue = function epilogue() {
             var description;
 
@@ -1796,7 +1809,9 @@
             // http://usejsdoc.org/tags-summary.html
             'summary': ['parseDescription'],
             // http://usejsdoc.org/tags-todo.html
-            'todo': ['parseDescription']
+            'todo': ['parseDescription'],
+            // http://usejsdoc.org/tags-variation.html
+            'variation': ['parseVariation']
         };
 
         TagParser.prototype.parse = function parse() {

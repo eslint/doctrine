@@ -358,6 +358,23 @@ describe('parse', function () {
         res.tags[0].should.have.property('title', 'summary');
         res.tags[0].should.have.property('description', 'ゆるゆり3期おめでとー');
     });
+
+    it('variation', function () {
+        // japanese lang
+        var res = doctrine.parse('/** @variation 42 */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'variation');
+        res.tags[0].should.have.property('variation', 42);
+    });
+
+    it('variation error', function () {
+        // japanese lang
+        var res = doctrine.parse('/** @variation Animation */', { unwrap: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('errors');
+        res.tags[0].errors.should.have.length(1);
+        res.tags[0].errors[0].should.equal('Invalid variation \'Animation\'');
+    });
 });
 
 describe('parseType', function () {
