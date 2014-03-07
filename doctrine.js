@@ -59,14 +59,14 @@
 
     isArray = Array.isArray;
     if (!isArray) {
-        isArray = function isArray(ary) {
+        isArray = function (ary) {
             return Object.prototype.toString.call(ary) === '[object Array]';
         };
     }
 
     hasOwnProperty = (function () {
         var func = Object.prototype.hasOwnProperty;
-        return function hasOwnProperty(obj, name) {
+        return function (obj, name) {
             return func.call(obj, name);
         };
     }());
@@ -1807,7 +1807,7 @@
             'variation': ['parseVariation']
         };
 
-        TagParser.prototype.parse = function parse() {
+        TagParser.prototype.init = function init() {
             var i, iz, sequences, method;
 
             // empty title
@@ -1852,7 +1852,7 @@
 
             // construct tag parser
             parser = new TagParser(options, title);
-            return parser.parse();
+            return parser.init();
         }
 
         //
