@@ -1830,6 +1830,16 @@
             return true;
         };
 
+        TagParser.prototype.parseNone = function () {
+            var shouldBeEmpty = trim(sliceSource(source, index, this._last));
+            if (shouldBeEmpty) {
+                if (!this.addError("Unknown content '%0'", shouldBeEmpty)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+
         TagParser.prototype.epilogue = function epilogue() {
             var description;
 
@@ -1858,6 +1868,12 @@
             'summary': ['parseDescription'],
             // http://usejsdoc.org/tags-todo.html
             'todo': ['parseDescription'],
+            // http://usejsdoc.org/tags-private.html
+            'private': ['parseNone'],
+            // http://usejsdoc.org/tags-protected.html
+            'protected': ['parseNone'],
+            // http://usejsdoc.org/tags-public.html
+            'public': ['parseNone'],
             // http://usejsdoc.org/tags-variation.html
             'variation': ['parseVariation']
         };

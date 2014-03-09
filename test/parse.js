@@ -521,6 +521,48 @@ describe('parse', function () {
         res.tags[0].errors.should.have.length(1);
         res.tags[0].errors[0].should.equal('Invalid access name \'ng\'');
     });
+
+    it('public', function () {
+        var res = doctrine.parse('/** @public */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'public');
+    });
+
+    it('public error', function () {
+        var res = doctrine.parse('/** @public ng */', { unwrap: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('errors');
+        res.tags[0].errors.should.have.length(1);
+        res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
+    });
+
+    it('protected', function () {
+        var res = doctrine.parse('/** @protected */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'protected');
+    });
+
+    it('protected error', function () {
+        var res = doctrine.parse('/** @protected ng */', { unwrap: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('errors');
+        res.tags[0].errors.should.have.length(1);
+        res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
+    });
+
+    it('private', function () {
+        var res = doctrine.parse('/** @private */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'private');
+    });
+
+    it('private error', function () {
+        var res = doctrine.parse('/** @private ng */', { unwrap: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('errors');
+        res.tags[0].errors.should.have.length(1);
+        res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
+    });
 });
 
 describe('parseType', function () {
