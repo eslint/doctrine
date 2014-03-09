@@ -135,9 +135,13 @@
         return title === 'property' || title === 'prop';
     }
 
-    function isAllowedName(title) {
+    function isNameParameterRequired(title) {
         return isParamTitle(title) || isProperty(title) || title === 'extends' || title === 'augments' ||
             title === 'alias';
+    }
+
+    function isAllowedName(title) {
+        return isNameParameterRequired(title) || title === 'const' || title === 'constant';
     }
 
     function isAllowedNested(title) {
@@ -149,6 +153,10 @@
             title === 'implements' || title === 'return' ||
             title === 'this' || title === 'type' || title === 'typedef' ||
             title === 'returns' || isProperty(title);
+    }
+
+    function isAllowedType(title) {
+        return isTypeParameterRequired(title) || title === 'throws' || title === 'const' || title === 'constant';
     }
 
     function stringToArray(str) {
@@ -1702,11 +1710,13 @@
                         return false;
                     }
                 }
-            }
-
-            // optional types
-            if (this._title === 'throws') {
-                this._tag.type = parseType(this._title, this._last);
+            } else if (isAllowedType(this._title)) {
+                // optional types
+                try {
+                    this._tag.type = parseType(this._title, this._last);
+                } catch (e) {
+                    //For optional types, lets drop the thrown error when we hit the end of the file
+                }
             }
             return true;
         };
@@ -1718,6 +1728,10 @@
             if (isAllowedName(this._title)) {
                 this._tag.name = parseName(this._last, sloppy && isParamTitle(this._title), isAllowedNested(this._title));
                 if (!this._tag.name) {
+                    if (!isNameParameterRequired(this._title)) {
+                        return true;
+                    }
+
                     // it's possible the name has already been parsed but interpreted as a type
                     // it's also possible this is a sloppy declaration, in which case it will be
                     // fixed at the end
