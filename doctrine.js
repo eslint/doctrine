@@ -1828,7 +1828,7 @@
             return true;
         };
 
-        TagParser.prototype.parseNone = function () {
+        TagParser.prototype.ensureEnd = function () {
             var shouldBeEmpty = trim(sliceSource(source, index, this._last));
             if (shouldBeEmpty) {
                 if (!this.addError("Unknown content '%0'", shouldBeEmpty)) {
@@ -1861,11 +1861,11 @@
             // http://usejsdoc.org/tags-access.html
             'access': ['parseAccess'],
             // http://usejsdoc.org/tags-global.html
-            'global': ['parseNone'],
+            'global': ['ensureEnd'],
             // http://usejsdoc.org/tags-inner.html
-            'inner': ['parseNone'],
+            'inner': ['ensureEnd'],
             // http://usejsdoc.org/tags-instance.html
-            'instance': ['parseNone'],
+            'instance': ['ensureEnd'],
             // http://usejsdoc.org/tags-kind.html
             'kind': ['parseKind'],
             // http://usejsdoc.org/tags-summary.html
@@ -1873,15 +1873,15 @@
             // http://usejsdoc.org/tags-todo.html
             'todo': ['parseDescription'],
             // http://usejsdoc.org/tags-private.html
-            'private': ['parseNone'],
+            'private': ['ensureEnd'],
             // http://usejsdoc.org/tags-protected.html
-            'protected': ['parseNone'],
+            'protected': ['ensureEnd'],
             // http://usejsdoc.org/tags-public.html
-            'public': ['parseNone'],
+            'public': ['ensureEnd'],
             // http://usejsdoc.org/tags-readonly.html
-            'readonly': ['parseNone'],
+            'readonly': ['ensureEnd'],
             // http://usejsdoc.org/tags-static.html
-            'static': ['parseNone'],
+            'static': ['ensureEnd'],
             // http://usejsdoc.org/tags-variation.html
             'variation': ['parseVariation']
         };
