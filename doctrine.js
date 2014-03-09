@@ -1864,6 +1864,8 @@
             'access': ['parseAccess'],
             // http://usejsdoc.org/tags-global.html
             'global': ['parseNone'],
+            // http://usejsdoc.org/tags-inner.html
+            'inner': ['parseNone'],
             // http://usejsdoc.org/tags-kind.html
             'kind': ['parseKind'],
             // http://usejsdoc.org/tags-summary.html
