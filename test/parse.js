@@ -81,6 +81,57 @@ describe('parse', function () {
         });
     });
 
+    it('param with properties', function () {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @param {String} user.name",
+                "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'param');
+        res.tags[0].should.have.property('name', 'user.name');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'String'
+        });
+    });
+
+    it('arg with properties', function () {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @arg {String} user.name",
+                "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'arg');
+        res.tags[0].should.have.property('name', 'user.name');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'String'
+        });
+    });
+
+    it('argument with properties', function () {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @argument {String} user.name",
+                "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'argument');
+        res.tags[0].should.have.property('name', 'user.name');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'String'
+        });
+    });
+
     it('param typeless', function () {
         var res = doctrine.parse(
         [
@@ -107,6 +158,20 @@ describe('parse', function () {
             title: 'param',
             type: null,
             name: 'userName',
+            description: 'Something descriptive'
+        });
+
+        var res = doctrine.parse(
+        [
+            "/**",
+            " * @param user.name Something descriptive",
+            "*/"
+        ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.eql({
+            title: 'param',
+            type: null,
+            name: 'user.name',
             description: 'Something descriptive'
         });
     });
@@ -304,6 +369,20 @@ describe('parse', function () {
         res.tags.should.have.length(0);
     });
 
+    it('property with nested name', function () {
+        var res = doctrine.parse(
+            [
+              "/**",
+              " * @property {string} thingName.name - does some stuff",
+              "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'property');
+        res.tags[0].should.have.property('description', 'does some stuff');
+        res.tags[0].type.should.have.property('name', 'string');
+        res.tags[0].should.have.property('name', 'thingName.name');
+    });
+
     it('throws', function () {
         var res = doctrine.parse(
             [
@@ -374,6 +453,21 @@ describe('parse', function () {
         res.tags[0].should.have.property('errors');
         res.tags[0].errors.should.have.length(1);
         res.tags[0].errors[0].should.equal('Invalid variation \'Animation\'');
+    });
+
+    it('access', function () {
+        var res = doctrine.parse('/** @access public */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'access');
+        res.tags[0].should.have.property('access', 'public');
+    });
+
+    it('access error', function () {
+        var res = doctrine.parse('/** @access ng */', { unwrap: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('errors');
+        res.tags[0].errors.should.have.length(1);
+        res.tags[0].errors[0].should.equal('Invalid access name \'ng\'');
     });
 });
 

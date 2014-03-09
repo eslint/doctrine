@@ -128,15 +128,22 @@
     }
 
     function isParamTitle(title) {
-        return title === 'param' || title === 'arguments' || title === 'arg';
+        return title === 'param' || title === 'argument' || title === 'arg';
+    }
+
+    function isProperty(title) {
+        return title === 'property' || title === 'prop';
+    }
+
+    function isAllowedNested(title) {
+        return isProperty(title) || isParamTitle(title);
     }
 
     function isTypeParameterRequired(title) {
         return isParamTitle(title) || title === 'define' || title === 'enum' ||
             title === 'extends' || title === 'implements' || title === 'return' ||
             title === 'this' || title === 'type' || title === 'typedef' ||
-            title === 'returns' || title === 'property' ||
-            title === 'prop';
+            title === 'returns' || isProperty(title);
     }
 
     function stringToArray(str) {
@@ -1571,7 +1578,7 @@
             }
         }
 
-        function parseName(last, allowBraces) {
+        function parseName(last, allowBraces, allowNestedParams) {
             var range, ch, name = '', i, len, useBraces;
 
             skipWhiteSpace(last);
@@ -1590,6 +1597,14 @@
             }
 
             name += scanIdentifier(last);
+
+            if (allowNestedParams) {
+                while (source[index] === '.') {
+                    name += '.';
+                    index += 1;
+                    name += scanIdentifier(last);
+                }
+            }
 
             if (useBraces) {
 
@@ -1695,8 +1710,8 @@
             var assign, name;
 
             // param, property requires name
-            if (isParamTitle(this._title) || this._title === 'property' || this._title === 'prop') {
-                this._tag.name = parseName(this._last, sloppy && isParamTitle(this._title));
+            if (isParamTitle(this._title) || isProperty(this._title)) {
+                this._tag.name = parseName(this._last, sloppy && isParamTitle(this._title), isAllowedNested(this._title));
                 if (!this._tag.name) {
                     // it's possible the name has already been parsed but interpreted as a type
                     // it's also possible this is a sloppy declaration, in which case it will be
@@ -1771,7 +1786,19 @@
             return true;
         };
 
-        TagParser.prototype.parseVariation = function parseKind() {
+        TagParser.prototype.parseAccess = function parseAccess() {
+            var access;
+            access = trim(sliceSource(source, index, this._last));
+            this._tag.access = access;
+            if (access !== 'private' && access !== 'protected' && access !== 'public') {
+                if (!this.addError("Invalid access name '%0'", access)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        TagParser.prototype.parseVariation = function parseVariation() {
             var variation, text;
             text = trim(sliceSource(source, index, this._last));
             variation = parseFloat(text, 10);
@@ -1804,6 +1831,8 @@
         };
 
         Rules = {
+            // http://usejsdoc.org/tags-access.html
+            'access': ['parseAccess'],
             // http://usejsdoc.org/tags-kind.html
             'kind': ['parseKind'],
             // http://usejsdoc.org/tags-summary.html

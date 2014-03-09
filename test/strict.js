@@ -151,5 +151,15 @@ describe('strict parse', function () {
                     " */"
                 ].join('\n'), { unwrap: true, strict: true });
         }).should.throw('Invalid variation \'Animation\'');
+
+        (function () {
+            doctrine.parse(
+                [
+                    "/**",
+                    " * Description",
+                    " * @access ng",
+                    " */"
+                ].join('\n'), { unwrap: true, strict: true });
+        }).should.throw('Invalid access name \'ng\'');
     });
 });
