@@ -619,6 +619,20 @@ describe('parse', function () {
         res.tags[0].errors.should.have.length(1);
         res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
     });
+
+    it('static', function () {
+        var res = doctrine.parse('/** @static */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'static');
+    });
+
+    it('static error', function () {
+        var res = doctrine.parse('/** @static ng */', { unwrap: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('errors');
+        res.tags[0].errors.should.have.length(1);
+        res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
+    });
 });
 
 describe('parseType', function () {
