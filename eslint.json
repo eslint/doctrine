@@ -16,6 +16,7 @@
     "strict": [2, true],
     "no-unused-vars": [2, true],
     "no-underscore-dangle": [0, false],
-    "no-use-before-define": [0, false]
+    "no-use-before-define": [0, false],
+    "no-constant-condition": [0, false]
   }
 }
