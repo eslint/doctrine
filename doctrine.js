@@ -1880,6 +1880,8 @@
             'instance': ['ensureEnd'],
             // http://usejsdoc.org/tags-kind.html
             'kind': ['parseKind'],
+            // http://usejsdoc.org/tags-name.html
+            'name': ['parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-private.html
             'private': ['ensureEnd'],
             // http://usejsdoc.org/tags-protected.html
