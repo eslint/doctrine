@@ -136,7 +136,8 @@
     }
 
     function isAllowedName(title) {
-        return isParamTitle(title) || isProperty(title) || title === 'extends' || title === 'augments';
+        return isParamTitle(title) || isProperty(title) || title === 'extends' || title === 'augments' ||
+            title === 'alias';
     }
 
     function isAllowedNested(title) {
