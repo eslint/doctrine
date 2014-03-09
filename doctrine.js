@@ -1862,6 +1862,8 @@
         Rules = {
             // http://usejsdoc.org/tags-access.html
             'access': ['parseAccess'],
+            // http://usejsdoc.org/tags-global.html
+            'global': ['parseNone'],
             // http://usejsdoc.org/tags-kind.html
             'kind': ['parseKind'],
             // http://usejsdoc.org/tags-summary.html
