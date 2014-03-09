@@ -1591,8 +1591,8 @@
             }
         }
 
-        function parseName(last, allowBraces, allowNestedParams) {
-            var range, ch, name = '', i, len, useBraces;
+        function parseName(last, allowBrackets, allowNestedParams) {
+            var range, ch, name = '', i, len, useBrackets;
 
             skipWhiteSpace(last);
 
@@ -1600,8 +1600,8 @@
                 return;
             }
 
-            if (allowBraces && source[index] === '[') {
-                useBraces = true;
+            if (allowBrackets && source[index] === '[') {
+                useBrackets = true;
                 name = advance();
             }
 
@@ -1619,8 +1619,7 @@
                 }
             }
 
-            if (useBraces) {
-
+            if (useBrackets) {
                 // do we have a default value for this?
                 if (source[index] === '=') {
 
@@ -1639,7 +1638,6 @@
 
                 // collect the last ']'
                 name += advance();
-
             }
 
             return name;
@@ -1718,6 +1716,18 @@
                     //For optional types, lets drop the thrown error when we hit the end of the file
                 }
             }
+            return true;
+        };
+
+        TagParser.prototype.parseNamePath = function () {
+            var name;
+            name = parseName(this._last, sloppy && isParamTitle(this._title), true);
+            if (!name) {
+                if (!this.addError("Missing or invalid tag name")) {
+                    return false;
+                }
+            }
+            this._tag.name = name;
             return true;
         };
 
@@ -1830,6 +1840,16 @@
             return true;
         };
 
+        TagParser.prototype.ensureEnd = function () {
+            var shouldBeEmpty = trim(sliceSource(source, index, this._last));
+            if (shouldBeEmpty) {
+                if (!this.addError("Unknown content '%0'", shouldBeEmpty)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+
         TagParser.prototype.epilogue = function epilogue() {
             var description;
 
@@ -1852,10 +1872,28 @@
         Rules = {
             // http://usejsdoc.org/tags-access.html
             'access': ['parseAccess'],
+            // http://usejsdoc.org/tags-global.html
+            'global': ['ensureEnd'],
+            // http://usejsdoc.org/tags-inner.html
+            'inner': ['ensureEnd'],
+            // http://usejsdoc.org/tags-instance.html
+            'instance': ['ensureEnd'],
             // http://usejsdoc.org/tags-kind.html
             'kind': ['parseKind'],
+            // http://usejsdoc.org/tags-private.html
+            'private': ['ensureEnd'],
+            // http://usejsdoc.org/tags-protected.html
+            'protected': ['ensureEnd'],
+            // http://usejsdoc.org/tags-public.html
+            'public': ['ensureEnd'],
+            // http://usejsdoc.org/tags-readonly.html
+            'readonly': ['ensureEnd'],
+            // http://usejsdoc.org/tags-static.html
+            'static': ['ensureEnd'],
             // http://usejsdoc.org/tags-summary.html
             'summary': ['parseDescription'],
+            // http://usejsdoc.org/tags-this.html
+            'this': ['parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-todo.html
             'todo': ['parseDescription'],
             // http://usejsdoc.org/tags-variation.html

@@ -521,6 +521,156 @@ describe('parse', function () {
         res.tags[0].errors.should.have.length(1);
         res.tags[0].errors[0].should.equal('Invalid access name \'ng\'');
     });
+
+    it('public', function () {
+        var res = doctrine.parse('/** @public */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'public');
+    });
+
+    it('public error', function () {
+        var res = doctrine.parse('/** @public ng */', { unwrap: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('errors');
+        res.tags[0].errors.should.have.length(1);
+        res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
+    });
+
+    it('protected', function () {
+        var res = doctrine.parse('/** @protected */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'protected');
+    });
+
+    it('protected error', function () {
+        var res = doctrine.parse('/** @protected ng */', { unwrap: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('errors');
+        res.tags[0].errors.should.have.length(1);
+        res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
+    });
+
+    it('private', function () {
+        var res = doctrine.parse('/** @private */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'private');
+    });
+
+    it('private error', function () {
+        var res = doctrine.parse('/** @private ng */', { unwrap: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('errors');
+        res.tags[0].errors.should.have.length(1);
+        res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
+    });
+
+    it('readonly', function () {
+        var res = doctrine.parse('/** @readonly */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'readonly');
+    });
+
+    it('readonly error', function () {
+        var res = doctrine.parse('/** @readonly ng */', { unwrap: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('errors');
+        res.tags[0].errors.should.have.length(1);
+        res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
+    });
+
+    it('global', function () {
+        var res = doctrine.parse('/** @global */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'global');
+    });
+
+    it('global error', function () {
+        var res = doctrine.parse('/** @global ng */', { unwrap: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('errors');
+        res.tags[0].errors.should.have.length(1);
+        res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
+    });
+
+    it('inner', function () {
+        var res = doctrine.parse('/** @inner */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'inner');
+    });
+
+    it('inner error', function () {
+        var res = doctrine.parse('/** @inner ng */', { unwrap: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('errors');
+        res.tags[0].errors.should.have.length(1);
+        res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
+    });
+
+    it('instance', function () {
+        var res = doctrine.parse('/** @instance */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'instance');
+    });
+
+    it('instance error', function () {
+        var res = doctrine.parse('/** @instance ng */', { unwrap: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('errors');
+        res.tags[0].errors.should.have.length(1);
+        res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
+    });
+
+    it('static', function () {
+        var res = doctrine.parse('/** @static */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'static');
+    });
+
+    it('static error', function () {
+        var res = doctrine.parse('/** @static ng */', { unwrap: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('errors');
+        res.tags[0].errors.should.have.length(1);
+        res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
+    });
+
+    it('this', function () {
+        var res = doctrine.parse(
+            [
+              "/**",
+              " * @this thingName",
+              "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'this');
+        res.tags[0].should.have.property('name', 'thingName');
+    });
+
+    it('this with nested name', function () {
+        var res = doctrine.parse(
+            [
+              "/**",
+              " * @this thingName.name",
+              "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'this');
+        res.tags[0].should.have.property('name', 'thingName.name');
+    });
+
+    it('this error', function () {
+        var res = doctrine.parse(
+            [
+              "/**",
+              " * @this",
+              "*/"
+            ].join('\n'), { unwrap: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'this');
+        res.tags[0].should.have.property('errors');
+        res.tags[0].errors.should.have.length(1);
+        res.tags[0].errors[0].should.equal('Missing or invalid tag name');
+    });
 });
 
 describe('parseType', function () {
