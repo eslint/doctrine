@@ -128,11 +128,15 @@
     }
 
     function isParamTitle(title) {
-        return title === 'param' || title === 'arguments' || title === 'arg';
+        return title === 'param' || title === 'argument' || title === 'arg';
     }
 
     function isProperty(title) {
         return title === 'property' || title === 'prop';
+    }
+
+    function isAllowedNested(title) {
+        return isProperty(title) || isParamTitle(title);
     }
 
     function isTypeParameterRequired(title) {
@@ -1707,7 +1711,7 @@
 
             // param, property requires name
             if (isParamTitle(this._title) || isProperty(this._title)) {
-                this._tag.name = parseName(this._last, sloppy && isParamTitle(this._title), isProperty(this._title));
+                this._tag.name = parseName(this._last, sloppy && isParamTitle(this._title), isAllowedNested(this._title));
                 if (!this._tag.name) {
                     // it's possible the name has already been parsed but interpreted as a type
                     // it's also possible this is a sloppy declaration, in which case it will be
