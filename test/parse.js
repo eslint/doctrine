@@ -122,6 +122,31 @@ describe('parse', function () {
         res.tags.should.have.length(0);
     });
 
+    it('namespace', function () {
+        var res = doctrine.parse('/** @namespace */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'namespace');
+    });
+
+    it('namespace with name', function () {
+        var res = doctrine.parse('/** @namespace thingName.name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'namespace');
+        res.tags[0].should.have.property('name', 'thingName.name');
+    });
+
+    it('namespace with type', function () {
+        var res = doctrine.parse('/** @namespace {Object} thingName.name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'namespace');
+        res.tags[0].should.have.property('name', 'thingName.name');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'Object'
+        });
+    });
+
     it('param', function () {
         var res = doctrine.parse(
             [

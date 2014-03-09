@@ -137,7 +137,7 @@
 
     function isNameParameterRequired(title) {
         return isParamTitle(title) || isProperty(title) || title === 'extends' || title === 'augments' ||
-            title === 'alias';
+            title === 'alias' || title === 'this';
     }
 
     function isAllowedName(title) {
@@ -156,7 +156,8 @@
     }
 
     function isAllowedType(title) {
-        return isTypeParameterRequired(title) || title === 'throws' || title === 'const' || title === 'constant';
+        return isTypeParameterRequired(title) || title === 'throws' || title === 'const' || title === 'constant' ||
+            title === 'namespace';
     }
 
     function stringToArray(str) {
@@ -1723,8 +1724,10 @@
             var name;
             name = parseName(this._last, sloppy && isParamTitle(this._title), true);
             if (!name) {
-                if (!this.addError("Missing or invalid tag name")) {
-                    return false;
+                if (isNameParameterRequired(this._title)) {
+                    if (!this.addError("Missing or invalid tag name")) {
+                        return false;
+                    }
                 }
             }
             this._tag.name = name;
@@ -1882,6 +1885,8 @@
             'kind': ['parseKind'],
             // http://usejsdoc.org/tags-name.html
             'name': ['parseNamePath', 'ensureEnd'],
+            // http://usejsdoc.org/tags-namespace.html
+            'namespace': ['parseType', 'parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-private.html
             'private': ['ensureEnd'],
             // http://usejsdoc.org/tags-protected.html
