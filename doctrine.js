@@ -135,13 +135,17 @@
         return title === 'property' || title === 'prop';
     }
 
+    function isAllowedName(title) {
+        return isParamTitle(title) || isProperty(title) || title === 'extends' || title === 'augments';
+    }
+
     function isAllowedNested(title) {
         return isProperty(title) || isParamTitle(title);
     }
 
     function isTypeParameterRequired(title) {
         return isParamTitle(title) || title === 'define' || title === 'enum' ||
-            title === 'extends' || title === 'implements' || title === 'return' ||
+            title === 'implements' || title === 'return' ||
             title === 'this' || title === 'type' || title === 'typedef' ||
             title === 'returns' || isProperty(title);
     }
@@ -1710,7 +1714,7 @@
             var assign, name;
 
             // param, property requires name
-            if (isParamTitle(this._title) || isProperty(this._title)) {
+            if (isAllowedName(this._title)) {
                 this._tag.name = parseName(this._last, sloppy && isParamTitle(this._title), isAllowedNested(this._title));
                 if (!this._tag.name) {
                     // it's possible the name has already been parsed but interpreted as a type
