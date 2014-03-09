@@ -1874,6 +1874,8 @@
             'protected': ['parseNone'],
             // http://usejsdoc.org/tags-public.html
             'public': ['parseNone'],
+            // http://usejsdoc.org/tags-readonly.html
+            'readonly': ['parseNone'],
             // http://usejsdoc.org/tags-variation.html
             'variation': ['parseVariation']
         };
