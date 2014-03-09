@@ -1591,8 +1591,8 @@
             }
         }
 
-        function parseName(last, allowBraces, allowNestedParams) {
-            var range, ch, name = '', i, len, useBraces;
+        function parseName(last, allowBrackets, allowNestedParams) {
+            var range, ch, name = '', i, len, useBrackets;
 
             skipWhiteSpace(last);
 
@@ -1600,8 +1600,8 @@
                 return;
             }
 
-            if (allowBraces && source[index] === '[') {
-                useBraces = true;
+            if (allowBrackets && source[index] === '[') {
+                useBrackets = true;
                 name = advance();
             }
 
@@ -1619,8 +1619,7 @@
                 }
             }
 
-            if (useBraces) {
-
+            if (useBrackets) {
                 // do we have a default value for this?
                 if (source[index] === '=') {
 
@@ -1639,7 +1638,6 @@
 
                 // collect the last ']'
                 name += advance();
-
             }
 
             return name;
