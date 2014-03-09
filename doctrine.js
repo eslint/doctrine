@@ -1719,6 +1719,18 @@
             return true;
         };
 
+        TagParser.prototype.parseNamePath = function () {
+            var name;
+            name = parseName(this._last, sloppy && isParamTitle(this._title), true);
+            if (!name) {
+                if (!this.addError("Missing or invalid tag name")) {
+                    return false;
+                }
+            }
+            this._tag.name = name;
+            return true;
+        };
+
         TagParser.prototype.parseName = function () {
             var assign, name;
 
@@ -1868,10 +1880,6 @@
             'instance': ['ensureEnd'],
             // http://usejsdoc.org/tags-kind.html
             'kind': ['parseKind'],
-            // http://usejsdoc.org/tags-summary.html
-            'summary': ['parseDescription'],
-            // http://usejsdoc.org/tags-todo.html
-            'todo': ['parseDescription'],
             // http://usejsdoc.org/tags-private.html
             'private': ['ensureEnd'],
             // http://usejsdoc.org/tags-protected.html
@@ -1882,6 +1890,12 @@
             'readonly': ['ensureEnd'],
             // http://usejsdoc.org/tags-static.html
             'static': ['ensureEnd'],
+            // http://usejsdoc.org/tags-summary.html
+            'summary': ['parseDescription'],
+            // http://usejsdoc.org/tags-this.html
+            'this': ['parseNamePath', 'ensureEnd'],
+            // http://usejsdoc.org/tags-todo.html
+            'todo': ['parseDescription'],
             // http://usejsdoc.org/tags-variation.html
             'variation': ['parseVariation']
         };

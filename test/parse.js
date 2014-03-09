@@ -633,6 +633,44 @@ describe('parse', function () {
         res.tags[0].errors.should.have.length(1);
         res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
     });
+
+    it('this', function () {
+        var res = doctrine.parse(
+            [
+              "/**",
+              " * @this thingName",
+              "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'this');
+        res.tags[0].should.have.property('name', 'thingName');
+    });
+
+    it('this with nested name', function () {
+        var res = doctrine.parse(
+            [
+              "/**",
+              " * @this thingName.name",
+              "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'this');
+        res.tags[0].should.have.property('name', 'thingName.name');
+    });
+
+    it('this error', function () {
+        var res = doctrine.parse(
+            [
+              "/**",
+              " * @this",
+              "*/"
+            ].join('\n'), { unwrap: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'this');
+        res.tags[0].should.have.property('errors');
+        res.tags[0].errors.should.have.length(1);
+        res.tags[0].errors[0].should.equal('Missing or invalid tag name');
+    });
 });
 
 describe('parseType', function () {
