@@ -42,6 +42,44 @@ describe('parse', function () {
         res.tags[0].should.have.property('title', 'const');
     });
 
+    it('const with name', function () {
+        var res = doctrine.parse('/** @const constname */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'const');
+        res.tags[0].should.have.property('name', 'constname');
+    });
+
+    it('constant with name', function () {
+        var res = doctrine.parse('/** @constant constname */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'constant');
+        res.tags[0].should.have.property('name', 'constname');
+    });
+
+    it('const with type and name', function () {
+        var res = doctrine.parse('/** @const {String} constname */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'const');
+        res.tags[0].should.have.property('name', 'constname');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'String'
+        });
+    });
+
+    it('constant with type and name', function () {
+        var res = doctrine.parse('/** @constant {String} constname */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'constant');
+        res.tags[0].should.have.property('name', 'constname');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'String'
+        });
+    });
+
     it('const multiple', function () {
         var res = doctrine.parse("/**@const\n @const*/", { unwrap: true });
         res.tags.should.have.length(2);
