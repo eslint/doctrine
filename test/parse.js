@@ -29,6 +29,13 @@ var doctrine = require('../doctrine');
 require('should');
 
 describe('parse', function () {
+    it('alias', function () {
+        var res = doctrine.parse('/** @alias aliasName */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'alias');
+        res.tags[0].should.have.property('name', 'aliasName');
+    });
+
     it('const', function () {
         var res = doctrine.parse('/** @const */', { unwrap: true });
         res.tags.should.have.length(1);
@@ -317,8 +324,15 @@ describe('parse', function () {
         var res = doctrine.parse('/** @augments ClassName */', { unwrap: true });
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'augments');
+        res.tags[0].should.have.property('name', 'ClassName');
     });
 
+    it('extends', function () {
+        var res = doctrine.parse('/** @extends ClassName */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'extends');
+        res.tags[0].should.have.property('name', 'ClassName');
+    });
 
     it('prop', function () {
         var res = doctrine.parse(
