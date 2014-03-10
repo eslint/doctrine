@@ -135,6 +135,31 @@ describe('parse', function () {
         res.tags[0].should.have.property('name', 'thingName.name');
     });
 
+    it('member', function () {
+        var res = doctrine.parse('/** @member */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'member');
+    });
+
+    it('member with name', function () {
+        var res = doctrine.parse('/** @member thingName.name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'member');
+        res.tags[0].should.have.property('name', 'thingName.name');
+    });
+
+    it('member with type', function () {
+        var res = doctrine.parse('/** @member {Object} thingName.name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'member');
+        res.tags[0].should.have.property('name', 'thingName.name');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'Object'
+        });
+    });
+
     it('name', function () {
         var res = doctrine.parse('/** @name thingName.name */', { unwrap: true });
         res.tags.should.have.length(1);
@@ -735,6 +760,32 @@ describe('parse', function () {
         res.tags[0].errors.should.have.length(1);
         res.tags[0].errors[0].should.equal('Missing or invalid tag name');
     });
+
+    it('var', function () {
+        var res = doctrine.parse('/** @var */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'var');
+    });
+
+    it('var with name', function () {
+        var res = doctrine.parse('/** @var thingName.name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'var');
+        res.tags[0].should.have.property('name', 'thingName.name');
+    });
+
+    it('var with type', function () {
+        var res = doctrine.parse('/** @var {Object} thingName.name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'var');
+        res.tags[0].should.have.property('name', 'thingName.name');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'Object'
+        });
+    });
+
 });
 
 describe('parseType', function () {
