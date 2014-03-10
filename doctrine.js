@@ -1901,6 +1901,8 @@
             'public': ['ensureEnd'],
             // http://usejsdoc.org/tags-readonly.html
             'readonly': ['ensureEnd'],
+            // http://usejsdoc.org/tags-since.html
+            'since': ['parseDescription'],
             // http://usejsdoc.org/tags-static.html
             'static': ['ensureEnd'],
             // http://usejsdoc.org/tags-summary.html
@@ -1910,7 +1912,9 @@
             // http://usejsdoc.org/tags-todo.html
             'todo': ['parseDescription'],
             // http://usejsdoc.org/tags-variation.html
-            'variation': ['parseVariation']
+            'variation': ['parseVariation'],
+            // http://usejsdoc.org/tags-version.html
+            'version': ['parseDescription']
         };
 
         TagParser.prototype.parse = function parse() {

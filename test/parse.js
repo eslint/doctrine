@@ -683,6 +683,13 @@ describe('parse', function () {
         res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
     });
 
+    it('since', function () {
+        var res = doctrine.parse('/** @since 1.2.1 */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'since');
+        res.tags[0].should.have.property('description', '1.2.1');
+    });
+
     it('static', function () {
         var res = doctrine.parse('/** @static */', { unwrap: true });
         res.tags.should.have.length(1);
@@ -758,6 +765,13 @@ describe('parse', function () {
             type: 'NameExpression',
             name: 'Object'
         });
+    });
+
+    it('version', function () {
+        var res = doctrine.parse('/** @version 1.2.1 */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'version');
+        res.tags[0].should.have.property('description', '1.2.1');
     });
 
 });
