@@ -1887,6 +1887,7 @@
             'kind': ['parseKind'],
             // http://usejsdoc.org/tags-member.html
             'member': ['parseType', 'parseNamePath', 'ensureEnd'],
+            // http://usejsdoc.org/tags-var.html
             'var': ['parseType', 'parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-name.html
             'name': ['parseNamePath', 'ensureEnd'],
