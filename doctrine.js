@@ -137,7 +137,7 @@
 
     function isNameParameterRequired(title) {
         return isParamTitle(title) || isProperty(title) || title === 'extends' || title === 'augments' ||
-            title === 'alias' || title === 'this';
+            title === 'alias' || title === 'this' || title === 'mixes';
     }
 
     function isAllowedName(title) {
@@ -1883,6 +1883,10 @@
             'instance': ['ensureEnd'],
             // http://usejsdoc.org/tags-kind.html
             'kind': ['parseKind'],
+            // http://usejsdoc.org/tags-mixes.html
+            'mixes': ['parseNamePath', 'ensureEnd'],
+            // http://usejsdoc.org/tags-mixin.html
+            'mixin': ['parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-name.html
             'name': ['parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-namespace.html

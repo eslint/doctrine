@@ -109,6 +109,32 @@ describe('parse', function () {
         res.tags[2].should.have.property('title', 'const');
     });
 
+
+    it('mixes', function () {
+        var res = doctrine.parse('/** @mixes */', { unwrap: true });
+        res.tags.should.have.length(0);
+    });
+
+    it('mixes with name', function () {
+        var res = doctrine.parse('/** @mixes thingName.name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'mixes');
+        res.tags[0].should.have.property('name', 'thingName.name');
+    });
+
+    it('mixin', function () {
+        var res = doctrine.parse('/** @mixin */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'mixin');
+    });
+
+    it('mixin with name', function () {
+        var res = doctrine.parse('/** @mixin thingName.name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'mixin');
+        res.tags[0].should.have.property('name', 'thingName.name');
+    });
+
     it('name', function () {
         var res = doctrine.parse('/** @name thingName.name */', { unwrap: true });
         res.tags.should.have.length(1);
