@@ -109,6 +109,57 @@ describe('parse', function () {
         res.tags[2].should.have.property('title', 'const');
     });
 
+
+    it('mixes', function () {
+        var res = doctrine.parse('/** @mixes */', { unwrap: true });
+        res.tags.should.have.length(0);
+    });
+
+    it('mixes with name', function () {
+        var res = doctrine.parse('/** @mixes thingName.name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'mixes');
+        res.tags[0].should.have.property('name', 'thingName.name');
+    });
+
+    it('mixin', function () {
+        var res = doctrine.parse('/** @mixin */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'mixin');
+    });
+
+    it('mixin with name', function () {
+        var res = doctrine.parse('/** @mixin thingName.name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'mixin');
+        res.tags[0].should.have.property('name', 'thingName.name');
+    });
+
+    it('member', function () {
+        var res = doctrine.parse('/** @member */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'member');
+    });
+
+    it('member with name', function () {
+        var res = doctrine.parse('/** @member thingName.name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'member');
+        res.tags[0].should.have.property('name', 'thingName.name');
+    });
+
+    it('member with type', function () {
+        var res = doctrine.parse('/** @member {Object} thingName.name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'member');
+        res.tags[0].should.have.property('name', 'thingName.name');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'Object'
+        });
+    });
+
     it('name', function () {
         var res = doctrine.parse('/** @name thingName.name */', { unwrap: true });
         res.tags.should.have.length(1);
@@ -658,6 +709,13 @@ describe('parse', function () {
         res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
     });
 
+    it('since', function () {
+        var res = doctrine.parse('/** @since 1.2.1 */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'since');
+        res.tags[0].should.have.property('description', '1.2.1');
+    });
+
     it('static', function () {
         var res = doctrine.parse('/** @static */', { unwrap: true });
         res.tags.should.have.length(1);
@@ -709,6 +767,39 @@ describe('parse', function () {
         res.tags[0].errors.should.have.length(1);
         res.tags[0].errors[0].should.equal('Missing or invalid tag name');
     });
+
+    it('var', function () {
+        var res = doctrine.parse('/** @var */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'var');
+    });
+
+    it('var with name', function () {
+        var res = doctrine.parse('/** @var thingName.name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'var');
+        res.tags[0].should.have.property('name', 'thingName.name');
+    });
+
+    it('var with type', function () {
+        var res = doctrine.parse('/** @var {Object} thingName.name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'var');
+        res.tags[0].should.have.property('name', 'thingName.name');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'Object'
+        });
+    });
+
+    it('version', function () {
+        var res = doctrine.parse('/** @version 1.2.1 */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'version');
+        res.tags[0].should.have.property('description', '1.2.1');
+    });
+
 });
 
 describe('parseType', function () {
