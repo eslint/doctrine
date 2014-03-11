@@ -667,6 +667,18 @@ describe('parse', function () {
         res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
     });
 
+    it('requires', function () {
+        var res = doctrine.parse('/** @requires */', { unwrap: true });
+        res.tags.should.have.length(0);
+    });
+
+    it('requires with module name', function () {
+        var res = doctrine.parse('/** @requires name.path */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'requires');
+        res.tags[0].should.have.property('name', 'name.path');
+    });
+
     it('global', function () {
         var res = doctrine.parse('/** @global */', { unwrap: true });
         res.tags.should.have.length(1);
