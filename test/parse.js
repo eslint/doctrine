@@ -504,6 +504,11 @@ describe('parse', function () {
     });
 
     it('augments', function () {
+        var res = doctrine.parse('/** @augments */', { unwrap: true });
+        res.tags.should.have.length(0);
+    });
+
+    it('augments with name', function () {
         var res = doctrine.parse('/** @augments ClassName */', { unwrap: true });
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'augments');
@@ -511,6 +516,11 @@ describe('parse', function () {
     });
 
     it('extends', function () {
+        var res = doctrine.parse('/** @extends */', { unwrap: true });
+        res.tags.should.have.length(0);
+    });
+
+    it('extends with name', function () {
         var res = doctrine.parse('/** @extends ClassName */', { unwrap: true });
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'extends');
