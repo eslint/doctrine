@@ -1902,7 +1902,7 @@
             'mixes': ['parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-mixin.html
             'mixin': ['parseNamePathOptional', 'ensureEnd'],
-            // Synonym: http://usejsdoc.org/tags-member.html
+            // http://usejsdoc.org/tags-member.html
             'member': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
             // http://usejsdoc.org/tags-method.html
             'method': ['parseNamePathOptional', 'ensureEnd'],
@@ -1910,7 +1910,7 @@
             'func': ['parseNamePathOptional', 'ensureEnd'],
             // Synonym: http://usejsdoc.org/tags-method.html
             'function': ['parseNamePathOptional', 'ensureEnd'],
-            // http://usejsdoc.org/tags-var.html
+            // Synonym: http://usejsdoc.org/tags-member.html
             'var': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
             // http://usejsdoc.org/tags-name.html
             'name': ['parseNamePath', 'ensureEnd'],
