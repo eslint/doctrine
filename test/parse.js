@@ -109,30 +109,42 @@ describe('parse', function () {
         res.tags[2].should.have.property('title', 'const');
     });
 
+    it('func', function () {
+        var res = doctrine.parse('/** @func */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'func');
+    });
 
-    it('mixes', function () {
-        var res = doctrine.parse('/** @mixes */', { unwrap: true });
+    it('func with name', function () {
+        var res = doctrine.parse('/** @func thingName.func */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'func');
+        res.tags[0].should.have.property('name', 'thingName.func');
+    });
+
+    it('func with type', function () {
+        var res = doctrine.parse('/** @func {Object} thingName.func */', { unwrap: true });
         res.tags.should.have.length(0);
+        // func does not accept type
     });
 
-    it('mixes with name', function () {
-        var res = doctrine.parse('/** @mixes thingName.name */', { unwrap: true });
+    it('function', function () {
+        var res = doctrine.parse('/** @function */', { unwrap: true });
         res.tags.should.have.length(1);
-        res.tags[0].should.have.property('title', 'mixes');
-        res.tags[0].should.have.property('name', 'thingName.name');
+        res.tags[0].should.have.property('title', 'function');
     });
 
-    it('mixin', function () {
-        var res = doctrine.parse('/** @mixin */', { unwrap: true });
+    it('function with name', function () {
+        var res = doctrine.parse('/** @function thingName.function */', { unwrap: true });
         res.tags.should.have.length(1);
-        res.tags[0].should.have.property('title', 'mixin');
+        res.tags[0].should.have.property('title', 'function');
+        res.tags[0].should.have.property('name', 'thingName.function');
     });
 
-    it('mixin with name', function () {
-        var res = doctrine.parse('/** @mixin thingName.name */', { unwrap: true });
-        res.tags.should.have.length(1);
-        res.tags[0].should.have.property('title', 'mixin');
-        res.tags[0].should.have.property('name', 'thingName.name');
+    it('function with type', function () {
+        var res = doctrine.parse('/** @function {Object} thingName.function */', { unwrap: true });
+        res.tags.should.have.length(0);
+        // function does not accept type
     });
 
     it('member', function () {
@@ -158,6 +170,50 @@ describe('parse', function () {
             type: 'NameExpression',
             name: 'Object'
         });
+    });
+
+    it('method', function () {
+        var res = doctrine.parse('/** @method */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'method');
+    });
+
+    it('method with name', function () {
+        var res = doctrine.parse('/** @method thingName.function */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'method');
+        res.tags[0].should.have.property('name', 'thingName.function');
+    });
+
+    it('method with type', function () {
+        var res = doctrine.parse('/** @method {Object} thingName.function */', { unwrap: true });
+        res.tags.should.have.length(0);
+        // method does not accept type
+    });
+
+    it('mixes', function () {
+        var res = doctrine.parse('/** @mixes */', { unwrap: true });
+        res.tags.should.have.length(0);
+    });
+
+    it('mixes with name', function () {
+        var res = doctrine.parse('/** @mixes thingName.name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'mixes');
+        res.tags[0].should.have.property('name', 'thingName.name');
+    });
+
+    it('mixin', function () {
+        var res = doctrine.parse('/** @mixin */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'mixin');
+    });
+
+    it('mixin with name', function () {
+        var res = doctrine.parse('/** @mixin thingName.name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'mixin');
+        res.tags[0].should.have.property('name', 'thingName.name');
     });
 
     it('name', function () {

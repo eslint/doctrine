@@ -1891,6 +1891,12 @@
             'mixin': ['parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-member.html
             'member': ['parseType', 'parseNamePath', 'ensureEnd'],
+            // http://usejsdoc.org/tags-method.html
+            'method': ['parseNamePath', 'ensureEnd'],
+            // Synonym: http://usejsdoc.org/tags-method.html
+            'func': ['parseNamePath', 'ensureEnd'],
+            // Synonym: http://usejsdoc.org/tags-method.html
+            'function': ['parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-var.html
             'var': ['parseType', 'parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-name.html
