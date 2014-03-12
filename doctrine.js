@@ -1891,7 +1891,7 @@
             'mixin': ['parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-member.html
             'member': ['parseType', 'parseNamePath', 'ensureEnd'],
-            // http://usejsdoc.org/tags-var.html
+            // Synonym: http://usejsdoc.org/tags-member.html
             'var': ['parseType', 'parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-name.html
             'name': ['parseNamePath', 'ensureEnd'],
