@@ -1722,11 +1722,11 @@
             return true;
         };
 
-        TagParser.prototype.parseNamePath = function () {
+        TagParser.prototype._parseNamePath = function (optional) {
             var name;
             name = parseName(this._last, sloppy && isParamTitle(this._title), true);
             if (!name) {
-                if (isNameParameterRequired(this._title)) {
+                if (!optional) {
                     if (!this.addError("Missing or invalid tag name")) {
                         return false;
                     }
@@ -1735,6 +1735,15 @@
             this._tag.name = name;
             return true;
         };
+
+        TagParser.prototype.parseNamePath = function () {
+            return this._parseNamePath(false);
+        };
+
+        TagParser.prototype.parseNamePathOptional = function () {
+            return this._parseNamePath(true);
+        };
+
 
         TagParser.prototype.parseName = function () {
             var assign, name;
@@ -1888,15 +1897,21 @@
             // http://usejsdoc.org/tags-mixes.html
             'mixes': ['parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-mixin.html
-            'mixin': ['parseNamePath', 'ensureEnd'],
-            // http://usejsdoc.org/tags-member.html
-            'member': ['parseType', 'parseNamePath', 'ensureEnd'],
+            'mixin': ['parseNamePathOptional', 'ensureEnd'],
             // Synonym: http://usejsdoc.org/tags-member.html
-            'var': ['parseType', 'parseNamePath', 'ensureEnd'],
+            'member': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
+            // http://usejsdoc.org/tags-method.html
+            'method': ['parseNamePathOptional', 'ensureEnd'],
+            // Synonym: http://usejsdoc.org/tags-method.html
+            'func': ['parseNamePathOptional', 'ensureEnd'],
+            // Synonym: http://usejsdoc.org/tags-method.html
+            'function': ['parseNamePathOptional', 'ensureEnd'],
+            // http://usejsdoc.org/tags-var.html
+            'var': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
             // http://usejsdoc.org/tags-name.html
             'name': ['parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-namespace.html
-            'namespace': ['parseType', 'parseNamePath', 'ensureEnd'],
+            'namespace': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
             // http://usejsdoc.org/tags-private.html
             'private': ['ensureEnd'],
             // http://usejsdoc.org/tags-protected.html
