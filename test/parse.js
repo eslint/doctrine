@@ -41,6 +41,13 @@ describe('parse', function () {
         res.tags[0].should.have.property('name', 'aliasName');
     });
 
+    it('alias with namepath', function () {
+        var res = doctrine.parse('/** @alias aliasName.OK */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'alias');
+        res.tags[0].should.have.property('name', 'aliasName.OK');
+    });
+
     it('const', function () {
         var res = doctrine.parse('/** @const */', { unwrap: true });
         res.tags.should.have.length(1);
@@ -202,6 +209,13 @@ describe('parse', function () {
     });
 
     it('mixes with name', function () {
+        var res = doctrine.parse('/** @mixes thingName */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'mixes');
+        res.tags[0].should.have.property('name', 'thingName');
+    });
+
+    it('mixes with namepath', function () {
         var res = doctrine.parse('/** @mixes thingName.name */', { unwrap: true });
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'mixes');
@@ -215,6 +229,13 @@ describe('parse', function () {
     });
 
     it('mixin with name', function () {
+        var res = doctrine.parse('/** @mixin thingName */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'mixin');
+        res.tags[0].should.have.property('name', 'thingName');
+    });
+
+    it('mixin with namepath', function () {
         var res = doctrine.parse('/** @mixin thingName.name */', { unwrap: true });
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'mixin');
@@ -520,6 +541,13 @@ describe('parse', function () {
         res.tags[0].should.have.property('name', 'ClassName');
     });
 
+    it('augments with name', function () {
+        var res = doctrine.parse('/** @augments ClassName.OK */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'augments');
+        res.tags[0].should.have.property('name', 'ClassName.OK');
+    });
+
     it('extends', function () {
         var res = doctrine.parse('/** @extends */', { unwrap: true });
         res.tags.should.have.length(0);
@@ -530,6 +558,13 @@ describe('parse', function () {
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'extends');
         res.tags[0].should.have.property('name', 'ClassName');
+    });
+
+    it('extends with namepath', function () {
+        var res = doctrine.parse('/** @extends ClassName.OK */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'extends');
+        res.tags[0].should.have.property('name', 'ClassName.OK');
     });
 
     it('prop', function () {
@@ -825,7 +860,7 @@ describe('parse', function () {
         res.tags[0].should.have.property('name', 'thingName');
     });
 
-    it('this with nested name', function () {
+    it('this with namepath', function () {
         var res = doctrine.parse(
             [
               "/**",
