@@ -30,6 +30,11 @@ require('should');
 
 describe('parse', function () {
     it('alias', function () {
+        var res = doctrine.parse('/** @alias */', { unwrap: true });
+        res.tags.should.have.length(0);
+    });
+
+    it('alias with name', function () {
         var res = doctrine.parse('/** @alias aliasName */', { unwrap: true });
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'alias');

@@ -1886,6 +1886,8 @@
         Rules = {
             // http://usejsdoc.org/tags-access.html
             'access': ['parseAccess'],
+            // http://usejsdoc.org/tags-alias.html
+            'alias': ['parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-augments.html
             'augments': ['parseNamePath', 'ensureEnd'],
             // Synonym: http://usejsdoc.org/tags-augments.html
