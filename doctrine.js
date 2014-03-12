@@ -137,7 +137,7 @@
 
     function isNameParameterRequired(title) {
         return isParamTitle(title) || isProperty(title) || title === 'extends' || title === 'augments' ||
-            title === 'alias' || title === 'this';
+            title === 'alias' || title === 'this' || title === 'mixes' || title === 'requires';
     }
 
     function isAllowedName(title) {
@@ -155,9 +155,11 @@
             title === 'returns' || isProperty(title);
     }
 
+    // Consider deprecation instead using 'isTypeParameterRequired' and 'Rules' declaration to pick when a type is optional/required
+    // This would require changes to 'parseType'
     function isAllowedType(title) {
         return isTypeParameterRequired(title) || title === 'throws' || title === 'const' || title === 'constant' ||
-            title === 'namespace';
+            title === 'namespace' || title === 'member' || title === 'var';
     }
 
     function stringToArray(str) {
@@ -1883,6 +1885,14 @@
             'instance': ['ensureEnd'],
             // http://usejsdoc.org/tags-kind.html
             'kind': ['parseKind'],
+            // http://usejsdoc.org/tags-mixes.html
+            'mixes': ['parseNamePath', 'ensureEnd'],
+            // http://usejsdoc.org/tags-mixin.html
+            'mixin': ['parseNamePath', 'ensureEnd'],
+            // http://usejsdoc.org/tags-member.html
+            'member': ['parseType', 'parseNamePath', 'ensureEnd'],
+            // http://usejsdoc.org/tags-var.html
+            'var': ['parseType', 'parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-name.html
             'name': ['parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-namespace.html
@@ -1895,6 +1905,10 @@
             'public': ['ensureEnd'],
             // http://usejsdoc.org/tags-readonly.html
             'readonly': ['ensureEnd'],
+            // http://usejsdoc.org/tags-requires.html
+            'requires': ['parseNamePath', 'ensureEnd'],
+            // http://usejsdoc.org/tags-since.html
+            'since': ['parseDescription'],
             // http://usejsdoc.org/tags-static.html
             'static': ['ensureEnd'],
             // http://usejsdoc.org/tags-summary.html
@@ -1904,7 +1918,9 @@
             // http://usejsdoc.org/tags-todo.html
             'todo': ['parseDescription'],
             // http://usejsdoc.org/tags-variation.html
-            'variation': ['parseVariation']
+            'variation': ['parseVariation'],
+            // http://usejsdoc.org/tags-version.html
+            'version': ['parseDescription']
         };
 
         TagParser.prototype.parse = function parse() {
