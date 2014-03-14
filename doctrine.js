@@ -159,7 +159,7 @@
     // This would require changes to 'parseType'
     function isAllowedType(title) {
         return isTypeParameterRequired(title) || title === 'throws' || title === 'const' || title === 'constant' ||
-            title === 'namespace' || title === 'member' || title === 'var';
+            title === 'namespace' || title === 'member' || title === 'var' || title === 'module';
     }
 
     function stringToArray(str) {
@@ -1908,6 +1908,8 @@
             'member': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
             // http://usejsdoc.org/tags-method.html
             'method': ['parseNamePathOptional', 'ensureEnd'],
+            // http://usejsdoc.org/tags-module.html
+            'module': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
             // Synonym: http://usejsdoc.org/tags-method.html
             'func': ['parseNamePathOptional', 'ensureEnd'],
             // Synonym: http://usejsdoc.org/tags-method.html
