@@ -242,6 +242,31 @@ describe('parse', function () {
         res.tags[0].should.have.property('name', 'thingName.name');
     });
 
+    it('module', function () {
+        var res = doctrine.parse('/** @module */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'module');
+    });
+
+    it('module with name', function () {
+        var res = doctrine.parse('/** @module thingName.name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'module');
+        res.tags[0].should.have.property('name', 'thingName.name');
+    });
+
+    it('module with type', function () {
+        var res = doctrine.parse('/** @module {Object} thingName.name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'module');
+        res.tags[0].should.have.property('name', 'thingName.name');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'Object'
+        });
+    });
+
     it('name', function () {
         var res = doctrine.parse('/** @name thingName.name */', { unwrap: true });
         res.tags.should.have.length(1);
