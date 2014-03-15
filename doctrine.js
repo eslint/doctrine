@@ -1890,6 +1890,8 @@
             'alias': ['parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-augments.html
             'augments': ['parseNamePath', 'ensureEnd'],
+            // http://usejsdoc.org/tags-deprecated.html
+            'deprecated': ['parseDescription'],
             // Synonym: http://usejsdoc.org/tags-augments.html
             'extends': ['parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-global.html
