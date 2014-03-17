@@ -121,6 +121,60 @@ describe('parse', function () {
         res.tags[2].should.have.property('title', 'const');
     });
 
+    it('constructor', function () {
+        var res = doctrine.parse('/** @constructor */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'constructor');
+    });
+
+    it('constructor with type', function () {
+        var res = doctrine.parse('/** @constructor {Object} */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'constructor');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'Object'
+        });
+    });
+
+    it('constructor with type and name', function () {
+        var res = doctrine.parse('/** @constructor {Object} objName */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'constructor');
+        res.tags[0].should.have.property('name', 'objName');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'Object'
+        });
+    });
+
+    it('class', function () {
+        var res = doctrine.parse('/** @class */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'class');
+    });
+
+    it('class with type', function () {
+        var res = doctrine.parse('/** @class {Object} */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'class');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'Object'
+        });
+    });
+
+    it('class with type and name', function () {
+        var res = doctrine.parse('/** @class {Object} objName */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'class');
+        res.tags[0].should.have.property('name', 'objName');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'Object'
+        });
+    });
+
     it('func', function () {
         var res = doctrine.parse('/** @func */', { unwrap: true });
         res.tags.should.have.length(1);

@@ -159,7 +159,8 @@
     // This would require changes to 'parseType'
     function isAllowedType(title) {
         return isTypeParameterRequired(title) || title === 'throws' || title === 'const' || title === 'constant' ||
-            title === 'namespace' || title === 'member' || title === 'var' || title === 'module';
+            title === 'namespace' || title === 'member' || title === 'var' || title === 'module' ||
+            title === 'constructor' || title === 'class';
     }
 
     function stringToArray(str) {
@@ -1890,7 +1891,11 @@
             'alias': ['parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-augments.html
             'augments': ['parseNamePath', 'ensureEnd'],
-            // Synonym: http://usejsdoc.org/tags-augments.html
+            // http://usejsdoc.org/tags-constructor.html
+            'constructor': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
+            // Synonym: http://usejsdoc.org/tags-constructor.html
+            'class': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
+            // Synonym: http://usejsdoc.org/tags-extends.html
             'extends': ['parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-global.html
             'global': ['ensureEnd'],
