@@ -1897,6 +1897,8 @@
             'class': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
             // Synonym: http://usejsdoc.org/tags-extends.html
             'extends': ['parseNamePath', 'ensureEnd'],
+            // http://usejsdoc.org/tags-deprecated.html
+            'deprecated': ['parseDescription'],
             // http://usejsdoc.org/tags-global.html
             'global': ['ensureEnd'],
             // http://usejsdoc.org/tags-inner.html

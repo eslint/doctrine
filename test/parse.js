@@ -175,6 +175,19 @@ describe('parse', function () {
         });
     });
 
+    it('deprecated', function () {
+        var res = doctrine.parse('/** @deprecated */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'deprecated');
+    });
+
+    it('deprecated', function () {
+        var res = doctrine.parse('/** @deprecated some text here describing why it is deprecated */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'deprecated');
+        res.tags[0].should.have.property('description', 'some text here describing why it is deprecated');
+    });
+
     it('func', function () {
         var res = doctrine.parse('/** @func */', { unwrap: true });
         res.tags.should.have.length(1);
