@@ -1544,7 +1544,8 @@
                 while (index < last) {
                     ch = source[index];
                     if (isLineTerminator(ch)) {
-                        break;
+                        advance();
+                        continue;
                     }
                     if (ch === '}') {
                         brace -= 1;
