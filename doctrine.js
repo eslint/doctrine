@@ -1544,18 +1544,19 @@
                 while (index < last) {
                     ch = source[index];
                     if (isLineTerminator(ch)) {
-                        break;
-                    }
-                    if (ch === '}') {
-                        brace -= 1;
-                        if (brace === 0) {
-                            advance();
-                            break;
+                        advance();
+                    } else {
+                        if (ch === '}') {
+                            brace -= 1;
+                            if (brace === 0) {
+                                advance();
+                                break;
+                            }
+                        } else if (ch === '{') {
+                            brace += 1;
                         }
-                    } else if (ch === '{') {
-                        brace += 1;
+                        type += advance();
                     }
-                    type += advance();
                 }
 
                 if (brace !== 0) {

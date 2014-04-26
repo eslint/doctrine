@@ -536,6 +536,31 @@ describe('parse', function () {
         res.tags.should.be.empty;
     });
 
+    it('param multiple lines', function () {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @param {string|",
+                " *     number} userName",
+                " * }}",
+                "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'param');
+        res.tags[0].should.have.property('name', 'userName');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'UnionType',
+            elements: [{
+                type: 'NameExpression',
+                name: 'string'
+            }, {
+                type: 'NameExpression',
+                name: 'number'
+            }]
+        });
+    });
+
     it('param without braces', function () {
         var res = doctrine.parse(
             [
