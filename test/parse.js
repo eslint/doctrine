@@ -1071,6 +1071,26 @@ describe('parseType', function () {
         });
     });
 
+    it('array type of all literal', function () {
+        var type = doctrine.parseType("[*]");
+        type.should.eql({
+            type: 'ArrayType',
+            elements: [{
+                type: 'AllLiteral'
+            }]
+        });
+    });
+
+    it('array type of nullable literal', function () {
+        var type = doctrine.parseType("[?]");
+        type.should.eql({
+            type: 'ArrayType',
+            elements: [{
+                type: 'NullableLiteral'
+            }]
+        });
+    });
+
     it('comma last record type', function () {
         var type = doctrine.parseType("{,}");
         type.should.eql({

@@ -1120,7 +1120,8 @@
             if (token === Token.QUESTION) {
                 consume(Token.QUESTION);
                 if (token === Token.COMMA || token === Token.EQUAL || token === Token.RBRACE ||
-                        token === Token.RPAREN || token === Token.PIPE || token === Token.EOF) {
+                        token === Token.RPAREN || token === Token.PIPE || token === Token.EOF ||
+                        token === Token.RBRACK) {
                     return {
                         type: Syntax.NullableLiteral
                     };
