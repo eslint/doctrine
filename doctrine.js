@@ -160,7 +160,8 @@
     function isAllowedType(title) {
         return isTypeParameterRequired(title) || title === 'throws' || title === 'const' || title === 'constant' ||
             title === 'namespace' || title === 'member' || title === 'var' || title === 'module' ||
-            title === 'constructor' || title === 'class';
+            title === 'constructor' || title === 'class' ||
+            title === 'public' || title === 'private' || title === 'protected';
     }
 
     function stringToArray(str) {
@@ -1930,11 +1931,11 @@
             // http://usejsdoc.org/tags-namespace.html
             'namespace': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
             // http://usejsdoc.org/tags-private.html
-            'private': ['ensureEnd'],
+            'private': ['parseType', 'parseDescription'],
             // http://usejsdoc.org/tags-protected.html
-            'protected': ['ensureEnd'],
+            'protected': ['parseType', 'parseDescription'],
             // http://usejsdoc.org/tags-public.html
-            'public': ['ensureEnd'],
+            'public': ['parseType', 'parseDescription'],
             // http://usejsdoc.org/tags-readonly.html
             'readonly': ['ensureEnd'],
             // http://usejsdoc.org/tags-requires.html

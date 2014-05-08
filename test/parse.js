@@ -840,12 +840,16 @@ describe('parse', function () {
         res.tags[0].should.have.property('title', 'public');
     });
 
-    it('public error', function () {
-        var res = doctrine.parse('/** @public ng */', { unwrap: true, recoverable: true });
+    it('public type and description', function () {
+        var res = doctrine.parse('/** @public {number} ok */', { unwrap: true, recoverable: true });
         res.tags.should.have.length(1);
-        res.tags[0].should.have.property('errors');
-        res.tags[0].errors.should.have.length(1);
-        res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
+        res.tags[0].should.have.property('title', 'public');
+        res.tags[0].should.have.property('description', 'ok');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'number'
+        });
     });
 
     it('protected', function () {
@@ -854,12 +858,16 @@ describe('parse', function () {
         res.tags[0].should.have.property('title', 'protected');
     });
 
-    it('protected error', function () {
-        var res = doctrine.parse('/** @protected ng */', { unwrap: true, recoverable: true });
+    it('protected type and description', function () {
+        var res = doctrine.parse('/** @protected {number} ok */', { unwrap: true, recoverable: true });
         res.tags.should.have.length(1);
-        res.tags[0].should.have.property('errors');
-        res.tags[0].errors.should.have.length(1);
-        res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
+        res.tags[0].should.have.property('title', 'protected');
+        res.tags[0].should.have.property('description', 'ok');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'number'
+        });
     });
 
     it('private', function () {
@@ -868,12 +876,16 @@ describe('parse', function () {
         res.tags[0].should.have.property('title', 'private');
     });
 
-    it('private error', function () {
-        var res = doctrine.parse('/** @private ng */', { unwrap: true, recoverable: true });
+    it('private type and description', function () {
+        var res = doctrine.parse('/** @private {number} ok */', { unwrap: true, recoverable: true });
         res.tags.should.have.length(1);
-        res.tags[0].should.have.property('errors');
-        res.tags[0].errors.should.have.length(1);
-        res.tags[0].errors[0].should.equal('Unknown content \'ng\'');
+        res.tags[0].should.have.property('title', 'private');
+        res.tags[0].should.have.property('description', 'ok');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'number'
+        });
     });
 
     it('readonly', function () {
