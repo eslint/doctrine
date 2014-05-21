@@ -136,7 +136,7 @@
     }
 
     function isNameParameterRequired(title) {
-        return isParamTitle(title) || isProperty(title) || title === 'extends' || title === 'augments' ||
+        return isParamTitle(title) || isProperty(title) ||
             title === 'alias' || title === 'this' || title === 'mixes' || title === 'requires';
     }
 
@@ -160,7 +160,7 @@
     function isAllowedType(title) {
         return isTypeParameterRequired(title) || title === 'throws' || title === 'const' || title === 'constant' ||
             title === 'namespace' || title === 'member' || title === 'var' || title === 'module' ||
-            title === 'constructor' || title === 'class' ||
+            title === 'constructor' || title === 'class' || title === 'extends' || title === 'augments' ||
             title === 'public' || title === 'private' || title === 'protected';
     }
 
@@ -1893,13 +1893,13 @@
             // http://usejsdoc.org/tags-alias.html
             'alias': ['parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-augments.html
-            'augments': ['parseNamePath', 'ensureEnd'],
+            'augments': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
             // http://usejsdoc.org/tags-constructor.html
             'constructor': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
             // Synonym: http://usejsdoc.org/tags-constructor.html
             'class': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
             // Synonym: http://usejsdoc.org/tags-extends.html
-            'extends': ['parseNamePath', 'ensureEnd'],
+            'extends': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
             // http://usejsdoc.org/tags-deprecated.html
             'deprecated': ['parseDescription'],
             // http://usejsdoc.org/tags-global.html

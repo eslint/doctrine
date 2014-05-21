@@ -648,7 +648,7 @@ describe('parse', function () {
 
     it('augments', function () {
         var res = doctrine.parse('/** @augments */', { unwrap: true });
-        res.tags.should.have.length(0);
+        res.tags.should.have.length(1);
     });
 
     it('augments with name', function () {
@@ -656,6 +656,16 @@ describe('parse', function () {
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'augments');
         res.tags[0].should.have.property('name', 'ClassName');
+    });
+
+    it('augments with type', function () {
+        var res = doctrine.parse('/** @augments {ClassName} */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'augments');
+        res.tags[0].should.have.property('type', {
+          type: 'NameExpression',
+          name: 'ClassName'
+        });
     });
 
     it('augments with name', function () {
@@ -667,7 +677,7 @@ describe('parse', function () {
 
     it('extends', function () {
         var res = doctrine.parse('/** @extends */', { unwrap: true });
-        res.tags.should.have.length(0);
+        res.tags.should.have.length(1);
     });
 
     it('extends with name', function () {
@@ -675,6 +685,16 @@ describe('parse', function () {
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'extends');
         res.tags[0].should.have.property('name', 'ClassName');
+    });
+
+    it('extends with type', function () {
+        var res = doctrine.parse('/** @extends {ClassName} */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'extends');
+        res.tags[0].should.have.property('type', {
+          type: 'NameExpression',
+          name: 'ClassName'
+        });
     });
 
     it('extends with namepath', function () {
