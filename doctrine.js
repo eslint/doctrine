@@ -1443,7 +1443,7 @@
         }
 
         function stringify(node, options) {
-            if (options === null || options === undefined) {
+            if (options == null) {
                 options = {};
             }
             return stringifyImpl(node, options.compact, options.topLevel);
@@ -1592,7 +1592,7 @@
         }
 
         function parseName(last, allowBrackets, allowNestedParams) {
-            var range, ch, name = '', i, len, useBrackets;
+            var name = '', useBrackets;
 
             skipWhiteSpace(last);
 
@@ -1724,7 +1724,7 @@
             name = parseName(this._last, sloppy && isParamTitle(this._title), true);
             if (!name) {
                 if (!optional) {
-                    if (!this.addError("Missing or invalid tag name")) {
+                    if (!this.addError('Missing or invalid tag name')) {
                         return false;
                     }
                 }
@@ -1831,7 +1831,7 @@
             access = trim(sliceSource(source, index, this._last));
             this._tag.access = access;
             if (access !== 'private' && access !== 'protected' && access !== 'public') {
-                if (!this.addError("Invalid access name '%0'", access)) {
+                if (!this.addError('Invalid access name \'%0\'', access)) {
                     return false;
                 }
             }
@@ -1854,7 +1854,7 @@
         TagParser.prototype.ensureEnd = function () {
             var shouldBeEmpty = trim(sliceSource(source, index, this._last));
             if (shouldBeEmpty) {
-                if (!this.addError("Unknown content '%0'", shouldBeEmpty)) {
+                if (!this.addError('Unknown content \'%0\'', shouldBeEmpty)) {
                     return false;
                 }
             }

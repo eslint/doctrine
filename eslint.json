@@ -10,7 +10,7 @@
     "no-bitwise": [2, true],
     "camelcase": [2, true],
     "curly": [2, true],
-    "eqeqeq": [2, true],
+    "eqeqeq": [2, "allow-null"],
     "wrap-iife": [2, true],
     "eqeqeq": [2, true],
     "strict": [2, true],
