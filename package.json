@@ -18,7 +18,7 @@
     },
     "devDependencies": {
         "jslint": "~0.1.9",
-        "eslint": "~0.4.2",
+        "eslint": "~0.6.2",
         "mocha": "*",
         "should": "*"
     },
@@ -27,7 +27,8 @@
         "url": "http://github.com/Constellation/doctrine/raw/master/LICENSE.BSD"
     }],
     "scripts": {
-        "test": "npm run-script lint && ./node_modules/.bin/mocha",
-        "lint": "node_modules/jslint/bin/jslint.js doctrine.js"
+        "test": "npm run-script lint && npm run-script eslint && ./node_modules/.bin/mocha",
+        "lint": "node_modules/jslint/bin/jslint.js doctrine.js",
+        "eslint": "node_modules/eslint/bin/eslint.js -c eslint.json doctrine.js"
     }
 }
