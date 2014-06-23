@@ -50,11 +50,13 @@
     CanAccessStringByIndex = typeof 'doctrine'[0] !== undefined;
 
     function sliceSource(source, index, last) {
+        var output;
         if (!CanAccessStringByIndex) {
-            return source.slice(index, last).join('');
+            output = source.slice(index, last).join('');
         } else {
-            return source.slice(index, last);
+            output = source.slice(index, last);
         }
+        return output;
     }
 
     isArray = Array.isArray;
