@@ -39,7 +39,7 @@
         hasOwnProperty;
 
     // Sync with package.json.
-    VERSION = '0.3.1-dev';
+    VERSION = '0.5.2-dev';
 
     // See also tools/generate-unicode-regex.py.
     Regex = {
@@ -126,15 +126,40 @@
     }
 
     function isParamTitle(title) {
-        return title === 'param' || title === 'arguments' || title === 'arg';
+        return title === 'param' || title === 'argument' || title === 'arg';
+    }
+
+    function isProperty(title) {
+        return title === 'property' || title === 'prop';
+    }
+
+    function isNameParameterRequired(title) {
+        return isParamTitle(title) || isProperty(title) ||
+            title === 'alias' || title === 'this' || title === 'mixes' || title === 'requires';
+    }
+
+    function isAllowedName(title) {
+        return isNameParameterRequired(title) || title === 'const' || title === 'constant';
+    }
+
+    function isAllowedNested(title) {
+        return isProperty(title) || isParamTitle(title);
     }
 
     function isTypeParameterRequired(title) {
         return isParamTitle(title) || title === 'define' || title === 'enum' ||
-            title === 'extends' || title === 'implements' || title === 'return' ||
+            title === 'implements' || title === 'return' ||
             title === 'this' || title === 'type' || title === 'typedef' ||
-            title === 'returns' || title === 'property' ||
-            title === 'prop';
+            title === 'returns' || isProperty(title);
+    }
+
+    // Consider deprecation instead using 'isTypeParameterRequired' and 'Rules' declaration to pick when a type is optional/required
+    // This would require changes to 'parseType'
+    function isAllowedType(title) {
+        return isTypeParameterRequired(title) || title === 'throws' || title === 'const' || title === 'constant' ||
+            title === 'namespace' || title === 'member' || title === 'var' || title === 'module' ||
+            title === 'constructor' || title === 'class' || title === 'extends' || title === 'augments' ||
+            title === 'public' || title === 'private' || title === 'protected';
     }
 
     function DoctrineError(message) {
@@ -1089,7 +1114,8 @@
             if (token === Token.QUESTION) {
                 consume(Token.QUESTION);
                 if (token === Token.COMMA || token === Token.EQUAL || token === Token.RBRACE ||
-                        token === Token.RPAREN || token === Token.PIPE || token === Token.EOF) {
+                        token === Token.RPAREN || token === Token.PIPE || token === Token.EOF ||
+                        token === Token.RBRACK) {
                     return {
                         type: Syntax.NullableLiteral
                     };
@@ -1513,18 +1539,19 @@
                 while (index < last) {
                     ch = source[index];
                     if (isLineTerminator(ch)) {
-                        break;
-                    }
-                    if (ch === '}') {
-                        brace -= 1;
-                        if (brace === 0) {
-                            advance();
-                            break;
+                        advance();
+                    } else {
+                        if (ch === '}') {
+                            brace -= 1;
+                            if (brace === 0) {
+                                advance();
+                                break;
+                            }
+                        } else if (ch === '{') {
+                            brace += 1;
                         }
-                    } else if (ch === '{') {
-                        brace += 1;
+                        type += advance();
                     }
-                    type += advance();
                 }
 
                 if (brace !== 0) {
@@ -1564,8 +1591,8 @@
             }
         }
 
-        function parseName(last, allowBraces) {
-            var name = '', useBraces;
+        function parseName(last, allowBrackets, allowNestedParams) {
+            var range, ch, name = '', i, len, useBrackets;
 
             skipWhiteSpace(last);
 
@@ -1573,8 +1600,8 @@
                 return null;
             }
 
-            if (allowBraces && source[index] === '[') {
-                useBraces = true;
+            if (allowBrackets && source[index] === '[') {
+                useBrackets = true;
                 name = advance();
             }
 
@@ -1584,8 +1611,15 @@
 
             name += scanIdentifier(last);
 
-            if (useBraces) {
+            if (allowNestedParams) {
+                while (source[index] === '.') {
+                    name += '.';
+                    index += 1;
+                    name += scanIdentifier(last);
+                }
+            }
 
+            if (useBrackets) {
                 // do we have a default value for this?
                 if (source[index] === '=') {
 
@@ -1604,7 +1638,6 @@
 
                 // collect the last ']'
                 name += advance();
-
             }
 
             return name;
@@ -1675,22 +1708,51 @@
                         return false;
                     }
                 }
-            }
-
-            // optional types
-            if (this._title === 'throws') {
-                this._tag.type = parseType(this._title, this._last);
+            } else if (isAllowedType(this._title)) {
+                // optional types
+                try {
+                    this._tag.type = parseType(this._title, this._last);
+                } catch (e) {
+                    //For optional types, lets drop the thrown error when we hit the end of the file
+                }
             }
             return true;
         };
+
+        TagParser.prototype._parseNamePath = function (optional) {
+            var name;
+            name = parseName(this._last, sloppy && isParamTitle(this._title), true);
+            if (!name) {
+                if (!optional) {
+                    if (!this.addError("Missing or invalid tag name")) {
+                        return false;
+                    }
+                }
+            }
+            this._tag.name = name;
+            return true;
+        };
+
+        TagParser.prototype.parseNamePath = function () {
+            return this._parseNamePath(false);
+        };
+
+        TagParser.prototype.parseNamePathOptional = function () {
+            return this._parseNamePath(true);
+        };
+
 
         TagParser.prototype.parseName = function () {
             var assign, name;
 
             // param, property requires name
-            if (isParamTitle(this._title) || this._title === 'property' || this._title === 'prop') {
-                this._tag.name = parseName(this._last, sloppy && isParamTitle(this._title));
+            if (isAllowedName(this._title)) {
+                this._tag.name = parseName(this._last, sloppy && isParamTitle(this._title), isAllowedNested(this._title));
                 if (!this._tag.name) {
+                    if (!isNameParameterRequired(this._title)) {
+                        return true;
+                    }
+
                     // it's possible the name has already been parsed but interpreted as a type
                     // it's also possible this is a sloppy declaration, in which case it will be
                     // fixed at the end
@@ -1764,13 +1826,35 @@
             return true;
         };
 
-        TagParser.prototype.parseVariation = function parseKind() {
+        TagParser.prototype.parseAccess = function parseAccess() {
+            var access;
+            access = trim(sliceSource(source, index, this._last));
+            this._tag.access = access;
+            if (access !== 'private' && access !== 'protected' && access !== 'public') {
+                if (!this.addError("Invalid access name '%0'", access)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        TagParser.prototype.parseVariation = function parseVariation() {
             var variation, text;
             text = trim(sliceSource(source, index, this._last));
             variation = parseFloat(text, 10);
             this._tag.variation = variation;
             if (isNaN(variation)) {
                 if (!this.addError('Invalid variation \'%0\'', text)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        TagParser.prototype.ensureEnd = function () {
+            var shouldBeEmpty = trim(sliceSource(source, index, this._last));
+            if (shouldBeEmpty) {
+                if (!this.addError("Unknown content '%0'", shouldBeEmpty)) {
                     return false;
                 }
             }
@@ -1797,14 +1881,72 @@
         };
 
         Rules = {
+            // http://usejsdoc.org/tags-access.html
+            'access': ['parseAccess'],
+            // http://usejsdoc.org/tags-alias.html
+            'alias': ['parseNamePath', 'ensureEnd'],
+            // http://usejsdoc.org/tags-augments.html
+            'augments': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
+            // http://usejsdoc.org/tags-constructor.html
+            'constructor': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
+            // Synonym: http://usejsdoc.org/tags-constructor.html
+            'class': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
+            // Synonym: http://usejsdoc.org/tags-extends.html
+            'extends': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
+            // http://usejsdoc.org/tags-deprecated.html
+            'deprecated': ['parseDescription'],
+            // http://usejsdoc.org/tags-global.html
+            'global': ['ensureEnd'],
+            // http://usejsdoc.org/tags-inner.html
+            'inner': ['ensureEnd'],
+            // http://usejsdoc.org/tags-instance.html
+            'instance': ['ensureEnd'],
             // http://usejsdoc.org/tags-kind.html
             'kind': ['parseKind'],
+            // http://usejsdoc.org/tags-mixes.html
+            'mixes': ['parseNamePath', 'ensureEnd'],
+            // http://usejsdoc.org/tags-mixin.html
+            'mixin': ['parseNamePathOptional', 'ensureEnd'],
+            // http://usejsdoc.org/tags-member.html
+            'member': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
+            // http://usejsdoc.org/tags-method.html
+            'method': ['parseNamePathOptional', 'ensureEnd'],
+            // http://usejsdoc.org/tags-module.html
+            'module': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
+            // Synonym: http://usejsdoc.org/tags-method.html
+            'func': ['parseNamePathOptional', 'ensureEnd'],
+            // Synonym: http://usejsdoc.org/tags-method.html
+            'function': ['parseNamePathOptional', 'ensureEnd'],
+            // Synonym: http://usejsdoc.org/tags-member.html
+            'var': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
+            // http://usejsdoc.org/tags-name.html
+            'name': ['parseNamePath', 'ensureEnd'],
+            // http://usejsdoc.org/tags-namespace.html
+            'namespace': ['parseType', 'parseNamePathOptional', 'ensureEnd'],
+            // http://usejsdoc.org/tags-private.html
+            'private': ['parseType', 'parseDescription'],
+            // http://usejsdoc.org/tags-protected.html
+            'protected': ['parseType', 'parseDescription'],
+            // http://usejsdoc.org/tags-public.html
+            'public': ['parseType', 'parseDescription'],
+            // http://usejsdoc.org/tags-readonly.html
+            'readonly': ['ensureEnd'],
+            // http://usejsdoc.org/tags-requires.html
+            'requires': ['parseNamePath', 'ensureEnd'],
+            // http://usejsdoc.org/tags-since.html
+            'since': ['parseDescription'],
+            // http://usejsdoc.org/tags-static.html
+            'static': ['ensureEnd'],
             // http://usejsdoc.org/tags-summary.html
             'summary': ['parseDescription'],
+            // http://usejsdoc.org/tags-this.html
+            'this': ['parseNamePath', 'ensureEnd'],
             // http://usejsdoc.org/tags-todo.html
             'todo': ['parseDescription'],
             // http://usejsdoc.org/tags-variation.html
-            'variation': ['parseVariation']
+            'variation': ['parseVariation'],
+            // http://usejsdoc.org/tags-version.html
+            'version': ['parseDescription']
         };
 
         TagParser.prototype.parse = function parse() {
