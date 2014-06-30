@@ -50,7 +50,13 @@
     CanAccessStringByIndex = typeof 'doctrine'[0] !== undefined;
 
     function sliceSource(source, index, last) {
-        return source.slice(index, last);
+        var output;
+        if (!CanAccessStringByIndex) {
+            output = source.slice(index, last).join('');
+        } else {
+            output = source.slice(index, last);
+        }
+        return output;
     }
 
     isArray = Array.isArray;
@@ -66,12 +72,6 @@
             return func.call(obj, name);
         };
     }());
-
-    if (!CanAccessStringByIndex) {
-        sliceSource = function sliceSource(source, index, last) {
-            return source.slice(index, last).join('');
-        };
-    }
 
     function shallowCopy(obj) {
         var ret = {}, key;
@@ -164,10 +164,6 @@
             title === 'public' || title === 'private' || title === 'protected';
     }
 
-    function stringToArray(str) {
-        return str.split('');
-    }
-
     function DoctrineError(message) {
         this.name = 'DoctrineError';
         this.message = message;
@@ -179,14 +175,12 @@
         throw new DoctrineError(message);
     }
 
-    function assert(cond, text) { }
-
-    if (VERSION.slice(-3) === 'dev') {
-        assert = function assert(cond, text) {
+    function assert(cond, text) {
+        if (VERSION.slice(-3) === 'dev') {
             if (!cond) {
                 throwError(text);
             }
-        };
+        }
     }
 
     function trim(str) {
@@ -346,7 +340,7 @@
         }
 
         function scanString() {
-            var str = '', quote, ch, code, unescaped, restore, octal = false;
+            var str = '', quote, ch, code, unescaped, restore; //TODO review removal octal = false
             quote = source[index];
             ++index;
 
@@ -395,12 +389,13 @@
                                 code = '01234567'.indexOf(ch);
 
                                 // \0 is not octal escape sequence
-                                if (code !== 0) {
-                                    octal = true;
-                                }
+                                // Deprecating unused code. TODO review removal
+                                //if (code !== 0) {
+                                //    octal = true;
+                                //}
 
                                 if (index < length && isOctalDigit(source[index])) {
-                                    octal = true;
+                                    //TODO Review Removal octal = true;
                                     code = code * 8 + '01234567'.indexOf(advance());
 
                                     // 3 digits are only allowed when string starts
@@ -834,7 +829,7 @@
         //   | FieldType
         //   | FieldType ',' FieldTypeList
         function parseRecordType() {
-            var fields, field;
+            var fields;
 
             consume(Token.LBRACE, 'RecordType should start with {');
             fields = [];
@@ -997,7 +992,7 @@
         //   | TypeParameters '(' 'this' ':' TypeName ')' ResultType
         //   | TypeParameters '(' 'this' ':' TypeName ',' ParametersType ')' ResultType
         function parseFunctionType() {
-            var isNew, thisBinding, params, result, fnType, name;
+            var isNew, thisBinding, params, result, fnType;
             assert(token === Token.NAME && value === 'function', 'FunctionType should start with \'function\'');
             consume(Token.NAME);
 
@@ -1103,7 +1098,7 @@
                 return parseTypeName();
 
             default:
-                throwError("unexpected token");
+                throwError('unexpected token');
             }
         }
 
@@ -1522,7 +1517,7 @@
         //
         // therefore, scanning type expression with balancing braces.
         function parseType(title, last) {
-            var ch, brace, type, direct = false, res;
+            var ch, brace, type, direct = false;
 
             // search '{'
             while (index < last) {
@@ -1573,17 +1568,17 @@
                     return typed.parseType(type);
                 } catch (e1) {
                     // parse failed
-                    return;
+                    return null;
                 }
             } else {
-                return;
+                return null;
             }
         }
 
         function scanIdentifier(last) {
             var identifier;
             if (!isIdentifierStart(source[index])) {
-                return;
+                return null;
             }
             identifier = advance();
             while (index < last && isIdentifierPart(source[index])) {
@@ -1599,12 +1594,12 @@
         }
 
         function parseName(last, allowBrackets, allowNestedParams) {
-            var range, ch, name = '', i, len, useBrackets;
+            var name = '', useBrackets;
 
             skipWhiteSpace(last);
 
             if (index >= last) {
-                return;
+                return null;
             }
 
             if (allowBrackets && source[index] === '[') {
@@ -1613,7 +1608,7 @@
             }
 
             if (!isIdentifierStart(source[index])) {
-                return;
+                return null;
             }
 
             name += scanIdentifier(last);
@@ -1640,7 +1635,7 @@
 
                 if (index >= last  || source[index] !== ']') {
                     // we never found a closing ']'
-                    return;
+                    return null;
                 }
 
                 // collect the last ']'
@@ -1704,7 +1699,7 @@
                     this._tag.type = parseType(this._title, this._last);
                     if (!this._tag.type) {
                         if (!isParamTitle(this._title)) {
-                            if (!this.addError("Missing or invalid tag type")) {
+                            if (!this.addError('Missing or invalid tag type')) {
                                 return false;
                             }
                         }
@@ -1731,7 +1726,7 @@
             name = parseName(this._last, sloppy && isParamTitle(this._title), true);
             if (!name) {
                 if (!optional) {
-                    if (!this.addError("Missing or invalid tag name")) {
+                    if (!this.addError('Missing or invalid tag name')) {
                         return false;
                     }
                 }
@@ -1768,7 +1763,7 @@
                         this._tag.name = this._tag.type.name;
                         this._tag.type = null;
                     } else {
-                        if (!this.addError("Missing or invalid tag name")) {
+                        if (!this.addError('Missing or invalid tag name')) {
                             return false;
                         }
                     }
@@ -1784,9 +1779,9 @@
                         this._tag.name = assign[0];
 
                         // convert to an optional type
-                        if (this._tag.type.type !== "OptionalType") {
+                        if (this._tag.type.type !== 'OptionalType') {
                             this._tag.type = {
-                                type: "OptionalType",
+                                type: 'OptionalType',
                                 expression: this._tag.type
                             };
                         }
@@ -1826,7 +1821,7 @@
             kind = trim(sliceSource(source, index, this._last));
             this._tag.kind = kind;
             if (!hasOwnProperty(kinds, kind)) {
-                if (!this.addError("Invalid kind name '%0'", kind)) {
+                if (!this.addError('Invalid kind name \'%0\'', kind)) {
                     return false;
                 }
             }
@@ -1838,7 +1833,7 @@
             access = trim(sliceSource(source, index, this._last));
             this._tag.access = access;
             if (access !== 'private' && access !== 'protected' && access !== 'public') {
-                if (!this.addError("Invalid access name '%0'", access)) {
+                if (!this.addError('Invalid access name \'%0\'', access)) {
                     return false;
                 }
             }
@@ -1851,7 +1846,7 @@
             variation = parseFloat(text, 10);
             this._tag.variation = variation;
             if (isNaN(variation)) {
-                if (!this.addError("Invalid variation '%0'", text)) {
+                if (!this.addError('Invalid variation \'%0\'', text)) {
                     return false;
                 }
             }
@@ -1861,7 +1856,7 @@
         TagParser.prototype.ensureEnd = function () {
             var shouldBeEmpty = trim(sliceSource(source, index, this._last));
             if (shouldBeEmpty) {
-                if (!this.addError("Unknown content '%0'", shouldBeEmpty)) {
+                if (!this.addError('Unknown content \'%0\'', shouldBeEmpty)) {
                     return false;
                 }
             }
@@ -1878,7 +1873,7 @@
                 this._tag.name = undefined;
 
                 if (!sloppy) {
-                    if (!this.addError("Missing or invalid tag name")) {
+                    if (!this.addError('Missing or invalid tag name')) {
                         return false;
                     }
                 }
@@ -1961,8 +1956,8 @@
 
             // empty title
             if (!this._title) {
-                if (!this.addError("Missing or invalid title")) {
-                    return;
+                if (!this.addError('Missing or invalid title')) {
+                    return null;
                 }
             }
 
@@ -1979,7 +1974,7 @@
             for (i = 0, iz = sequences.length; i < iz; ++i) {
                 method = sequences[i];
                 if (!this[method]()) {
-                    return;
+                    return null;
                 }
             }
 
@@ -1993,7 +1988,7 @@
 
             // skip to tag
             if (!skipToTag()) {
-                return;
+                return null;
             }
 
             // scan title
