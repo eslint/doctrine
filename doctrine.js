@@ -1614,8 +1614,8 @@
             name += scanIdentifier(last);
 
             if (allowNestedParams) {
-                while (source[index] === '.') {
-                    name += '.';
+                while (source[index] === '.' || source[index] === '#' || source[index] === '~') {
+                    name += source[index];
                     index += 1;
                     name += scanIdentifier(last);
                 }
