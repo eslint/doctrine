@@ -1755,6 +1755,10 @@ describe('recovery tests', function() {
          res.tags[1].should.have.property('name', 'f2');
 	});
 
+	it ('should not crash on bad type in @param without name', function() {
+		var res = doctrine.parse("@param {Function(DOMNode)}",
+                                         { recoverable: true });
+        });
 });
 
 describe('exported Syntax', function() {

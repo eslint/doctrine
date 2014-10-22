@@ -1758,7 +1758,7 @@
                     // it's possible the name has already been parsed but interpreted as a type
                     // it's also possible this is a sloppy declaration, in which case it will be
                     // fixed at the end
-                    if (isParamTitle(this._title) && this._tag.type.name) {
+                    if (isParamTitle(this._title) && this._tag.type && this._tag.type.name) {
                         this._extra.name = this._tag.type;
                         this._tag.name = this._tag.type.name;
                         this._tag.type = null;
