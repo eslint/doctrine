@@ -1779,7 +1779,7 @@
                         this._tag.name = assign[0];
 
                         // convert to an optional type
-                        if (this._tag.type.type !== 'OptionalType') {
+                        if (this._tag.type && this._tag.type.type !== 'OptionalType') {
                             this._tag.type = {
                                 type: 'OptionalType',
                                 expression: this._tag.type
