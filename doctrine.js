@@ -1472,7 +1472,7 @@
         function advance() {
             var ch = source[index];
             index += 1;
-            if (isLineTerminator(ch)) {
+            if (isLineTerminator(ch) && !(ch === '\r' && source[index] === '\n')) {
                 lineNumber += 1;
             }
             return ch;
@@ -1496,7 +1496,7 @@
             waiting = false;
             while (last < length) {
                 ch = source[last];
-                if (isLineTerminator(ch)) {
+                if (isLineTerminator(ch) && !(ch === '\r' && source[last + 1] === '\n')) {
                     lineNumber += 1;
                     waiting = true;
                 } else if (waiting) {
