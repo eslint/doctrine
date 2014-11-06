@@ -52,24 +52,18 @@ var ESLINT_OPTION = {
     }
 };
 
-gulp.task('test', function () {
-    return gulp.src(TEST)
-        .pipe(mocha({
-            reporter: 'spec',
-            timeout: 100000 // 100s
-        }));
-});
-
-
-gulp.task('cover', function (cb) {
-  gulp.src(SRC)
-    .pipe(istanbul()) // Covering files
-    .on('finish', function () {
-      gulp.src(['test/*.js'])
-        .pipe(mocha())
-        .pipe(istanbul.writeReports()) // Creating the reports after tests runned
-        .on('end', cb);
-    });
+gulp.task('test', function (cb) {
+    gulp.src(SRC)
+        .pipe(istanbul()) // Covering files
+        .on('finish', function () {
+            gulp.src(['test/*.js'])
+                .pipe(mocha({
+                    reporter: 'spec',
+                    timeout: 100000 // 100s
+                    }))
+                .pipe(istanbul.writeReports()) // Creating the reports after tests runned
+                .on('end', cb);
+        });
 });
 
 gulp.task('lint', function () {
