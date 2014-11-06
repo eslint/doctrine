@@ -1514,6 +1514,27 @@ describe('parseType', function () {
         });
     });
 
+    it('rest array type', function () {
+        var type;
+        type = doctrine.parseType("[string,...string]");
+        type.should.eql({
+            "elements": [
+                {
+                    "name": "string",
+                    "type": "NameExpression"
+                },
+                {
+                    "expression": {
+                        "name": "string",
+                        "type": "NameExpression"
+                    },
+                "type": "RestType"
+                }
+            ],
+            "type": "ArrayType"
+        });
+    });
+
     it('illegal tokens', function () {
         doctrine.parseType.bind(doctrine, ".").should.throw('unexpected token');
         doctrine.parseType.bind(doctrine, ".d").should.throw('unexpected token');
