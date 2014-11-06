@@ -124,7 +124,7 @@
         var middle = function () { };
         middle.prototype = Error.prototype;
         return new middle();
-    });
+    }());
     DoctrineError.prototype.constructor = DoctrineError;
 
     function throwError(message) {
@@ -308,7 +308,7 @@
                     break;
                 } else if (ch === '\\') {
                     ch = advance();
-                    if (!esutils.code.isLineTerminator(ch)) {
+                    if (!esutils.code.isLineTerminator(ch.charCodeAt(0))) {
                         switch (ch) {
                         case 'n':
                             str += '\n';
@@ -341,7 +341,7 @@
                             break;
 
                         default:
-                            if (esutils.code.isOctalDigit(ch)) {
+                            if (esutils.code.isOctalDigit(ch.charCodeAt(0))) {
                                 code = '01234567'.indexOf(ch);
 
                                 // \0 is not octal escape sequence
@@ -373,7 +373,7 @@
                             ++index;
                         }
                     }
-                } else if (esutils.code.isLineTerminator(ch)) {
+                } else if (esutils.code.isLineTerminator(ch.charCodeAt(0))) {
                     break;
                 } else {
                     str += ch;
@@ -392,6 +392,8 @@
             var number, ch;
 
             number = '';
+            ch = source.charCodeAt(index);
+
             if (ch !== 0x2E  /* '.' */) {
                 number = advance();
                 ch = source.charCodeAt(index);
@@ -536,6 +538,7 @@
 
             ch = source.charCodeAt(index);
             switch (ch) {
+            case 0x27:  /* ''' */
             case 0x22:  /* '"' */
                 token = scanString();
                 return token;
@@ -581,18 +584,19 @@
                 return token;
 
             case 0x2E:  /* '.' */
-                advance();
-                if (index < length) {
-                    ch = source.charCodeAt(index);
+                if (index + 1 < length) {
+                    ch = source.charCodeAt(index + 1);
                     if (ch === 0x3C  /* '<' */) {
-                        advance();
+                        advance();  // '.'
+                        advance();  // '<'
                         token = Token.DOT_LT;
                         return token;
                     }
 
-                    if (ch === 0x2E  /* '.' */ && index + 1 < length && source.charCodeAt(index + 1) === 0x2E  /* '.' */) {
-                        advance();
-                        advance();
+                    if (ch === 0x2E  /* '.' */ && index + 2 < length && source.charCodeAt(index + 2) === 0x2E  /* '.' */) {
+                        advance();  // '.'
+                        advance();  // '.'
+                        advance();  // '.'
                         token = Token.REST;
                         return token;
                     }
@@ -602,6 +606,7 @@
                         return token;
                     }
                 }
+                advance();  // '.'
                 token = Token.DOT;
                 return token;
 

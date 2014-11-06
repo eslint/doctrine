@@ -61,7 +61,7 @@ gulp.task('test', function () {
 });
 
 
-gulp.task('test', function (cb) {
+gulp.task('cover', function (cb) {
   gulp.src(SRC)
     .pipe(istanbul()) // Covering files
     .on('finish', function () {

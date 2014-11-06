@@ -1361,6 +1361,149 @@ describe('parseType', function () {
 		 "result": null
 		});
     });
+
+    it('string value in type', function () {
+        var type;
+
+        type = doctrine.parseType("{'ok':String}");
+        type.should.eql({
+            "fields": [
+                {
+                    "key": "ok",
+                    "type": "FieldType",
+                    "value": {
+                        "name": "String",
+                        "type": "NameExpression"
+                    }
+                }
+            ],
+            "type": "RecordType"
+        });
+
+        type = doctrine.parseType('{"\\r\\n\\t\\u2028\\x20\\u20\\b\\f\\v\\\r\n\\\n\\0\\07\\012\\o":String}');
+        type.should.eql({
+            "fields": [
+                {
+                    "key": "\r\n\t\u2028\x20u20\b\f\v\0\u0007\u000ao",
+                    "type": "FieldType",
+                    "value": {
+                        "name": "String",
+                        "type": "NameExpression"
+                    }
+                }
+            ],
+            "type": "RecordType"
+        });
+
+        doctrine.parseType.bind(doctrine, "{'ok\":String}").should.throw('unexpected quote');
+        doctrine.parseType.bind(doctrine, "{'o\n':String}").should.throw('unexpected quote');
+    });
+
+    it('number value in type', function () {
+        var type;
+
+        type = doctrine.parseType("{20:String}");
+        type.should.eql({
+            "fields": [
+                {
+                    "key": "20",
+                    "type": "FieldType",
+                    "value": {
+                        "name": "String",
+                        "type": "NameExpression"
+                    }
+                }
+            ],
+            "type": "RecordType"
+        });
+
+        type = doctrine.parseType("{.2:String, 30:Number, 0x20:String}");
+        type.should.eql({
+            "fields": [
+                {
+                    "key": "0.2",
+                    "type": "FieldType",
+                    "value": {
+                        "name": "String",
+                        "type": "NameExpression"
+                    }
+                },
+                {
+                    "key": "30",
+                    "type": "FieldType",
+                    "value": {
+                        "name": "Number",
+                        "type": "NameExpression"
+                    }
+                },
+                {
+                    "key": "32",
+                    "type": "FieldType",
+                    "value": {
+                        "name": "String",
+                        "type": "NameExpression"
+                    }
+                }
+            ],
+            "type": "RecordType"
+        });
+
+
+        type = doctrine.parseType("{0X2:String, 0:Number, 100e200:String, 10e-20:Number}");
+        type.should.eql({
+            "fields": [
+                {
+                    "key": "2",
+                    "type": "FieldType",
+                    "value": {
+                        "name": "String",
+                        "type": "NameExpression"
+                    }
+                },
+                {
+                    "key": "0",
+                    "type": "FieldType",
+                    "value": {
+                        "name": "Number",
+                        "type": "NameExpression"
+                    }
+                },
+                {
+                    "key": "1e+202",
+                    "type": "FieldType",
+                    "value": {
+                        "name": "String",
+                        "type": "NameExpression"
+                    }
+                },
+                {
+                    "key": "1e-19",
+                    "type": "FieldType",
+                    "value": {
+                        "name": "Number",
+                        "type": "NameExpression"
+                    }
+                }
+            ],
+            "type": "RecordType"
+        });
+
+
+        doctrine.parseType.bind(doctrine, "{0x:String}").should.throw('unexpected token');
+        doctrine.parseType.bind(doctrine, "{0x").should.throw('unexpected token');
+        doctrine.parseType.bind(doctrine, "{0xd").should.throw('unexpected token');
+        doctrine.parseType.bind(doctrine, "{0x2_:").should.throw('unexpected token');
+        doctrine.parseType.bind(doctrine, "{021:").should.throw('unexpected token');
+        doctrine.parseType.bind(doctrine, "{021_:").should.throw('unexpected token');
+        doctrine.parseType.bind(doctrine, "{021").should.throw('unexpected token');
+        doctrine.parseType.bind(doctrine, "{08").should.throw('unexpected token');
+        doctrine.parseType.bind(doctrine, "{0y").should.throw('unexpected token');
+        doctrine.parseType.bind(doctrine, "{0").should.throw('unexpected token');
+        doctrine.parseType.bind(doctrine, "{100e2").should.throw('unexpected token');
+        doctrine.parseType.bind(doctrine, "{100e-2").should.throw('unexpected token');
+        doctrine.parseType.bind(doctrine, "{100e-200:").should.throw('unexpected token');
+        doctrine.parseType.bind(doctrine, "{100e:").should.throw('unexpected token');
+    });
 });
 
 describe('parseParamType', function () {
