@@ -23,10 +23,21 @@
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+/*global define:true, exports:true*/
 
-/*global doctrine:true, exports:true, parseTypeExpression:true, parseTop:true*/
+(function (root, factory) {
+    'use strict';
 
-(function (exports) {
+    // Universal Module Definition (UMD) to support AMD, CommonJS/Node.js,
+    // Rhino, and plain browser loading.
+    if (typeof define === 'function' && define.amd) {
+        define(['exports'], factory);
+    } else if (typeof exports !== 'undefined') {
+        factory(exports);
+    } else {
+        factory((root.doctrine = {}));
+    }
+}(this, function (exports) {
     'use strict';
 
     var VERSION,
@@ -2040,5 +2051,5 @@
         parseParamType: typed.parseParamType,
         stringify: typed.stringify
     };
-}(typeof exports === 'undefined' ? (doctrine = {}) : exports));
+}));
 /* vim: set sw=4 ts=4 et tw=80 : */

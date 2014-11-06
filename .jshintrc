@@ -19,5 +19,10 @@
 
     "onevar": true,
 
-    "node": true
+    "node": true,
+    "predef": [
+        "doctrine",
+        "parseTypeExpression",
+        "parseTop"
+    ]
 }
