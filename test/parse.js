@@ -1778,6 +1778,11 @@ describe('recovery tests', function() {
 		var res = doctrine.parse("@param {Function(DOMNode)}",
                                          { recoverable: true });
         });
+
+	it ('should not crash on bad type in @param in sloppy mode', function() {
+		var res = doctrine.parse("@param {int[} [x]",
+                                         { sloppy: true });
+        });
 });
 
 describe('exported Syntax', function() {
