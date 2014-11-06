@@ -1441,6 +1441,10 @@ describe('invalid', function () {
     it('comma only record type', function () {
         doctrine.parseType.bind(doctrine, "{,,}").should.throw();
     });
+
+    it('incorrect bracket', function () {
+        doctrine.parseParamType.bind(doctrine, "int[").should.throw();
+    });
 });
 
 describe('tags option', function() {
@@ -1775,14 +1779,33 @@ describe('recovery tests', function() {
 	});
 
 	it ('should not crash on bad type in @param without name', function() {
-		var res = doctrine.parse("@param {Function(DOMNode)}",
-                                         { recoverable: true });
+		var res = doctrine.parse("@param {Function(DOMNode)}", { recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.eql({
+            "description": null,
+            "errors": [
+                "not reach to EOF",
+                "Missing or invalid tag name"
+            ],
+            "name": null,
+            "title": "param",
+            "type": null
         });
+    });
 
 	it ('should not crash on bad type in @param in sloppy mode', function() {
-		var res = doctrine.parse("@param {int[} [x]",
-                                         { sloppy: true });
+		var res = doctrine.parse("@param {int[} [x]", { sloppy: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.eql({
+            "description": null,
+            "errors": [
+                "expected an array-style type declaration (int[])"
+            ],
+            "name": "x",
+            "title": "param",
+            "type": null
         });
+    });
 });
 
 describe('exported Syntax', function() {

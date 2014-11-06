@@ -1519,6 +1519,7 @@
         function parseType(title, last) {
             var ch, brace, type, direct = false;
 
+
             // search '{'
             while (index < last) {
                 ch = source[index];
@@ -1534,45 +1535,41 @@
                 }
             }
 
-            if (!direct) {
-                // type expression { is found
-                brace = 1;
-                type = '';
-                while (index < last) {
-                    ch = source[index];
-                    if (isLineTerminator(ch)) {
-                        advance();
-                    } else {
-                        if (ch === '}') {
-                            brace -= 1;
-                            if (brace === 0) {
-                                advance();
-                                break;
-                            }
-                        } else if (ch === '{') {
-                            brace += 1;
-                        }
-                        type += advance();
-                    }
-                }
 
-                if (brace !== 0) {
-                    // braces is not balanced
-                    return throwError('Braces are not balanced');
-                }
-
-                try {
-                    if (isParamTitle(title)) {
-                        return typed.parseParamType(type);
-                    }
-                    return typed.parseType(type);
-                } catch (e1) {
-                    // parse failed
-                    return null;
-                }
-            } else {
+            if (direct) {
                 return null;
             }
+
+            // type expression { is found
+            brace = 1;
+            type = '';
+            while (index < last) {
+                ch = source[index];
+                if (isLineTerminator(ch)) {
+                    advance();
+                } else {
+                    if (ch === '}') {
+                        brace -= 1;
+                        if (brace === 0) {
+                            advance();
+                            break;
+                        }
+                    } else if (ch === '{') {
+                        brace += 1;
+                    }
+                    type += advance();
+                }
+            }
+
+            if (brace !== 0) {
+                // braces is not balanced
+                return throwError('Braces are not balanced');
+            }
+
+            if (isParamTitle(title)) {
+                return typed.parseParamType(type);
+            }
+            return typed.parseType(type);
         }
 
         function scanIdentifier(last) {
