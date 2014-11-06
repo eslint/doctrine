@@ -17,8 +17,8 @@
         "url": "http://github.com/Constellation/doctrine.git"
     },
     "devDependencies": {
-        "jslint": "~0.1.9",
-        "eslint": "~0.6.2",
+        "jslint": "~0.6.5",
+        "eslint": "~0.9.2",
         "mocha": "*",
         "should": "*"
     },
