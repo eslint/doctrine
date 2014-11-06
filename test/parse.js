@@ -1536,6 +1536,32 @@ describe('parseType', function () {
         });
     });
 
+    it ('nullable type', function () {
+        var type;
+        type = doctrine.parseType("string?");
+        type.should.eql({
+            "expression": {
+                "name": "string",
+                "type": "NameExpression"
+            },
+            "prefix": false,
+            "type": "NullableType"
+        });
+    });
+
+    it ('non-nullable type', function () {
+        var type;
+        type = doctrine.parseType("string!");
+        type.should.eql({
+            "expression": {
+                "name": "string",
+                "type": "NameExpression"
+            },
+            "prefix": false,
+            "type": "NonNullableType"
+        });
+    });
+
     it('illegal tokens', function () {
         doctrine.parseType.bind(doctrine, ".").should.throw('unexpected token');
         doctrine.parseType.bind(doctrine, ".d").should.throw('unexpected token');
