@@ -121,9 +121,9 @@
         this.message = message;
     }
     DoctrineError.prototype = (function () {
-        var middle = function () { };
-        middle.prototype = Error.prototype;
-        return new middle();
+        var Middle = function () { };
+        Middle.prototype = Error.prototype;
+        return new Middle();
     }());
     DoctrineError.prototype.constructor = DoctrineError;
 
@@ -510,7 +510,7 @@
             while (index < length && isTypeName(source.charCodeAt(index))) {
                 ch = source.charCodeAt(index);
                 if (ch === 0x2E  /* '.' */) {
-                    if (!((index + 1) < length)) {
+                    if ((index + 1) >= length) {
                         return Token.ILLEGAL;
                     }
                     ch2 = source.charCodeAt(index + 1);
