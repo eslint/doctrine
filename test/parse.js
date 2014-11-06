@@ -1081,6 +1081,16 @@ describe('parse', function () {
         res.tags[0].should.have.property('description', '1.2.1');
     });
 
+    it('incorrect name', function () {
+        var res = doctrine.parse('/** @name thingName#%name */', { unwrap: true });
+        // name does not accept type
+        res.tags.should.have.length(0);
+        res.should.eql({
+            "description": "",
+            "tags": [
+            ]
+        });
+    });
 });
 
 describe('parseType', function () {
