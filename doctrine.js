@@ -24,7 +24,6 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/*jslint bitwise:true plusplus:true eqeq:true nomen:true*/
 /*global doctrine:true, exports:true, parseTypeExpression:true, parseTop:true*/
 
 (function (exports) {
