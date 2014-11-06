@@ -39,7 +39,7 @@
         hasOwnProperty;
 
     // Sync with package.json.
-    VERSION = '0.5.2-dev';
+    VERSION = '0.6.2-dev';
 
     // See also tools/generate-unicode-regex.py.
     Regex = {
