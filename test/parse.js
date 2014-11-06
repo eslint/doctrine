@@ -1504,6 +1504,22 @@ describe('parseType', function () {
         doctrine.parseType.bind(doctrine, "{100e-200:").should.throw('unexpected token');
         doctrine.parseType.bind(doctrine, "{100e:").should.throw('unexpected token');
     });
+
+    it('dotted type', function () {
+        var type;
+        type = doctrine.parseType("Cocoa.Cappuccino");
+        type.should.eql({
+            "name": "Cocoa.Cappuccino",
+            "type": "NameExpression"
+        });
+    });
+
+    it('illegal tokens', function () {
+        doctrine.parseType.bind(doctrine, ".").should.throw('unexpected token');
+        doctrine.parseType.bind(doctrine, ".d").should.throw('unexpected token');
+        doctrine.parseType.bind(doctrine, "(").should.throw('unexpected token');
+        doctrine.parseType.bind(doctrine, "Test.").should.throw('unexpected token');
+    });
 });
 
 describe('parseParamType', function () {

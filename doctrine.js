@@ -232,28 +232,27 @@
 
         Token = {
             ILLEGAL: 0,    // ILLEGAL
-            DOT: 1,        // .
-            DOT_LT: 2,     // .<
-            REST: 3,       // ...
-            LT: 4,         // <
-            GT: 5,         // >
-            LPAREN: 6,     // (
-            RPAREN: 7,     // )
-            LBRACE: 8,     // {
-            RBRACE: 9,     // }
-            LBRACK: 10,    // [
-            RBRACK: 11,    // ]
-            COMMA: 12,     // ,
-            COLON: 13,     // :
-            STAR: 14,      // *
-            PIPE: 15,      // |
-            QUESTION: 16,  // ?
-            BANG: 17,      // !
-            EQUAL: 18,     // =
-            NAME: 19,      // name token
-            STRING: 20,    // string
-            NUMBER: 21,    // number
-            EOF: 22
+            DOT_LT: 1,     // .<
+            REST: 2,       // ...
+            LT: 3,         // <
+            GT: 4,         // >
+            LPAREN: 5,     // (
+            RPAREN: 6,     // )
+            LBRACE: 7,     // {
+            RBRACE: 8,     // }
+            LBRACK: 9,    // [
+            RBRACK: 10,    // ]
+            COMMA: 11,     // ,
+            COLON: 12,     // :
+            STAR: 13,      // *
+            PIPE: 14,      // |
+            QUESTION: 15,  // ?
+            BANG: 16,      // !
+            EQUAL: 17,     // =
+            NAME: 18,      // name token
+            STRING: 19,    // string
+            NUMBER: 20,    // number
+            EOF: 21
         };
 
         function Context(previous, index, token, value) {
@@ -511,11 +510,12 @@
             while (index < length && isTypeName(source.charCodeAt(index))) {
                 ch = source.charCodeAt(index);
                 if (ch === 0x2E  /* '.' */) {
-                    if ((index + 1) < length) {
-                        ch2 = source.charCodeAt(index + 1);
-                        if (ch2 === 0x3C  /* '<' */) {
-                            break;
-                        }
+                    if (!((index + 1) < length)) {
+                        return Token.ILLEGAL;
+                    }
+                    ch2 = source.charCodeAt(index + 1);
+                    if (ch2 === 0x3C  /* '<' */) {
+                        break;
                     }
                 }
                 value += advance();
@@ -606,8 +606,7 @@
                         return token;
                     }
                 }
-                advance();  // '.'
-                token = Token.DOT;
+                token = Token.ILLEGAL;
                 return token;
 
             case 0x3C:  /* '<' */
@@ -656,12 +655,8 @@
                 // namespace.module.MyClass
                 //
                 // this reduced 1 token TK_NAME
-                if (isTypeName(ch)) {
-                    token = scanTypeName();
-                    return token;
-                }
-
-                token = Token.ILLEGAL;
+                assert(isTypeName(ch));
+                token = scanTypeName();
                 return token;
             }
         }
