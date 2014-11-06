@@ -28,13 +28,15 @@ var gulp = require('gulp');
 var mocha = require('gulp-mocha');
 var jshint = require('gulp-jshint');
 var eslint = require('gulp-eslint');
+var istanbul = require('gulp-istanbul');
+
+var SRC = [ 'doctrine.js' ];
 
 var TEST = [ 'test/*.js' ];
 
 var LINT = [
-    'gulpfile.js',
-    'doctrine.js'
-];
+    'gulpfile.js'
+].concat(SRC);
 
 var ESLINT_OPTION = {
     'rules': {
@@ -56,6 +58,18 @@ gulp.task('test', function () {
             reporter: 'spec',
             timeout: 100000 // 100s
         }));
+});
+
+
+gulp.task('test', function (cb) {
+  gulp.src(SRC)
+    .pipe(istanbul()) // Covering files
+    .on('finish', function () {
+      gulp.src(['test/*.js'])
+        .pipe(mocha())
+        .pipe(istanbul.writeReports()) // Creating the reports after tests runned
+        .on('end', cb);
+    });
 });
 
 gulp.task('lint', function () {
