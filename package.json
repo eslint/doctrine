@@ -37,5 +37,8 @@
     "test": "gulp",
     "unit-test": "gulp test",
     "lint": "gulp lint"
+  },
+  "dependencies": {
+    "esutils": "^1.1.4"
   }
 }
