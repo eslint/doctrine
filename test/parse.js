@@ -1751,6 +1751,17 @@ describe('optional params', function() {
             "tags": []
         });
     });
+
+    it('failure 1', function() {
+        doctrine.parse(
+        ["/**", " * @param [val", " */"].join('\n'), {
+            unwrap: true, sloppy: true
+        }).should.eql({
+            "description": "",
+            "tags": []
+        });
+    });
+
     it('success 1', function() {
         doctrine.parse(
         ["/**", " * @param {String} [val]", " */"].join('\n'), {
