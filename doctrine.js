@@ -120,7 +120,11 @@
         this.name = 'DoctrineError';
         this.message = message;
     }
-    DoctrineError.prototype = new Error();
+    DoctrineError.prototype = (function () {
+        var middle = function () { };
+        middle.prototype = Error.prototype;
+        return new middle();
+    });
     DoctrineError.prototype.constructor = DoctrineError;
 
     function throwError(message) {
