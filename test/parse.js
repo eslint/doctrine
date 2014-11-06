@@ -1562,6 +1562,28 @@ describe('parseType', function () {
         });
     });
 
+    it ('toplevel multiple pipe type', function () {
+        var type;
+        type = doctrine.parseType("string|number|Test");
+        type.should.eql({
+            "elements": [
+                {
+                    "name": "string",
+                    "type": "NameExpression"
+                },
+                {
+                    "name": "number",
+                    "type": "NameExpression"
+                },
+                {
+                    "name": "Test",
+                    "type": "NameExpression"
+                }
+            ],
+            "type": "UnionType"
+        });
+    });
+
     it('illegal tokens', function () {
         doctrine.parseType.bind(doctrine, ".").should.throw('unexpected token');
         doctrine.parseType.bind(doctrine, ".d").should.throw('unexpected token');
