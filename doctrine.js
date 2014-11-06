@@ -895,7 +895,7 @@
         //
         // Identifier is "new" or "this"
         function parseParametersType() {
-            var params = [], normal = true, expr, rest = false;
+            var params = [], optionalSequence = false, expr, rest = false;
 
             while (token !== Token.RPAREN) {
                 if (token === Token.REST) {
@@ -920,9 +920,9 @@
                         type: Syntax.OptionalType,
                         expression: expr
                     };
-                    normal = false;
+                    optionalSequence = true;
                 } else {
-                    if (!normal) {
+                    if (optionalSequence) {
                         throwError('unexpected token');
                     }
                 }

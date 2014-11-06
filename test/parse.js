@@ -1503,7 +1503,7 @@ describe('parseType', function () {
         doctrine.parseType.bind(doctrine, "{100e-2").should.throw('unexpected token');
         doctrine.parseType.bind(doctrine, "{100e-200:").should.throw('unexpected token');
         doctrine.parseType.bind(doctrine, "{100e:").should.throw('unexpected token');
-        doctrine.parseType.bind(doctrine, "{(").should.throw('unexpected token');
+        doctrine.parseType.bind(doctrine, "function(number=, string)").should.throw('not reach to EOF');
     });
 
     it('dotted type', function () {
