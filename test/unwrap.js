@@ -25,7 +25,10 @@
 /*jslint node:true */
 'use strict';
 
-var doctrine = require('../doctrine');
+var fs = require('fs'),
+    path = require('path'),
+    root = path.join(path.dirname(fs.realpathSync(__filename)), '..'),
+    doctrine = require(root);
 require('should');
 
 describe('unwrapComment', function () {

@@ -25,14 +25,17 @@
 /*jslint node:true */
 'use strict';
 
-var doctrine = require('../doctrine');
-var assert = require('assert');
+var fs = require('fs'),
+    path = require('path'),
+    root = path.join(path.dirname(fs.realpathSync(__filename)), '..'),
+    doctrine = require(root),
+    assert = require('assert');
 require('should');
 
-// tests for the stringify function.  
+// tests for the stringify function.
 // ensure that we can parse and then stringify and the results are identical
 describe('stringify', function () {
-    
+
     function testStringify(text) {
         it (text, function() {
             var result = doctrine.parse("@param {" + text + "} name");
@@ -41,7 +44,7 @@ describe('stringify', function () {
             stringed.should.equal(text);
         });
     }
-    
+
     // simple
     testStringify("String");
     testStringify("*");
@@ -49,12 +52,12 @@ describe('stringify', function () {
     testStringify("undefined");
     testStringify("void");
     //testStringify("?=");  // Failing
-    
+
     // rest
     testStringify("...string");
     testStringify("...[string]");
     testStringify("...[[string]]");
-    
+
     // optional, nullable, nonnullable
     testStringify("string=");
     testStringify("?string");
@@ -83,7 +86,7 @@ describe('stringify', function () {
     testStringify("{a:(String|Number),b,c:Array.<String>}");
     testStringify("...{a:(String|Number),b,c:Array.<String>}");
     testStringify("{a:(String|Number),b,c:Array.<String>}=");
-    
+
     // fn types
     testStringify("function(a)");
     testStringify("function(a):String");
