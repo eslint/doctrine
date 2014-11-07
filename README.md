@@ -1,11 +1,13 @@
-doctrine ([doctrine](http://github.com/Constellation/doctrine)) is JSDoc parser. [![Build Status](https://secure.travis-ci.org/Constellation/doctrine.png)](http://travis-ci.org/Constellation/doctrine)
+doctrine ([doctrine](http://github.com/Constellation/doctrine)) is JSDoc parser.
 
-It is now used by content assist system of [Eclipse Orion](http://www.eclipse.org/orion/) ([detail](http://planetorion.org/news/2012/10/orion-1-0-release/))
+[![Build Status](https://travis-ci.org/Constellation/doctrine.svg?branch=master)](https://travis-ci.org/Constellation/doctrine)
+[![Dependency Status](https://david-dm.org/Constellation/doctrine.svg)](https://david-dm.org/Constellation/doctrine)
+[![devDependency Status](https://david-dm.org/Constellation/doctrine/dev-status.svg)](https://david-dm.org/Constellation/doctrine#info=devDependencies)
+[![Gitter chat](https://badges.gitter.im/Constellation/doctrine.png)](https://gitter.im/Constellation/doctrine)
 
-Doctrine can be used in a web browser:
+It is now used by content assist system of [Eclipse Orion](http://www.eclipse.org/orion/) ([detail](http://planetorion.org/news/2012/10/orion-1-0-release/)). And used as JSDoc validator in [ESLint](http://eslint.org/).
 
-    <script src="doctrine.js"></script>
-
+Doctrine can be used in a web browser with using browserify.
 or in a Node.js application via the package manager:
 
     npm install doctrine
