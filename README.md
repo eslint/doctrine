@@ -1,6 +1,7 @@
 doctrine ([doctrine](http://github.com/Constellation/doctrine)) is JSDoc parser.
 
 [![Build Status](https://travis-ci.org/Constellation/doctrine.svg?branch=master)](https://travis-ci.org/Constellation/doctrine)
+[![Coverage Status](https://img.shields.io/coveralls/Constellation/doctrine.svg)](https://coveralls.io/r/Constellation/doctrine?branch=master)
 [![Dependency Status](https://david-dm.org/Constellation/doctrine.svg)](https://david-dm.org/Constellation/doctrine)
 [![devDependency Status](https://david-dm.org/Constellation/doctrine/dev-status.svg)](https://david-dm.org/Constellation/doctrine#info=devDependencies)
 [![Gitter chat](https://badges.gitter.im/Constellation/doctrine.png)](https://gitter.im/Constellation/doctrine)
