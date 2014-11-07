@@ -30,7 +30,7 @@ var jshint = require('gulp-jshint');
 var eslint = require('gulp-eslint');
 var istanbul = require('gulp-istanbul');
 
-var SRC = [ 'doctrine.js' ];
+var SRC = [ 'lib/*.js' ];
 
 var TEST = [ 'test/*.js' ];
 
