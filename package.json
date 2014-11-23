@@ -24,12 +24,12 @@
   "devDependencies": {
     "coveralls": "^2.11.2",
     "gulp": "^3.8.10",
-    "gulp-eslint": "^0.1.8",
-    "gulp-istanbul": "^0.3.1",
+    "gulp-eslint": "^0.2.0",
+    "gulp-istanbul": "^0.4.0",
     "gulp-jshint": "^1.9.0",
-    "gulp-mocha": "^1.1.1",
+    "gulp-mocha": "^2.0.0",
     "jshint-stylish": "^1.0.0",
-    "should": "^4.1.0"
+    "should": "^4.3.0"
   },
   "licenses": [
     {
@@ -44,6 +44,6 @@
     "coveralls": "cat ./coverage/lcov.info | coveralls && rm -rf ./coverage"
   },
   "dependencies": {
-    "esutils": "^1.1.4"
+    "esutils": "^1.1.6"
   }
 }
