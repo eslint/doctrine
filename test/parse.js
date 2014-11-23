@@ -2161,4 +2161,51 @@ describe('function', function () {
     });
 });
 
+describe('tagged namepaths', function () {
+    it ('recognize module:', function () {
+        var res = doctrine.parse(
+            [
+                "@alias module:Foo.bar"
+            ].join('\n'), {});
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'alias');
+        res.tags[0].should.have.property('name', 'module:Foo.bar');
+        res.tags[0].should.have.property('description', null);
+    });
+
+    it ('recognize external:', function () {
+        var res = doctrine.parse(
+            [
+                "@param {external:Foo.bar} baz description"
+            ].join('\n'), {});
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'param');
+         res.tags[0].type.should.eql({
+             "name": "external:Foo.bar",
+             "type": "NameExpression"
+         });
+        res.tags[0].should.have.property('name', 'baz');
+        res.tags[0].should.have.property('description', 'description');
+    });
+
+    it ('recognize event:', function () {
+        var res = doctrine.parse(
+            [
+                "@function event:Foo.bar"
+            ].join('\n'), {});
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'function');
+        res.tags[0].should.have.property('name', 'event:Foo.bar');
+        res.tags[0].should.have.property('description', null);
+    });
+
+    it ('invalid bogus:', function () {
+        var res = doctrine.parse(
+            [
+                "@method bogus:Foo.bar"
+            ].join('\n'), {});
+        res.tags.should.have.length(0);
+    });
+});
+
 /* vim: set sw=4 ts=4 et tw=80 : */
