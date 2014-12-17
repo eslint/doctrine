@@ -44,6 +44,7 @@
     "coveralls": "cat ./coverage/lcov.info | coveralls && rm -rf ./coverage"
   },
   "dependencies": {
-    "esutils": "^1.1.6"
+    "esutils": "^1.1.6",
+    "isarray": "0.0.1"
   }
 }
