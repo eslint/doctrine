@@ -46,7 +46,8 @@ var ESLINT_OPTION = {
         'no-underscore-dangle': 0,
         'no-shadow': 0,
         'no-constant-condition': 0,
-        'no-multi-spaces': 0
+        'no-multi-spaces': 0,
+        'dot-notation': [2, {'allowKeywords': false}]
     },
     'env': {
         'node': true

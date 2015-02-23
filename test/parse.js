@@ -1173,6 +1173,20 @@ describe('parseType', function () {
         });
     });
 
+    it('type application with NullableLiteral', function () {
+        var type = doctrine.parseType("Array<?>");
+        type.should.eql({
+            type: 'TypeApplication',
+            expression: {
+                type: 'NameExpression',
+                name: 'Array'
+            },
+            applications: [{
+                type: 'NullableLiteral'
+            }]
+        });
+    });
+
     it('type application with multiple patterns', function () {
         var type = doctrine.parseType("Array.<String, Number>");
         type.should.eql({
