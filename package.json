@@ -24,12 +24,12 @@
   "devDependencies": {
     "coveralls": "^2.11.2",
     "gulp": "^3.8.10",
-    "gulp-eslint": "^0.2.0",
-    "gulp-istanbul": "^0.5.0",
+    "gulp-eslint": "^0.5.0",
+    "gulp-istanbul": "^0.6.0",
     "gulp-jshint": "^1.9.0",
     "gulp-mocha": "^2.0.0",
     "jshint-stylish": "^1.0.0",
-    "should": "^4.4.1"
+    "should": "^5.0.1"
   },
   "licenses": [
     {
