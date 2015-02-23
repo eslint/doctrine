@@ -109,7 +109,7 @@ function inc(importance) {
         // read only one file to get the version number
         .pipe(filter('package.json'))
         // **tag it in the repository**
-        .pipe(tagVersion());
+        .pipe(tagVersion({ prefix: '' }));
 }
 
 gulp.task('patch', [ 'travis' ], function () { return inc('patch'); });
