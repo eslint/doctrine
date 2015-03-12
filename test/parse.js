@@ -831,6 +831,17 @@ describe('parse', function () {
         res.tags[0].should.have.property('description', 'Write the documentation');
     });
 
+    it('typedef', function () {
+        var res = doctrine.parse('/** @typedef {Object} NumberLike */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'Object'
+        });
+        res.tags[0].should.have.property('name', 'NumberLike');
+    });
+
     it('summary', function () {
         // japanese lang
         var res = doctrine.parse('/** @summary ゆるゆり3期おめでとー */', { unwrap: true });
