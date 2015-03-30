@@ -10,6 +10,13 @@
   "directories": {
     "lib": "./lib"
   },
+  "files": [
+    "lib",
+    "LICENSE.BSD",
+    "LICENSE.closure-compiler",
+    "LICENSE.esprima",
+    "README.md"
+  ],
   "maintainers": [
     {
       "name": "Yusuke Suzuki",
