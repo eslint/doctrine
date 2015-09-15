@@ -1,10 +1,10 @@
-doctrine ([doctrine](http://github.com/Constellation/doctrine)) is JSDoc parser.
+doctrine ([doctrine](http://github.com/eslint/doctrine)) is JSDoc parser.
 
-[![Build Status](https://travis-ci.org/Constellation/doctrine.svg?branch=master)](https://travis-ci.org/Constellation/doctrine)
-[![Coverage Status](https://img.shields.io/coveralls/Constellation/doctrine.svg)](https://coveralls.io/r/Constellation/doctrine?branch=master)
-[![Dependency Status](https://david-dm.org/Constellation/doctrine.svg)](https://david-dm.org/Constellation/doctrine)
-[![devDependency Status](https://david-dm.org/Constellation/doctrine/dev-status.svg)](https://david-dm.org/Constellation/doctrine#info=devDependencies)
-[![Gitter chat](https://badges.gitter.im/Constellation/doctrine.png)](https://gitter.im/Constellation/doctrine)
+[![Build Status](https://travis-ci.org/eslint/doctrine.svg?branch=master)](https://travis-ci.org/eslint/doctrine)
+[![Coverage Status](https://img.shields.io/coveralls/eslint/doctrine.svg)](https://coveralls.io/r/eslint/doctrine?branch=master)
+[![Dependency Status](https://david-dm.org/eslint/doctrine.svg)](https://david-dm.org/eslint/doctrine)
+[![devDependency Status](https://david-dm.org/eslint/doctrine/dev-status.svg)](https://david-dm.org/eslint/doctrine#info=devDependencies)
+[![Gitter chat](https://badges.gitter.im/eslint/doctrine.png)](https://gitter.im/eslint/doctrine)
 
 It is now used by content assist system of [Eclipse Orion](http://www.eclipse.org/orion/) ([detail](http://planetorion.org/news/2012/10/orion-1-0-release/)). And used as JSDoc validator in [ESLint](http://eslint.org/).
 
