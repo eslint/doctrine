@@ -423,6 +423,60 @@ describe('parse', function () {
         });
     });
 
+    it('param with properties with description', function () {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @param {String} user.name - hi",
+                "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'param');
+        res.tags[0].should.have.property('name', 'user.name');
+        res.tags[0].should.have.property('description', 'hi');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'String'
+        });
+    });
+
+    it('param with array properties with description', function () {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @param {string} employee[].name - hi",
+                " */"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'param');
+        res.tags[0].should.have.property('name', 'employee[].name');
+        res.tags[0].should.have.property('description', 'hi');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'string'
+        });
+    });
+
+    it('param with array properties without description', function () {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @param {string} employee[].name",
+                " */"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'param');
+        res.tags[0].should.have.property('name', 'employee[].name');
+        res.tags[0].should.have.property('description', null);
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'string'
+        });
+    });
+
     it('arg with properties', function () {
         var res = doctrine.parse(
             [
