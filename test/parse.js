@@ -459,6 +459,20 @@ describe('parse', function () {
 
     it('param typeless', function () {
         var res = doctrine.parse(
+            [
+                "/**",
+                " * @param something [bye] hi",
+                "*/"
+            ].join('\n'), { unwrap: true, sloppy: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.eql({
+            title: 'param',
+            type: undefined,
+            name: 'something',
+            description: "[bye] hi"
+        });
+
+        var res = doctrine.parse(
         [
             "/**",
             " * @param userName",
