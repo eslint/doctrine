@@ -3,7 +3,7 @@
   "description": "JSDoc parser",
   "homepage": "http://github.com/Constellation/doctrine.html",
   "main": "lib/doctrine.js",
-  "version": "0.6.4",
+  "version": "0.7.0",
   "engines": {
     "node": ">=0.10.0"
   },
