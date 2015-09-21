@@ -3,7 +3,7 @@
   "description": "JSDoc parser",
   "homepage": "http://github.com/Constellation/doctrine.html",
   "main": "lib/doctrine.js",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "engines": {
     "node": ">=0.10.0"
   },
@@ -52,6 +52,9 @@
     "test": "gulp",
     "unit-test": "gulp test",
     "lint": "gulp lint",
+    "patch": "gulp patch",
+    "minor": "gulp minor",
+    "major": "gulp major",
     "coveralls": "cat ./coverage/lcov.info | coveralls && rm -rf ./coverage"
   },
   "dependencies": {
