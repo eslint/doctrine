@@ -33,7 +33,7 @@ require('should');
 
 describe('unwrapComment', function () {
   it('normal', function () {
-    doctrine.unwrapComment('/**\n * @const\n * @const\n */').should.equal('\n@const\n@const\n');
+    doctrine.unwrapComment('/**\n * @const\n * @const\n */').should.equal('\n@const\n@const');
   });
 
   it('single', function () {
@@ -46,15 +46,15 @@ describe('unwrapComment', function () {
   });
 
   it('2 lines', function () {
-    doctrine.unwrapComment('/**x\n * y\n*/').should.equal('x\ny\n');
+    doctrine.unwrapComment('/**x\n * y\n*/').should.equal('x\ny');
   });
 
   it('2 lines with space', function () {
-    doctrine.unwrapComment('/**x\n *    y\n*/').should.equal('x\n   y\n');
+    doctrine.unwrapComment('/**x\n *    y\n*/').should.equal('x\n   y');
   });
 
   it('3 lines with blank line', function () {
-    doctrine.unwrapComment('/**x\n *\n \* y\n*/').should.equal('x\n\ny\n');
+    doctrine.unwrapComment('/**x\n *\n \* y\n*/').should.equal('x\n\ny');
   });
 });
 /* vim: set sw=4 ts=4 et tw=80 : */
