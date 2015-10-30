@@ -1921,6 +1921,28 @@ describe('optional params', function() {
         });
     });
 
+    it('default array', function() {
+        doctrine.parse(
+            ["/**", " * @param {String} [val=['foo']] some description", " */"].join('\n'),
+            { unwrap: true, sloppy: true}
+        ).should.eql({
+            "description": "",
+            "tags": [{
+                "title": "param",
+                "description": "some description",
+                "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                        "type": "NameExpression",
+                        "name": "String"
+                    }
+                },
+                "name": "val",
+                "default": "['foo']"
+            }]
+        });
+    });
+
     it('line numbers', function() {
         var res = doctrine.parse(
             [
