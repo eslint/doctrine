@@ -1,7 +1,7 @@
 {
   "name": "doctrine",
   "description": "JSDoc parser",
-  "homepage": "http://github.com/Constellation/doctrine.html",
+  "homepage": "https://github.com/eslint/doctrine",
   "main": "lib/doctrine.js",
   "version": "0.7.0",
   "engines": {
