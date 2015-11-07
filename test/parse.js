@@ -2054,6 +2054,19 @@ describe('recovery tests', function() {
          res.tags[1].should.have.property('name', 'f2');
 	});
 
+	it ('return no type', function() {
+		var res = doctrine.parse(
+            [
+                "@return a value"
+            ].join('\n'));
+
+         // return tag should exist
+         res.tags.should.have.length(1);
+         res.tags[0].should.have.property('title', 'return');
+         res.tags[0].should.have.property('type', null);
+         res.tags[0].should.have.property('description', 'a value');
+	});
+
 	it ('extra @ 1', function() {
 		var res = doctrine.parse(
             [
