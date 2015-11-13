@@ -42,6 +42,7 @@
     "gulp-mocha": "^2.0.0",
     "gulp-tag-version": "^1.2.1",
     "jshint-stylish": "^1.0.0",
+    "linefix": "^0.1.1",
     "mocha": "^2.3.3",
     "npm-license": "^0.3.1",
     "semver": "^5.0.3",
