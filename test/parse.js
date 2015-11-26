@@ -1947,6 +1947,7 @@ describe('optional params', function() {
         var res = doctrine.parse(
             [
                 "/**",
+                " * @constructor",
                 " * @param {string} foo",
                 " * @returns {string}",
                 " *",
@@ -1959,7 +1960,8 @@ describe('optional params', function() {
 
         res.tags[0].should.have.property('lineNumber', 1);
         res.tags[1].should.have.property('lineNumber', 2);
-        res.tags[2].should.have.property('lineNumber', 4);
+        res.tags[2].should.have.property('lineNumber', 3);
+        res.tags[3].should.have.property('lineNumber', 5);
     });
 
     it('should handle \\r\\n line endings correctly', function() {
