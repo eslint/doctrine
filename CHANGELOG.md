@@ -1,3 +1,8 @@
+v0.7.2 - November 27, 2015
+
+* Fix: Line numbers for some tags (fixes #138) Fixing issue where input was not consumed via advance() but was skipped when parsing tags resulting in sometimes incorrect reported lineNumber. (TEHEK)
+* Build: Add missing linefix package (Nicholas C. Zakas)
+
 v0.7.1 - November 13, 2015
 
 * Update: Begin switch to Makefile.js (Nicholas C. Zakas)
