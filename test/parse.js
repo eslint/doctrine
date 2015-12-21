@@ -1964,6 +1964,21 @@ describe('optional params', function() {
         res.tags[3].should.have.property('lineNumber', 5);
     });
 
+    it('example caption', function() {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @example <caption>hi</caption>",
+                " * f('blah'); // => undefined",
+                " */"
+            ].join('\n'),
+            { unwrap: true, lineNumbers: true }
+        );
+
+        res.tags[0].description.should.eql("f('blah'); // => undefined");
+        res.tags[0].caption.should.eql("hi");
+    });
+
     it('should handle \\r\\n line endings correctly', function() {
         var res = doctrine.parse(
             [
