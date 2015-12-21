@@ -1,3 +1,7 @@
+v1.0.0 - December 21, 2015
+
+* New: parse caption tags in examples into separate property. (fixes #131) (Tom MacWright)
+
 v0.7.2 - November 27, 2015
 
 * Fix: Line numbers for some tags (fixes #138) Fixing issue where input was not consumed via advance() but was skipped when parsing tags resulting in sometimes incorrect reported lineNumber. (TEHEK)
