@@ -1117,6 +1117,32 @@ describe('parse', function () {
         res.tags[0].should.have.property('name', 'thingName.name');
     });
 
+    it('this with name expression', function () {
+        var res = doctrine.parse(
+            [
+              "/**",
+              " * @this {thingName.name}",
+              "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'this');
+        res.tags[0].should.have.property('name', 'thingName.name');
+    });
+
+    it('this error with type application', function () {
+        var res = doctrine.parse(
+            [
+              "/**",
+              " * @this {Array<string>}",
+              "*/"
+            ].join('\n'), { unwrap: true, recoverable: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'this');
+        res.tags[0].should.have.property('errors');
+        res.tags[0].errors.should.have.length(1);
+        res.tags[0].errors[0].should.equal('Invalid name for this');
+    });
+
     it('this error', function () {
         var res = doctrine.parse(
             [
