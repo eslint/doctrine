@@ -3,3 +3,4 @@ node_modules
 *.iml
 coverage
 .cache
+npm-debug.log

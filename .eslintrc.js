@@ -77,7 +77,6 @@ module.exports = {
         "no-dupe-class-members": 2,
         "no-dupe-keys": 2,
         "no-duplicate-case": 2,
-        "no-else-return": 2,
         "no-empty": 2,
         "no-empty-character-class": 2,
         "no-empty-label": 2,
@@ -200,7 +199,6 @@ module.exports = {
         "valid-typeof": 2,
         "wrap-iife": 2,
         "wrap-regex": 2,
-        "yield-star-spacing": 2,
         "yoda": [
             2,
             "never"
