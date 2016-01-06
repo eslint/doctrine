@@ -262,12 +262,12 @@ target.test = function() {
     var errors = 0,
         lastReturn;
 
-    lastReturn = nodeCLI.exec("istanbul", "cover", MOCHA, "-- -R progress -t " + MOCHA_TIMEOUT, "-c", TEST_FILES);
+    lastReturn = nodeCLI.exec("istanbul", "cover", MOCHA, "-- -R dot -t " + MOCHA_TIMEOUT, "-c", TEST_FILES);
     if (lastReturn.code !== 0) {
         errors++;
     }
 
-    lastReturn = nodeCLI.exec("istanbul", "check-coverage", "--statement 99 --branch 97 --function 99 --lines 99");
+    lastReturn = nodeCLI.exec("istanbul", "check-coverage", "--statement 99 --branch 97 --function 100 --lines 99");
     if (lastReturn.code !== 0) {
         errors++;
     }

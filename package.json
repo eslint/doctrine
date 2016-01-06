@@ -19,9 +19,14 @@
   ],
   "maintainers": [
     {
+      "name": "Nicholas C. Zakas",
+      "email": "nicholas+npm@nczconsulting.com",
+      "web": "https://www.nczonline.net"
+    },
+    {
       "name": "Yusuke Suzuki",
       "email": "utatane.tea@gmail.com",
-      "web": "http://github.com/Constellation"
+      "web": "https://github.com/Constellation"
     }
   ],
   "repository": {
@@ -31,17 +36,8 @@
   "devDependencies": {
     "coveralls": "^2.11.2",
     "dateformat": "^1.0.11",
-    "eslint": "^1.9.0",
-    "gulp": "^3.8.10",
-    "gulp-bump": "^0.1.13",
-    "gulp-eslint": "^0.5.0",
-    "gulp-filter": "^2.0.2",
-    "gulp-git": "^1.0.0",
-    "gulp-istanbul": "^0.6.0",
-    "gulp-jshint": "^1.9.0",
-    "gulp-mocha": "^2.0.0",
-    "gulp-tag-version": "^1.2.1",
-    "jshint-stylish": "^1.0.0",
+    "eslint": "^1.10.3",
+    "istanbul": "^0.4.1",
     "linefix": "^0.1.1",
     "mocha": "^2.3.3",
     "npm-license": "^0.3.1",
@@ -57,10 +53,8 @@
     }
   ],
   "scripts": {
-    "test": "gulp",
-    "unit-test": "gulp test",
-    "lint": "gulp lint",
-    "coveralls": "cat ./coverage/lcov.info | coveralls && rm -rf ./coverage"
+    "test": "node Makefile.js test",
+    "lint": "node Makefile.js lint"
   },
   "dependencies": {
     "esutils": "^1.1.6",
