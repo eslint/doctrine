@@ -1,3 +1,9 @@
+v1.1.0 - January 6, 2016
+
+* Build: Switch to Makefile.js (Nicholas C. Zakas)
+* New: support name expression for @this tag (fixes #143) (Tim Schaub)
+* Build: Update ESLint settings (Nicholas C. Zakas)
+
 v1.0.0 - December 21, 2015
 
 * New: parse caption tags in examples into separate property. (fixes #131) (Tom MacWright)
