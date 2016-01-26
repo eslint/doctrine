@@ -58,6 +58,6 @@
   },
   "dependencies": {
     "esutils": "^1.1.6",
-    "isarray": "0.0.1"
+    "isarray": "^1.0.0"
   }
 }
