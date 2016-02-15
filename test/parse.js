@@ -51,6 +51,13 @@ describe('parse', function () {
         res.tags[0].should.have.property('name', 'aliasName.OK');
     });
 
+    it('alias with namepath', function () {
+        var res = doctrine.parse('/** @alias module:mymodule/mymodule.init */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'alias');
+        res.tags[0].should.have.property('name', 'module:mymodule/mymodule.init');
+    });
+
     it('const', function () {
         var res = doctrine.parse('/** @const */', { unwrap: true });
         res.tags.should.have.length(1);
@@ -335,6 +342,13 @@ describe('parse', function () {
             type: 'NameExpression',
             name: 'Object'
         });
+    });
+
+    it('module with path', function () {
+        var res = doctrine.parse('/** @module path/to/thingName.name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'module');
+        res.tags[0].should.have.property('name', 'path/to/thingName.name');
     });
 
     it('name', function () {
@@ -787,6 +801,13 @@ describe('parse', function () {
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'extends');
         res.tags[0].should.have.property('name', 'ClassName.OK');
+    });
+
+    it('extends with namepath', function () {
+        var res = doctrine.parse('/** @extends module:path/ClassName~OK */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'extends');
+        res.tags[0].should.have.property('name', 'module:path/ClassName~OK');
     });
 
     it('prop', function () {
