@@ -1,3 +1,11 @@
+v1.2.0 - February 19, 2016
+
+* 18136c5 Build: Cleanup build system (Nicholas C. Zakas)
+* b082f85 Update: Add support for slash in namepaths (fixes #100) (Ryan Duffy)
+* def53a2 Docs: Fix typo in option lineNumbers (Daniel Tschinder)
+* e2cbbc5 Update: Bump isarray to v1.0.0 (Shinnosuke Watanabe)
+* ae07aa8 Fix: Allow whitespace in optional param with default value (fixes #141) (chris)
+
 v1.1.0 - January 6, 2016
 
 * Build: Switch to Makefile.js (Nicholas C. Zakas)
