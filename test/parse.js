@@ -58,6 +58,13 @@ describe('parse', function () {
         res.tags[0].should.have.property('name', 'module:mymodule/mymodule.init');
     });
 
+    it('alias with namepath with hyphen in it', function () {
+        var res = doctrine.parse('/** @alias module:mymodule/my-module */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'alias');
+        res.tags[0].should.have.property('name', 'module:mymodule/my-module');
+    });
+
     it('const', function () {
         var res = doctrine.parse('/** @const */', { unwrap: true });
         res.tags.should.have.length(1);
@@ -330,6 +337,13 @@ describe('parse', function () {
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'module');
         res.tags[0].should.have.property('name', 'thingName.name');
+    });
+
+    it('module with name that has a hyphen in it', function () {
+        var res = doctrine.parse('/** @module thingName-name */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'module');
+        res.tags[0].should.have.property('name', 'thingName-name');
     });
 
     it('module with type', function () {
