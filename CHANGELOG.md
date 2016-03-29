@@ -1,3 +1,8 @@
+v1.2.1 - March 29, 2016
+
+* 1f54014 Fix: allow hyphens in names (fixes #116) (Kai Cataldo)
+* bbee469 Docs: Add issue template (Nicholas C. Zakas)
+
 v1.2.0 - February 19, 2016
 
 * 18136c5 Build: Cleanup build system (Nicholas C. Zakas)
