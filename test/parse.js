@@ -1987,6 +1987,72 @@ describe('optional params', function() {
         });
     });
 
+    it('default string', function() {
+        doctrine.parse(
+            ["/**", " * @param {String} [val=\"foo\"] some description", " */"].join('\n'),
+            { unwrap: true, sloppy: true}
+        ).should.eql({
+            "description": "",
+            "tags": [{
+                "title": "param",
+                "description": "some description",
+                "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                        "type": "NameExpression",
+                        "name": "String"
+                    }
+                },
+                "name": "val",
+                "default": "\"foo\""
+            }]
+        });
+    });
+
+    it('default string surrounded by whitespace', function() {
+        doctrine.parse(
+            ["/**", " * @param {String} [val=   'foo'  ] some description", " */"].join('\n'),
+            { unwrap: true, sloppy: true}
+        ).should.eql({
+            "description": "",
+            "tags": [{
+                "title": "param",
+                "description": "some description",
+                "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                        "type": "NameExpression",
+                        "name": "String"
+                    }
+                },
+                "name": "val",
+                "default": "'foo'"
+            }]
+        });
+    });
+
+    it('should preserve whitespace in default string', function() {
+        doctrine.parse(
+            ["/**", " * @param {String} [val=   \"   foo\"  ] some description", " */"].join('\n'),
+            { unwrap: true, sloppy: true}
+        ).should.eql({
+            "description": "",
+            "tags": [{
+                "title": "param",
+                "description": "some description",
+                "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                        "type": "NameExpression",
+                        "name": "String"
+                    }
+                },
+                "name": "val",
+                "default": "\"   foo\""
+            }]
+        });
+    });
+
     it('default array', function() {
         doctrine.parse(
             ["/**", " * @param {String} [val=['foo']] some description", " */"].join('\n'),
@@ -2009,6 +2075,27 @@ describe('optional params', function() {
         });
     });
 
+    it('default array', function() {
+        doctrine.parse(
+            ["/**", " * @param {String} [val=['foo']] some description", " */"].join('\n'),
+            { unwrap: true, sloppy: true}
+        ).should.eql({
+            "description": "",
+            "tags": [{
+                "title": "param",
+                "description": "some description",
+                "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                        "type": "NameExpression",
+                        "name": "String"
+                    }
+                },
+                "name": "val",
+                "default": "['foo']"
+            }]
+        });
+    });
 
     it('default array within white spaces', function() {
         doctrine.parse(
