@@ -1,8 +1,6 @@
 /**
  * @fileoverview Build file
  * @author nzakas
- * @copyright jQuery Foundation and other contributors, https://jquery.org/
- * BSD 2-Clause License
  */
 /* global exec, exit, find, target*/
 

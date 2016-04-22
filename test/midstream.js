@@ -1,8 +1,6 @@
 /*
  * @fileoverview Main Doctrine object
  * @author Yusuke Suzuki <utatane.tea@gmail.com>
- * @copyright jQuery Foundation and other contributors, https://jquery.org/
- * BSD 2-Clause License
  */
 
 /*global require describe it*/
