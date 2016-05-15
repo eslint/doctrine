@@ -78,6 +78,18 @@ describe('parse', function () {
         });
     });
 
+    it('Const with type and name', function () {
+        var res = doctrine.parse('/** @Const {String} constname */', { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'Const');
+        res.tags[0].should.have.property('name', 'constname');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'String'
+        });
+    });
+
     it('constant with type and name', function () {
         var res = doctrine.parse('/** @constant {String} constname */', { unwrap: true });
         res.tags.should.have.length(1);
