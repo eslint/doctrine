@@ -1,3 +1,10 @@
+v1.2.2 - May 19, 2016
+
+* ebe0b08 Fix: Support case insensitive tags (fixes #163) (#164) (alberto)
+* 8e6d81e Chore: Remove copyright and license from headers (Nicholas C. Zakas)
+* 79035c6 Chore: Include jQuery Foundation copyright (Nicholas C. Zakas)
+* 06910a7 Fix: Preserve whitespace in default param string values (fixes #157) (Kai Cataldo)
+
 v1.2.1 - March 29, 2016
 
 * 1f54014 Fix: allow hyphens in names (fixes #116) (Kai Cataldo)
