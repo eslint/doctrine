@@ -29,15 +29,12 @@
       "web": "https://github.com/Constellation"
     }
   ],
-  "repository": {
-    "type": "git",
-    "url": "http://github.com/eslint/doctrine.git"
-  },
+  "repository": "eslint/doctrine",
   "devDependencies": {
     "coveralls": "^2.11.2",
     "dateformat": "^1.0.11",
     "eslint": "^1.10.3",
-    "eslint-release": "^0.3.0",
+    "eslint-release": "^0.10.0",
     "istanbul": "^0.4.1",
     "linefix": "^0.1.1",
     "mocha": "^2.3.3",
@@ -57,6 +54,7 @@
     "test": "npm run lint && node Makefile.js test",
     "lint": "eslint lib/",
     "release": "eslint-release",
+    "ci-release": "eslint-ci-release",
     "alpharelease": "eslint-prerelease alpha",
     "betarelease": "eslint-prerelease beta"
   },
