@@ -1227,6 +1227,25 @@ describe('parse', function () {
             ]
         });
     });
+
+    it('string literal property', function () {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @typedef {Object} comment",
+                " * @property {('public'|'protected'|'private')} access",
+                "*/"
+            ].join('\n'), { unwrap: true });
+
+        res.tags.should.have.length(2);
+        res.tags[1].should.have.property('title', 'property');
+        res.tags[1].should.have.property('name', 'access');
+        res.tags[1].type.should.have.property('type', 'UnionType');
+        res.tags[1].type.elements.should.have.length(3);
+        res.tags[1].type.elements.should.containEql({type: 'StringLiteralType', value: 'public'});
+        res.tags[1].type.elements.should.containEql({type: 'StringLiteralType', value: 'private'});
+        res.tags[1].type.elements.should.containEql({type: 'StringLiteralType', value: 'protected'});
+    });
 });
 
 describe('parseType', function () {
@@ -1741,6 +1760,29 @@ describe('parseType', function () {
                 }
             ],
             "type": "UnionType"
+        });
+    });
+
+    it('string literal type', function () {
+        var type;
+        type = doctrine.parseType('"Hello, World"');
+        type.should.eql({
+            type: 'StringLiteralType',
+            value: 'Hello, World'
+        });
+    });
+
+    it('numeric literal type', function () {
+        var type;
+        type = doctrine.parseType('32');
+        type.should.eql({
+            type: 'NumericLiteralType',
+            value: 32
+        });
+        type = doctrine.parseType('-142.42');
+        type.should.eql({
+            type: 'NumericLiteralType',
+            value: -142.42
         });
     });
 
@@ -2405,7 +2447,9 @@ describe('exported Syntax', function() {
             OptionalType: 'OptionalType',
             NullableType: 'NullableType',
             NameExpression: 'NameExpression',
-            TypeApplication: 'TypeApplication'
+            TypeApplication: 'TypeApplication',
+            StringLiteralType: 'StringLiteralType',
+            NumericLiteralType: 'NumericLiteralType'
         });
     });
 });

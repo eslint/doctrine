@@ -76,6 +76,10 @@ describe('stringify', function () {
     testStringify("function(a:number,callback:function(a:Array.<(String|Number|Object)>):boolean):String");
     testStringify("function(a:(string|number),this:string,new:true):function():number");
     testStringify("function(a:(string|number),this:string,new:true):function(a:function(val):result):number");
+
+    // literal types
+    testStringify('"Hello, World!"');
+    testStringify("-142.35");
 });
 
 describe('literals', function() {
@@ -101,6 +105,20 @@ describe('literals', function() {
         doctrine.type.stringify({
             type: doctrine.Syntax.UndefinedLiteral
         }).should.equal('undefined');
+    });
+
+    it('StringLiteralType', function () {
+        doctrine.type.stringify({
+            type: doctrine.Syntax.StringLiteralType,
+            value: 'Hello, World!'
+        }).should.equal('"Hello, World!"');
+    });
+
+    it('NumericLiteralType', function () {
+        doctrine.type.stringify({
+            type: doctrine.Syntax.NumericLiteralType,
+            value: '-142.35'
+        }).should.equal('-142.35');
     });
 });
 
