@@ -1,3 +1,7 @@
+v1.4.0 - September 13, 2016
+
+* d7426e5 Update: add ability to parse optional properties in typedefs (refs #5) (#174) (ikokostya)
+
 v1.3.0 - August 22, 2016
 
 * 12c7ad9 Update: Add support for numeric and string literal types (fixes #156) (#172) (Andrew Walter)
