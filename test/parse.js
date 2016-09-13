@@ -866,6 +866,24 @@ describe('parse', function () {
         res.tags.should.have.length(0);
     });
 
+
+    it('property with optional type', function() {
+        var res = doctrine.parse(
+            ["/**",
+                "* testtypedef",
+                "* @typedef {object} abc",
+                "* @property {String} [val] value description",
+                "*/"].join('\n'), {
+                unwrap: true,
+                sloppy: true
+            });
+
+        res.tags[1].should.have.property('title', 'property');
+        res.tags[1].should.have.property('type');
+        res.tags[1]['type'].should.have.property('type', "OptionalType");
+    });
+
+
     it('property with nested name', function () {
         var res = doctrine.parse(
             [
@@ -2224,6 +2242,228 @@ describe('optional params', function() {
         res.tags[0].should.have.property('lineNumber', 1);
         res.tags[1].should.have.property('lineNumber', 2);
         res.tags[2].should.have.property('lineNumber', 4);
+    });
+});
+
+describe('optional properties', function() {
+
+    // should fail since sloppy option not set
+    it('failure 0', function() {
+        doctrine.parse(
+            [   "/**",
+                " * @property {String} [val] some description",
+                " */"].join('\n'), {
+                unwrap: true
+            }).should.eql({
+                "description": "",
+                "tags": []
+            });
+    });
+
+    it('failure 1', function() {
+        doctrine.parse(
+            ["/**", " * @property [val", " */"].join('\n'), {
+                unwrap: true, sloppy: true
+            }).should.eql({
+                "description": "",
+                "tags": []
+            });
+    });
+
+    it('success 1', function() {
+        doctrine.parse(
+            ["/**", " * @property {String} [val]", " */"].join('\n'), {
+                unwrap: true, sloppy: true
+            }).should.eql({
+                "description": "",
+                "tags": [{
+                    "title": "property",
+                    "description": null,
+                    "type": {
+                        "type": "OptionalType",
+                        "expression": {
+                            "type": "NameExpression",
+                            "name": "String"
+                        }
+                    },
+                    "name": "val"
+                }]
+            });
+    });
+
+    it('success 2', function() {
+        doctrine.parse(
+            ["/**", " * @property {String=} val", " */"].join('\n'), {
+                unwrap: true, sloppy: true
+            }).should.eql({
+                "description": "",
+                "tags": [{
+                    "title": "property",
+                    "description": null,
+                    "type": {
+                        "type": "OptionalType",
+                        "expression": {
+                            "type": "NameExpression",
+                            "name": "String"
+                        }
+                    },
+                    "name": "val"
+                }]
+            });
+    });
+
+    it('success 3', function() {
+        doctrine.parse(
+            ["/**", " * @property {String=} [val=abc] some description", " */"].join('\n'),
+            { unwrap: true, sloppy: true}
+        ).should.eql({
+                "description": "",
+                "tags": [{
+                    "title": "property",
+                    "description": "some description",
+                    "type": {
+                        "type": "OptionalType",
+                        "expression": {
+                            "type": "NameExpression",
+                            "name": "String"
+                        }
+                    },
+                    "name": "val",
+                    "default": "abc"
+                }]
+            });
+    });
+
+    it('success 4', function() {
+        doctrine.parse(
+            ["/**", " * @property {String=} [val = abc] some description", " */"].join('\n'),
+            { unwrap: true, sloppy: true}
+        ).should.eql({
+                "description": "",
+                "tags": [{
+                    "title": "property",
+                    "description": "some description",
+                    "type": {
+                        "type": "OptionalType",
+                        "expression": {
+                            "type": "NameExpression",
+                            "name": "String"
+                        }
+                    },
+                    "name": "val",
+                    "default": "abc"
+                }]
+            });
+    });
+
+    it('default string', function() {
+        doctrine.parse(
+            ["/**", " * @property {String} [val=\"foo\"] some description", " */"].join('\n'),
+            { unwrap: true, sloppy: true}
+        ).should.eql({
+                "description": "",
+                "tags": [{
+                    "title": "property",
+                    "description": "some description",
+                    "type": {
+                        "type": "OptionalType",
+                        "expression": {
+                            "type": "NameExpression",
+                            "name": "String"
+                        }
+                    },
+                    "name": "val",
+                    "default": "\"foo\""
+                }]
+            });
+    });
+
+    it('default string surrounded by whitespace', function() {
+        doctrine.parse(
+            ["/**", " * @property {String} [val=   'foo'  ] some description", " */"].join('\n'),
+            { unwrap: true, sloppy: true}
+        ).should.eql({
+                "description": "",
+                "tags": [{
+                    "title": "property",
+                    "description": "some description",
+                    "type": {
+                        "type": "OptionalType",
+                        "expression": {
+                            "type": "NameExpression",
+                            "name": "String"
+                        }
+                    },
+                    "name": "val",
+                    "default": "'foo'"
+                }]
+            });
+    });
+
+    it('should preserve whitespace in default string', function() {
+        doctrine.parse(
+            ["/**", " * @property {String} [val=   \"   foo\"  ] some description", " */"].join('\n'),
+            { unwrap: true, sloppy: true}
+        ).should.eql({
+                "description": "",
+                "tags": [{
+                    "title": "property",
+                    "description": "some description",
+                    "type": {
+                        "type": "OptionalType",
+                        "expression": {
+                            "type": "NameExpression",
+                            "name": "String"
+                        }
+                    },
+                    "name": "val",
+                    "default": "\"   foo\""
+                }]
+            });
+    });
+
+    it('default array', function() {
+        doctrine.parse(
+            ["/**", " * @property {String} [val=['foo']] some description", " */"].join('\n'),
+            { unwrap: true, sloppy: true}
+        ).should.eql({
+                "description": "",
+                "tags": [{
+                    "title": "property",
+                    "description": "some description",
+                    "type": {
+                        "type": "OptionalType",
+                        "expression": {
+                            "type": "NameExpression",
+                            "name": "String"
+                        }
+                    },
+                    "name": "val",
+                    "default": "['foo']"
+                }]
+            });
+    });
+
+    it('default array within white spaces', function() {
+        doctrine.parse(
+            ["/**", " * @property {String} [val = [ 'foo' ]] some description", " */"].join('\n'),
+            { unwrap: true, sloppy: true}
+        ).should.eql({
+                "description": "",
+                "tags": [{
+                    "title": "property",
+                    "description": "some description",
+                    "type": {
+                        "type": "OptionalType",
+                        "expression": {
+                            "type": "NameExpression",
+                            "name": "String"
+                        }
+                    },
+                    "name": "val",
+                    "default": "['foo']"
+                }]
+            });
     });
 });
 
