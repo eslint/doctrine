@@ -1,3 +1,7 @@
+v1.5.0 - October 13, 2016
+
+* e33c6bb Update: Add support for BooleanLiteralType (#173) (Erik Arvidsson)
+
 v1.4.0 - September 13, 2016
 
 * d7426e5 Update: add ability to parse optional properties in typedefs (refs #5) (#174) (ikokostya)
