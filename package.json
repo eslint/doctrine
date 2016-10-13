@@ -3,7 +3,7 @@
   "description": "JSDoc parser",
   "homepage": "https://github.com/eslint/doctrine",
   "main": "lib/doctrine.js",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "engines": {
     "node": ">=0.10.0"
   },
