@@ -1264,6 +1264,74 @@ describe('parse', function () {
         res.tags[1].type.elements.should.containEql({type: 'StringLiteralType', value: 'private'});
         res.tags[1].type.elements.should.containEql({type: 'StringLiteralType', value: 'protected'});
     });
+
+    it('numeric literal property', function () {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @typedef {Object} comment",
+                " * @property {(-42|1.5|0)} access",
+                "*/"
+            ].join('\n'), { unwrap: true });
+
+        res.tags.should.have.length(2);
+        res.tags[1].should.have.property('title', 'property');
+        res.tags[1].should.have.property('name', 'access');
+        res.tags[1].type.should.have.property('type', 'UnionType');
+        res.tags[1].type.elements.should.have.length(3);
+        res.tags[1].type.elements.should.containEql({type: 'NumericLiteralType', value: -42});
+        res.tags[1].type.elements.should.containEql({type: 'NumericLiteralType', value: 1.5});
+        res.tags[1].type.elements.should.containEql({type: 'NumericLiteralType', value: 0});
+    });
+
+    it('boolean literal property', function () {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @typedef {Object} comment",
+                " * @property {(true|false)} access",
+                "*/"
+            ].join('\n'), { unwrap: true });
+
+        res.tags.should.have.length(2);
+        res.tags[1].should.have.property('title', 'property');
+        res.tags[1].should.have.property('name', 'access');
+        res.tags[1].type.should.have.property('type', 'UnionType');
+        res.tags[1].type.elements.should.have.length(2);
+        res.tags[1].type.elements.should.containEql({type: 'BooleanLiteralType', value: true});
+        res.tags[1].type.elements.should.containEql({type: 'BooleanLiteralType', value: false});
+    });
+
+    it('complex union with literal types', function () {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @typedef {({ok: true, data: string} | {ok: false, error: Error})} Result",
+                "*/"
+            ].join('\n'), { unwrap: true });
+
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'typedef');
+        res.tags[0].should.have.property('name', 'Result');
+        res.tags[0].type.should.have.property('type', 'UnionType');
+        res.tags[0].type.elements.should.have.length(2);
+
+        var e0 = res.tags[0].type.elements[0];
+        e0.should.have.property('type', 'RecordType');
+        e0.fields.should.have.length(2);
+        e0.fields.should.containEql({type: 'FieldType', key: 'ok',
+          value: {type: 'BooleanLiteralType', value: true}});
+        e0.fields.should.containEql({type: 'FieldType', key: 'data',
+          value: {type: 'NameExpression', name: 'string'}});
+
+        var e1 = res.tags[0].type.elements[1];
+        e1.should.have.property('type', 'RecordType');
+        e1.fields.should.have.length(2);
+        e1.fields.should.containEql({type: 'FieldType', key: 'ok',
+          value: {type: 'BooleanLiteralType', value: false}});
+        e1.fields.should.containEql({type: 'FieldType', key: 'error',
+          value: {type: 'NameExpression', name: 'Error'}});
+    });
 });
 
 describe('parseType', function () {
@@ -1801,6 +1869,20 @@ describe('parseType', function () {
         type.should.eql({
             type: 'NumericLiteralType',
             value: -142.42
+        });
+    });
+
+    it('boolean literal type', function () {
+        var type;
+        type = doctrine.parseType('true');
+        type.should.eql({
+            type: 'BooleanLiteralType',
+            value: true
+        });
+        type = doctrine.parseType('false');
+        type.should.eql({
+            type: 'BooleanLiteralType',
+            value: false
         });
     });
 
@@ -2678,6 +2760,7 @@ describe('exported Syntax', function() {
             VoidLiteral: 'VoidLiteral',
             UnionType: 'UnionType',
             ArrayType: 'ArrayType',
+            BooleanLiteralType: 'BooleanLiteralType',
             RecordType: 'RecordType',
             FieldType: 'FieldType',
             FunctionType: 'FunctionType',

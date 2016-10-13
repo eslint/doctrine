@@ -117,8 +117,19 @@ describe('literals', function() {
     it('NumericLiteralType', function () {
         doctrine.type.stringify({
             type: doctrine.Syntax.NumericLiteralType,
-            value: '-142.35'
+            value: -142.35
         }).should.equal('-142.35');
+    });
+
+    it('BooleanLiteralType', function () {
+        doctrine.type.stringify({
+            type: doctrine.Syntax.BooleanLiteralType,
+            value: true
+        }).should.equal('true');
+        doctrine.type.stringify({
+            type: doctrine.Syntax.BooleanLiteralType,
+            value: false
+        }).should.equal('false');
     });
 });
 
