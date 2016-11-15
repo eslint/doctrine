@@ -44,12 +44,7 @@
     "shelljs-nodecli": "^0.1.1",
     "should": "^5.0.1"
   },
-  "licenses": [
-    {
-      "type": "BSD",
-      "url": "http://github.com/eslint/doctrine/raw/master/LICENSE.BSD"
-    }
-  ],
+  "license": "Apache-2.0",
   "scripts": {
     "test": "npm run lint && node Makefile.js test",
     "lint": "eslint lib/",
