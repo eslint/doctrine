@@ -1,3 +1,8 @@
+v2.0.0 - November 15, 2016
+
+* 7d7c5f1 Breaking: Re-license to Apache 2 (fixes #176) (#178) (Nicholas C. Zakas)
+* 5496132 Docs: Update license copyright (Nicholas C. Zakas)
+
 v1.5.0 - October 13, 2016
 
 * e33c6bb Update: Add support for BooleanLiteralType (#173) (Erik Arvidsson)
