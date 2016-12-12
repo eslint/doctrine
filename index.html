@@ -11,23 +11,31 @@
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/styles/default.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
   </head>
   <body>
     <div class="wrapper">
       <header>
         <h1>Doctrine</h1>
-        <p>JSDoc parser</p>
-        <p class="view"><a href="https://github.com/Constellation/doctrine">View the Project on GitHub <small>Constellation/doctrine</small></a></p>
+        <div class='nav'><span>Home</span><a href='./demo'>Demo</a></div>
+        <p class="view"><a href="https://github.com/eslint/doctrine">View the Project on GitHub <small>eslint/doctrine</small></a></p>
+        <p><a href="./demo/index.html">Demo</a></p>
         <ul>
-          <li><a href="https://github.com/Constellation/doctrine/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/Constellation/doctrine/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/Constellation/doctrine">View On <strong>GitHub</strong></a></li>
+          <li><a href="https://github.com/eslint/doctrine/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/eslint/doctrine/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/eslint/doctrine">View On <strong>GitHub</strong></a></li>
         </ul>
       </header>
       <section>
-        <p>doctrine (<a href="http://github.com/Constellation/doctrine">doctrine</a>) is JSDoc parser.</p>
+        <p>doctrine (<a href="http://github.com/eslint/doctrine">doctrine</a>) is a JSDoc parser.</p>
 
-<p>It is now used by content assist system of <a href="http://www.eclipse.org/orion/">Eclipse Orion</a> (<a href="http://planetorion.org/news/2012/10/orion-1-0-release/">detail</a>)</p>
+        <p>It's used by</p>
+        <ul>
+          <li><a href="http://www.eclipse.org/orion/">Eclipse Orion</a>'s content assist system (<a href="http://planetorion.org/news/2012/10/orion-1-0-release/">detail</a>)</li>
+          <li><a href="http://eslint.org/">eslint</a>'s <a href="http://eslint.org/docs/rules/valid-jsdoc">valid-jsdoc rule</a></li>
+        </ul>
 
 <p>Doctrine can be used in a web browser:</p>
 
@@ -39,7 +47,7 @@
 
 <p>simple example:</p>
 
-<pre><code>doctrine.parse(
+<pre><code class='hljs javascript'>doctrine.parse(
     [
         "/**",
         " * This function comment is parsed by doctrine",
@@ -75,7 +83,6 @@
 }
 </code></pre>
 
-<p>see <a href="http://constellation.github.com/doctrine/demo/index.html">demo page</a> more detail.</p>
 
 <h3>License</h3>
 
@@ -106,7 +113,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
 
 <h4>esprima</h4>
 
-<p>some of functions is derived from esprima</p>
+<p>some the functions are derived from esprima</p>
 
 <p>Copyright (C) 2012, 2011 <a href="http://ariya.ofilabs.com/about">Ariya Hidayat</a>
  (twitter: <a href="http://twitter.com/ariyahidayat">@ariyahidayat</a>) and other contributors.</p>
@@ -133,7 +140,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
 
 <h4>closure-compiler</h4>
 
-<p>some of extensions is derived from closure-compiler</p>
+<p>some extensions are derived from closure-compiler</p>
 
 <p>Apache License
 Version 2.0, January 2004

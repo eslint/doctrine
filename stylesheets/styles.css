@@ -1,8 +1,30 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:300italic,700italic,300,700);
 
+.nav span,
+.nav a {
+  width: 135px;
+  background: #eee;
+  border: 1px solid #aaa;
+  display: inline-block;
+  box-sizing: border-box;
+  padding: 5px 10px;
+  margin-bottom:20px;
+  font-weight:bold;
+}
+.nav a {
+  font-weight:normal;
+  background: #fff;
+  border: 0;
+  border-bottom: 1px solid #aaa;
+  display: inline-block;
+  box-sizing: border-box;
+  padding: 5px 10px;
+  margin-bottom:20px;
+}
+
 body {
   padding:50px;
-  font:14px/1.5 Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font:18px/1.5 Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color:#777;
   font-weight:300;
 }
@@ -65,9 +87,9 @@ code, pre {
 
 pre {
   padding:8px 15px;
-  background: #f8f8f8;  
+  background: #F0F0F0;  
   border-radius:5px;
-  border:1px solid #e5e5e5;
+  border:1px solid #666;
   overflow-x: auto;
 }
 

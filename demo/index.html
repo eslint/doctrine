@@ -11,54 +11,75 @@
     <script type="text/javascript" charset="utf-8" src="../javascripts/jquery.min.js"></script>
     <script type="text/javascript" charset="utf-8" src="../javascripts/json2.js"></script>
     <script type="text/javascript" charset="utf-8" src="../javascripts/doctrine.js"></script>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/styles/default.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
     <script type="text/javascript" charset="utf-8">
     $(function() {
+      var lineNumbers = false;
+      var sloppy = false;
+      var recoverable = false;
+      $('input#lineNumbers').change(function (ev) {
+        lineNumbers = !!$(this).attr('checked');
+        updateDocumentation();
+      });
+      $('input#sloppy').change(function (ev) {
+        sloppy = !!$(this).attr('checked');
+        updateDocumentation();
+      });
+      $('input#recoverable').change(function (ev) {
+        recoverable = !!$(this).attr('checked');
+        updateDocumentation();
+      });
       var code = [
         '@constructor',
         '@param {(jQuerySelector|Element|Object|Array.<Element>|jQuery|string|function())=} arg1',
         '@param {(Element|Object|Document|Object.<string, (string|function(!jQuery.event=))>)=} arg2',
         '@return {!jQuery}',
       ].join('\n');
-      $('#code').val(code).on('keyup paste change', function (ev) {
-        var comment = '/**\n' + $(this).val() + '\n*/';
+      $('#code').val(code).on('keyup paste change', updateDocumentation).change();
+      function updateDocumentation(ev) {
+        var comment = '/**\n' + $('#code').val() + '\n*/';
         try {
-          var result = doctrine.parse(comment, { unwrap : true });
+          var result = doctrine.parse(comment, { unwrap : true, sloppy: sloppy, lineNumbers: lineNumbers, recoverable: recoverable });
           $('#result').text(JSON.stringify(result, null, 4));
+          hljs.highlightBlock($('#result')[0]);
         } catch (e) {
           $('#result').text(e.toString());
         }
-      }).change();
+      }
     });
     </script>
+    <style>
+    #code {
+        font-family:Monaco, Bitstream Vera Sans Mono, Lucida Console, Terminal;
+        font-size:13px;
+        width:100%;
+        height:100px;
+        box-sizing: border-box;
+        padding: 5px;
+    }
+    </style>
     <title>Doctrine</title>
   </head>
 
   <body>
     <div class="wrapper">
-      <header>
-        <h1>Doctrine</h1>
-        <p>JSDoc parser</p>
-        <p class="view"><a href="https://github.com/Constellation/doctrine">View the Project on GitHub <small>Constellation/doctrine</small></a></p>
-        <ul>
-          <li><a href="https://github.com/Constellation/doctrine/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/Constellation/doctrine/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/Constellation/doctrine">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h2>Doctrine Demo</h2>
-        <p>doctrine (<a href="http://github.com/Constellation/doctrine">doctrine</a>) is JSDoc parser.</p>
+        <h2>Doctrine</h2>
+        <div class='nav'><a href='../'>Home</a><span>Demo</span></div>
+        
         <p>see <a href="https://developers.google.com/closure/compiler/docs/js-for-compiler">samples in Google Closure Compiler</a></p>
 
-        <strong>/**<strong>
-        <textarea id='code' style="width:100%;height:100px;"></textarea>
-        <strong>*/<strong>
-        <pre id='result' style="font-size:50%"><code></code></pre>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/Constellation">Constellation</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
+        <textarea id='code'></textarea>
+        <div>
+          <input type='checkbox' id='sloppy' /> <label for='sloppy'>sloppy</label>
+        </div>
+        <div>
+          <input type='checkbox' id='lineNumbers' /> <label for='lineNumbers'>lineNumbers</label>
+        </div>
+        <div>
+          <input type='checkbox' id='recoverable' /> <label for='recoverable'>recoverable</label>
+        </div>
+        <pre id='result'><code></code></pre>
     </div>
     <script src="../javascripts/scale.fix.js"></script>
   </body>
