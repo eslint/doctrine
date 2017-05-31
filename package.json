@@ -54,7 +54,6 @@
     "betarelease": "eslint-prerelease beta"
   },
   "dependencies": {
-    "esutils": "^2.0.2",
-    "isarray": "^1.0.0"
+    "esutils": "^2.0.2"
   }
 }
