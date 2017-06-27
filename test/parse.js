@@ -2271,6 +2271,28 @@ describe('optional params', function() {
         });
     });
 
+    it('default arrow functions', function() {
+        doctrine.parse(
+            ["/**", " * @param {Function} [fn=()=>{}] some description", " */"].join('\n'),
+            {unwrap: true, sloppy: true}
+        ).should.eql({
+            description: "",
+            tags: [{
+                "title": "param",
+                "description": "some description",
+                "type": {
+                    "type": "OptionalType",
+                    "expression": {
+                        "type": "NameExpression",
+                        "name": "Function"
+                    }
+                },
+                "name": "fn",
+                "default": "()=>{}"
+            }]
+        });
+    });
+
     it('line numbers', function() {
         var res = doctrine.parse(
             [
