@@ -498,6 +498,41 @@ describe('parse', function () {
         });
     });
 
+    it('param with array indexes', function () {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @param {String} user.0",
+                "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'param');
+        res.tags[0].should.have.property('name', 'user.0');
+        res.tags[0].should.have.property('type');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'String'
+        });
+    });
+
+    it('param with array indexes and descriptions', function () {
+        var res = doctrine.parse(
+            [
+                "/**",
+                " * @param {String} user.0 The first element",
+                "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'param');
+        res.tags[0].should.have.property('name', 'user.0');
+        res.tags[0].should.have.property('type');
+        res.tags[0].should.have.property('description', 'The first element');
+        res.tags[0].type.should.eql({
+            type: 'NameExpression',
+            name: 'String'
+        });
+    });
+
     it('arg with properties', function () {
         var res = doctrine.parse(
             [
