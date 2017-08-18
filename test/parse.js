@@ -1207,7 +1207,23 @@ describe('parse', function () {
             ].join('\n'), { unwrap: true });
         res.tags.should.have.length(1);
         res.tags[0].should.have.property('title', 'this');
+        res.tags[0].type.should.have.property('type', 'NameExpression');
         res.tags[0].should.have.property('name', 'thingName.name');
+    });
+
+    it('this with UnionType expression', function () {
+        var res = doctrine.parse(
+            [
+              "/**",
+              " * @this {thingName.name|FooBar}",
+              "*/"
+            ].join('\n'), { unwrap: true });
+        res.tags.should.have.length(1);
+        res.tags[0].should.have.property('title', 'this');
+        res.tags[0].type.should.have.property('type', 'UnionType');
+        res.tags[0].type.elements.should.have.length(2);
+        res.tags[0].type.elements.should.containEql({type: 'NameExpression', name: 'thingName.name'});
+        res.tags[0].type.elements.should.containEql({type: 'NameExpression', name: 'FooBar'});
     });
 
     it('this error with type application', function () {
