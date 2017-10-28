@@ -237,7 +237,7 @@ describe('Expression', function () {
                 type: doctrine.Syntax.NameExpression,
                 name: 'Number'
             }]
-        }).should.equal('(String|Number)');
+        }, {compact: false }).should.equal('(String | Number)');
 
         doctrine.type.stringify({
             type: doctrine.Syntax.UnionType,
@@ -248,7 +248,7 @@ describe('Expression', function () {
                 type: doctrine.Syntax.NameExpression,
                 name: 'Number'
             }]
-        }, { topLevel: true }).should.equal('String|Number');
+        }, { topLevel: true, compact: true }).should.equal('String|Number');
     });
 
     it('RestType', function () {
@@ -382,7 +382,7 @@ describe('Complex identity', function () {
             doctrine.type.parseType(data07)
         ).should.equal(data07);
 
-        var data08 = 'function (new: Date, a: Array.<String, Number>, b: (Number|String|Date)): HashMap.<String, Number>';
+        var data08 = 'function (new: Date, a: Array.<String, Number>, b: (Number | String | Date)): HashMap.<String, Number>';
         doctrine.type.stringify(
             doctrine.type.parseType(data08)
         ).should.equal(data08);
