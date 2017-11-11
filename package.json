@@ -11,11 +11,7 @@
     "lib": "./lib"
   },
   "files": [
-    "lib",
-    "LICENSE.BSD",
-    "LICENSE.closure-compiler",
-    "LICENSE.esprima",
-    "README.md"
+    "lib"
   ],
   "maintainers": [
     {
