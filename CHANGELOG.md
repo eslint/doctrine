@@ -1,3 +1,7 @@
+v2.0.2 - November 25, 2017
+
+* 5049ee3 Fix: Remove redundant LICENSE/README names from files (#203) (Kevin Partington)
+
 v2.0.1 - November 10, 2017
 
 * 009f33d Fix: Making sure union type stringification respects compact flag (#199) (Mitermayer Reis)
