@@ -1,3 +1,7 @@
+v2.1.0 - January 6, 2018
+
+* 827f314 Update: support node ranges (fixes #89) (#190) (Teddy Katz)
+
 v2.0.2 - November 25, 2017
 
 * 5049ee3 Fix: Remove redundant LICENSE/README names from files (#203) (Kevin Partington)
