@@ -27,7 +27,7 @@
   ],
   "repository": "eslint/doctrine",
   "devDependencies": {
-    "coveralls": "^2.11.2",
+    "coveralls": "^3.0.1",
     "dateformat": "^1.0.11",
     "eslint": "^1.10.3",
     "eslint-release": "^0.11.1",
