@@ -1,9 +1,10 @@
 language: node_js
 node_js:
-    - "0.10"
-    - "0.12"
-    - iojs
-    - "4"
+    - "6"
+    - "8"
+    - "9"
+    - "10"
+    - "11"
 sudo: false
 script: "npm test"
 after_success:
