@@ -8,6 +8,10 @@
 
 Doctrine is a [JSDoc](http://usejsdoc.org) parser that parses documentation comments from JavaScript (you need to pass in the comment, not a whole JavaScript file).
 
+## Deprecation notice
+
+__This project is no longer maintained.__ See the [ESLint website](https://eslint.org/blog/2018/11/jsdoc-end-of-life) for more details.
+
 ## Installation
 
 You can install Doctrine using [npm](https://npmjs.com):
